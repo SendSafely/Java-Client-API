@@ -2,7 +2,7 @@ package com.sendsafely.handlers;
 
 import java.io.IOException;
 
-import com.sendsafely.dto.PackageInformation;
+import com.sendsafely.Package;
 import com.sendsafely.dto.request.CreatePackageRequest;
 import com.sendsafely.dto.response.CreatePackageResponse;
 import com.sendsafely.enums.APIResponse;
@@ -20,12 +20,17 @@ public class CreatePackageHandler extends BaseHandler
 {	
 	
 	private CreatePackageRequest request = new CreatePackageRequest();
+	private boolean isVDR = false;
 	
 	public CreatePackageHandler(UploadManager uploadManager) {
 		super(uploadManager);
 	}
 
-	public PackageInformation makeRequest() throws CreatePackageFailedException, LimitExceededException {
+	public void setVDR(boolean isVDR) {
+		this.isVDR = isVDR;
+	}
+	
+	public Package makeRequest() throws CreatePackageFailedException, LimitExceededException {
 		CreatePackageResponse response = send();
 		
 		if(response.getResponse() == APIResponse.SUCCESS) 
@@ -44,6 +49,7 @@ public class CreatePackageHandler extends BaseHandler
 	
 	protected CreatePackageResponse send() throws CreatePackageFailedException
 	{
+		this.request.setIsVDR(this.isVDR);
 		try {
 			return send(request, new CreatePackageResponse());
 		} catch (SendFailedException e) {
@@ -53,12 +59,11 @@ public class CreatePackageHandler extends BaseHandler
 		}
 	}
 	
-	protected PackageInformation convert(CreatePackageResponse obj) throws CreatePackageFailedException
+	protected Package convert(CreatePackageResponse obj) throws CreatePackageFailedException
 	{
-		
 		try
 		{
-			PackageInformation info = getPackageInformation(obj.getPackageId());
+			Package info = getPackageInformation(obj.getPackageId());
 			info.setKeyCode(CryptoUtil.GenerateKeyCode());
 			return info;
 		}
@@ -68,9 +73,9 @@ public class CreatePackageHandler extends BaseHandler
 		}
 	}
 	
-	protected PackageInformation getPackageInformation(String packageId) throws CreatePackageFailedException
+	protected Package getPackageInformation(String packageId) throws CreatePackageFailedException
 	{
-		PackageInformation info;
+		Package info;
 		try {
 			info = ((PackageInformationHandler)(HandlerFactory.getInstance(uploadManager, Endpoint.PACKAGE_INFORMATION))).makeRequest(packageId);
 		} catch (PackageInformationFailedException e) {

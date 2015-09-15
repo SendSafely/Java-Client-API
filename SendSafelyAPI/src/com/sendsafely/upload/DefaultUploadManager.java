@@ -1,9 +1,11 @@
 package com.sendsafely.upload;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -26,6 +28,7 @@ public class DefaultUploadManager implements UploadManager {
 	
 	private CredentialsManager credentialsManager;
 	private ConnectionManager conn;
+	private InputStream content;
 	
 	public DefaultUploadManager(ConnectionManager connManager, CredentialsManager credentialsManager)
 	{
@@ -34,7 +37,7 @@ public class DefaultUploadManager implements UploadManager {
 	}
 
 	@Override
-	public String send(String path, HTTPMethod method, String data) throws SendFailedException, IOException 
+	public void send(String path, HTTPMethod method, String data) throws SendFailedException, IOException 
 	{
 		URL url = createUrl(path);
 		conn.open(url);
@@ -48,9 +51,7 @@ public class DefaultUploadManager implements UploadManager {
 			conn.send(data);
 		}
 		
-		String responseVal = conn.getResponse();
-		
-		return responseVal;
+		this.content = conn.getResponse();
 	}
 	
 	@Override
@@ -80,8 +81,34 @@ public class DefaultUploadManager implements UploadManager {
 		writer.append("--" + boundary + "--").append(CRLF);
 		writer.flush();
 	
-		String responseVal = conn.getResponse();		
+		this.content = conn.getResponse();
+		String responseVal = getResponse();		
 		return responseVal;
+	}
+	
+	@Override
+	public String getResponse() throws IOException
+	{
+		// Wait for response
+		BufferedReader in = new BufferedReader(new InputStreamReader(this.content));
+		String responseVal = "";
+		String line = null;
+		while((line = in.readLine()) != null) 
+		{
+			responseVal += line;
+		}
+		
+		return responseVal;
+	}
+	
+	@Override
+	public String getContentType() {
+		return conn.getHeader("Content-Type");
+	}
+
+	@Override
+	public InputStream getStream() {
+		return this.content;
 	}
 	
 	private URL createUrl(String path) throws SendFailedException

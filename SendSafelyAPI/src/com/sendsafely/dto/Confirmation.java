@@ -2,6 +2,8 @@ package com.sendsafely.dto;
 
 import java.util.Date;
 
+import com.sendsafely.File;
+
 /**
  * @description A Java Bean containing information about a Confirmation. A confirmation contains information about when a file was downloaded by a recipient. Only the Getters should be used from this object, since the server will populate the object. Updating the setters will not change any state on the server and should be avoided.
  * @author Erik Larsson

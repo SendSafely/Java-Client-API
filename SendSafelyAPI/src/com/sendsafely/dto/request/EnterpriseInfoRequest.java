@@ -6,11 +6,11 @@ import com.sendsafely.enums.HTTPMethod;
 public class EnterpriseInfoRequest extends BaseRequest 
 {	
 	
-	private static HTTPMethod method = HTTPMethod.GET;
-	private static String path = "/enterprise/";
+	private HTTPMethod method = HTTPMethod.GET;
+	private String path = "/enterprise/";
 	
 	public EnterpriseInfoRequest() {
-		super(method, path);
+		initialize(method, path);
 	}
 	
 	public void setVersion(double version)

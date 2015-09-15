@@ -6,11 +6,11 @@ import com.sendsafely.enums.HTTPMethod;
 public class DeletePackageRequest extends BaseRequest 
 {	
 	
-	private static HTTPMethod method = HTTPMethod.DELETE;
-	private static String path = "/package/" + GetParam.PACKAGE_ID + "/";
+	private HTTPMethod method = HTTPMethod.DELETE;
+	private String path = "/package/" + GetParam.PACKAGE_ID + "/";
 	
 	public DeletePackageRequest() {
-		super(method, path);
+		initialize(method, path);
 	}
 	
 	public void setPackageId(String packageId)

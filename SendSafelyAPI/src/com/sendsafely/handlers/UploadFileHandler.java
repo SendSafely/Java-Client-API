@@ -6,8 +6,7 @@ import java.util.Timer;
 
 import com.sendsafely.ProgressInterface;
 import com.sendsafely.dto.request.UploadFileRequest;
-import com.sendsafely.enums.GetParam;
-import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.dto.response.FileResponse;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.exceptions.UploadFileException;
@@ -24,12 +23,12 @@ public class UploadFileHandler extends BaseHandler
 		super(uploadManager);
 	}
 
-	public void makeRequest(String packageId, String fileId, String encryptionKey, File file, ProgressInterface progressCallback) throws SendFailedException, IOException, LimitExceededException, UploadFileException 
+	public com.sendsafely.File makeRequest(String packageId, String fileId, String encryptionKey, File file, ProgressInterface progressCallback) throws SendFailedException, IOException, LimitExceededException, UploadFileException 
 	{	
-		upload(file, encryptionKey, packageId, fileId, progressCallback);
+		return upload(file, encryptionKey, packageId, fileId, progressCallback);
 	}
 	
-	protected void upload(File file, String passPhrase, String packageId, String fileId, ProgressInterface progressCallback) throws UploadFileException, LimitExceededException
+	protected com.sendsafely.File upload(File file, String passPhrase, String packageId, String fileId, ProgressInterface progressCallback) throws UploadFileException, LimitExceededException
 	{
 		request.setFileId(fileId);
 		request.setPackageId(packageId);
@@ -72,6 +71,17 @@ public class UploadFileHandler extends BaseHandler
 			stopTimer(timer);
 		}
 		
+		return convert(uploadUtility.getFileObject());
+	}
+	
+	protected com.sendsafely.File convert(FileResponse response)
+	{
+		com.sendsafely.File file = new com.sendsafely.File();		
+		//file.setCreatedBy(response.getCreatedByEmail());
+		file.setFileId(response.getFileId());
+		file.setFileName(response.getFileName());
+		file.setFileSize(Long.parseLong(response.getFileSize()));
+		return file;
 	}
 	
 	protected long uploadSegment(FileUploadUtility uploadUtility, String fileId, String passPhrase, File file, long totalBytesRead, Progress progress) throws UploadFileException, SendFailedException, LimitExceededException

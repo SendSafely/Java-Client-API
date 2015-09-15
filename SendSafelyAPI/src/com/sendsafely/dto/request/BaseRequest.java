@@ -13,9 +13,13 @@ public class BaseRequest
 	private String path;
 	private Map<String, Object> postParams;
 	
-	public BaseRequest(HTTPMethod method, String path) 
+	public BaseRequest()
 	{
 		this.postParams = new HashMap<String, Object>();
+	}
+	
+	protected void initialize(HTTPMethod method, String path)
+	{
 		this.method = method;
 		this.path = path;
 	}

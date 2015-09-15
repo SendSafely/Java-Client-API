@@ -5,11 +5,17 @@ import com.sendsafely.enums.HTTPMethod;
 
 public class AddMessageRequest extends BaseRequest {
 
-	private static HTTPMethod method = HTTPMethod.PUT;
-	private static String path = "/package/" + GetParam.PACKAGE_ID + "/message/";
+	protected HTTPMethod method = HTTPMethod.PUT;
+	protected String path = "/package/" + GetParam.PACKAGE_ID + "/message/";
 	
 	public AddMessageRequest() {
-		super(method, path);
+		initialize(method, path);
+	}
+	
+	public AddMessageRequest(HTTPMethod method, String path) {
+		this.method = method;
+		this.path = path;
+		initialize(method, path);
 	}
 	
 	public void setUploadType(String uploadType) 
@@ -21,6 +27,12 @@ public class AddMessageRequest extends BaseRequest {
 	}
 	public void setMessage(String message) {
 		super.setPostParam("message", message);
+	}
+	
+	@Override
+	public String getPath()
+	{
+		return super.getPath();
 	}
 	
 }

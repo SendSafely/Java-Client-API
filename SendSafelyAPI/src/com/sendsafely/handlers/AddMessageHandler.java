@@ -1,28 +1,25 @@
 package com.sendsafely.handlers;
 
 import java.io.IOException;
-import java.util.Timer;
 
-import com.sendsafely.dto.PackageInformation;
+import com.sendsafely.Package;
 import com.sendsafely.dto.request.AddMessageRequest;
 import com.sendsafely.enums.Endpoint;
-import com.sendsafely.enums.GetParam;
-import com.sendsafely.enums.HTTPMethod;
 import com.sendsafely.exceptions.MessageException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
 import com.sendsafely.exceptions.SendFailedException;
-import com.sendsafely.exceptions.UploadFileException;
 import com.sendsafely.upload.UploadManager;
 import com.sendsafely.utils.MessageUtility;
-import com.sendsafely.utils.Progress;
-import com.sendsafely.utils.SendSafelyConfig;
 
 public class AddMessageHandler extends BaseHandler 
 {	
-	private AddMessageRequest request = new AddMessageRequest();
+	//private AddMessageRequest request = new AddMessageRequest();
+	private AddMessageRequest request;
 	
-	public AddMessageHandler(UploadManager uploadManager) {
+	public AddMessageHandler(UploadManager uploadManager, AddMessageRequest request) {
 		super(uploadManager);
+		
+		this.request = request;
 	}
 
 	public void makeRequest(String packageId, String keyCode, String message) throws MessageException 
@@ -30,7 +27,7 @@ public class AddMessageHandler extends BaseHandler
 		request.setPackageId(packageId);
 		
 		try {
-			PackageInformation packageInfo = getPackageInfo(packageId);
+			Package packageInfo = getPackageInfo(packageId);
 			String encryptionKey = createEncryptionKey(packageInfo.getServerSecret(), keyCode);
 			
 			MessageUtility utility = new MessageUtility(super.uploadManager);
@@ -42,9 +39,9 @@ public class AddMessageHandler extends BaseHandler
 		}
 	}
 	
-	protected PackageInformation getPackageInfo(String packageId) throws SendFailedException, IOException, MessageException
+	protected Package getPackageInfo(String packageId) throws SendFailedException, IOException, MessageException
 	{
-		PackageInformation info;
+		Package info;
 		try {
 			info = ((PackageInformationHandler)(HandlerFactory
 					.getInstance(uploadManager, Endpoint.PACKAGE_INFORMATION))).makeRequest(packageId);

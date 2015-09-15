@@ -48,6 +48,7 @@ public class EnterpriseInfoHandler extends BaseHandler
 		EnterpriseInfo info = new EnterpriseInfo();
 		info.setHost(obj.getHost());
 		info.setSystemName(obj.getSystemName());
+		info.setAllowUndisclosedRecipients(obj.getAllowUndisclosedRecipients());
 		return info;
 	}
 	

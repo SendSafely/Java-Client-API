@@ -6,19 +6,19 @@ import com.sendsafely.enums.PackageState;
 
 public class GetPackagesResponse extends BaseResponse {
 	
-	List<String> packages;
+	List<PackageListResponse> packages;
 
 	/**
 	 * @return the packages
 	 */
-	public List<String> getPackages() {
+	public List<PackageListResponse> getPackages() {
 		return packages;
 	}
 
 	/**
 	 * @param packages the packageList to set
 	 */
-	public void setPackages(List<String> packages) {
+	public void setPackages(List<PackageListResponse> packages) {
 		this.packages = packages;
 	}
 	

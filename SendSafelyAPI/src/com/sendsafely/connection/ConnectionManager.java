@@ -1,6 +1,7 @@
 package com.sendsafely.connection;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 
@@ -51,6 +52,10 @@ public interface ConnectionManager {
 	/**
 	 * @description Get the server response. Will be called after first calling send or getOutputStream
 	 */
-	public String getResponse() throws IOException;
+	public InputStream getResponse() throws IOException;
 	
+	/**
+	 * @description Get a header from the response.
+	 */
+	public String getHeader(String header);
 }

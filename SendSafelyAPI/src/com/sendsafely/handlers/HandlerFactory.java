@@ -42,7 +42,6 @@ public class HandlerFactory
 		endpoints.put(Endpoint.USER_INFORMATION, new UserInformationHandler(uploadManager));
 		endpoints.put(Endpoint.ENTERPRISE_INFO, new EnterpriseInfoHandler(uploadManager));
 		endpoints.put(Endpoint.CREATE_PACKAGE, new CreatePackageHandler(uploadManager));
-		endpoints.put(Endpoint.ADD_RECIPIENT, new AddRecipientHandler(uploadManager));
 		endpoints.put(Endpoint.UPDATE_RECIPIENT, new UpdateRecipientHandler(uploadManager));
 		endpoints.put(Endpoint.DELETE_PACKAGE, new DeletePackageHandler(uploadManager));
 		endpoints.put(Endpoint.PACKAGE_INFORMATION, new PackageInformationHandler(uploadManager));
@@ -52,7 +51,6 @@ public class HandlerFactory
 		endpoints.put(Endpoint.FINALIZE_PACKAGE, new FinalizePackageHandler(uploadManager));
 		endpoints.put(Endpoint.ADD_FILE, new AddFileHandler(uploadManager));
 		endpoints.put(Endpoint.UPLOAD_FILE, new UploadFileHandler(uploadManager));
-		endpoints.put(Endpoint.ADD_MESSAGE, new AddMessageHandler(uploadManager));
 	}
 	
 	public static BaseHandler getInstance(UploadManager uploadManager, Endpoint p)

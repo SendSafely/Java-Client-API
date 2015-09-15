@@ -6,16 +6,16 @@ import com.sendsafely.enums.HTTPMethod;
 public class AddRecipientRequest extends BaseRequest 
 {	
 	
-	private static HTTPMethod method = HTTPMethod.PUT;
-	private static String path = "/package/" + GetParam.PACKAGE_ID + "/recipient/";
+	private HTTPMethod method = HTTPMethod.PUT;
+	private String path = "/package/" + GetParam.PACKAGE_ID + "/recipient/";
 	
-	public AddRecipientRequest() {
-		super(method, path);
+	public AddRecipientRequest(String email) {
+		initialize(method, path);
+	
+		super.setPostParam("email", email);
 	}
 	
-	public void setEmail(String email)
-	{
-		super.setPostParam("email", email);
+	public AddRecipientRequest() {
 	}
 	
 	public void setPackageId(String packageId)

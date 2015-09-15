@@ -4,6 +4,8 @@ public class EnterpriseInfo {
 
 	private String host;
 	private String systemName;
+	private Boolean outlookBeta;
+	private Boolean allowUndisclosedRecipients;
 	
 	/**
 	 * @description Returns the host name for the organization.
@@ -35,6 +37,22 @@ public class EnterpriseInfo {
 	 */
 	public void setSystemName(String systemName) {
 		this.systemName = systemName;
+	}
+	
+	/** 
+	 * @description Returns true or false depending on if the Organization allows finalizing packages without recipients.
+	 * @return True or false depending on the organization settings.
+	 */
+	public Boolean getAllowUndisclosedRecipients() {
+		return allowUndisclosedRecipients;
+	}
+	
+	/**
+	 * @description Set internally by the API.
+	 * @param allowUndisclosedRecipients
+	 */
+	public void setAllowUndisclosedRecipients(Boolean allowUndisclosedRecipients) {
+		this.allowUndisclosedRecipients = allowUndisclosedRecipients;
 	}
 	
 }

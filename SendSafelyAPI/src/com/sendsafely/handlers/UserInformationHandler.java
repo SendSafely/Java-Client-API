@@ -22,8 +22,6 @@ public class UserInformationHandler extends BaseHandler
 	public UserInformation makeRequest() throws UserInformationFailedException {
 		UserInformationResponse response = send();
 		
-		System.out.println("API: " + response.getResponse());
-		
 		if(response.getResponse() != APIResponse.SUCCESS) {
 			throw new UserInformationFailedException();
 		}

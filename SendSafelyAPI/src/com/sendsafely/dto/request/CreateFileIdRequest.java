@@ -5,11 +5,11 @@ import com.sendsafely.enums.HTTPMethod;
 
 public class CreateFileIdRequest extends BaseRequest {
 
-	private static HTTPMethod method = HTTPMethod.PUT;
-	private static String path = "/package/" + GetParam.PACKAGE_ID + "/file/";
+	private HTTPMethod method = HTTPMethod.PUT;
+	private String path = "/package/" + GetParam.PACKAGE_ID + "/file/";
 	
 	public CreateFileIdRequest() {
-		super(method, path);
+		initialize(method, path);
 	
 		super.setPostParam("uploadType", "JAVA_API");
 	}

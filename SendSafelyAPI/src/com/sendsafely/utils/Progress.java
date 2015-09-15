@@ -3,6 +3,7 @@ package com.sendsafely.utils;
 import java.util.TimerTask;
 
 import com.sendsafely.ProgressInterface;
+import com.sendsafely.progress.DefaultProgress;
 
 public class Progress extends TimerTask {
 

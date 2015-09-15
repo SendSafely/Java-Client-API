@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sendsafely.File;
+import com.sendsafely.Package;
+import com.sendsafely.Recipient;
 import com.sendsafely.dto.Confirmation;
-import com.sendsafely.dto.File;
-import com.sendsafely.dto.PackageInformation;
-import com.sendsafely.dto.Recipient;
 import com.sendsafely.dto.request.UpdatePackageLifeRequest;
 import com.sendsafely.dto.response.BaseResponse;
 import com.sendsafely.dto.response.ConfirmationResponse;
@@ -50,9 +50,9 @@ public class UpdatePackageLifeHandler extends BaseHandler
 		}
 	}
 	
-	protected PackageInformation convert(PackageInformationResponse obj)
+	protected Package convert(PackageInformationResponse obj)
 	{
-		PackageInformation info = new PackageInformation();
+		Package info = new Package();
 		info.setApproverList(obj.getApproverList());
 		info.setFiles(convertFiles(obj.getFiles()));
 		info.setLife(obj.getLife());

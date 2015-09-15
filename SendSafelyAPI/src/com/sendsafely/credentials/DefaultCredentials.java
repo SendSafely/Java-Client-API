@@ -12,7 +12,7 @@ import com.sendsafely.utils.CryptoUtil;
 
 public class DefaultCredentials implements CredentialsManager 
 {
-	private final String apiPath = "/api/v1.1";
+	private final String apiPath = "/api/v2.0";
 	
 	private final String API_KEY_HEADER = "ss-api-key";
 	private final String TIMESTAMP_HEADER = "ss-request-timestamp";

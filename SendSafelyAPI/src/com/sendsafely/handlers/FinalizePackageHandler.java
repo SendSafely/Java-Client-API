@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import com.sendsafely.dto.PackageInformation;
+import com.sendsafely.Package;
 import com.sendsafely.dto.PackageURL;
 import com.sendsafely.dto.request.FinalizePackageRequest;
 import com.sendsafely.dto.response.CreatePackageResponse;
@@ -33,14 +33,14 @@ public class FinalizePackageHandler extends BaseHandler
 	public PackageURL makeRequest(String packageId, String keyCode) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException {
 		request.setPackageId(packageId);
 		
-		PackageInformation info;
+		Package info;
 		try {
 			info = ((PackageInformationHandler)(HandlerFactory.getInstance(uploadManager, Endpoint.PACKAGE_INFORMATION))).makeRequest(packageId);
 		} catch (PackageInformationFailedException e) {
 			throw new FinalizePackageFailedException(e);
 		}
 		
-		request.setChecksum(createChecksum(keyCode, info.getPackageCode()));
+		request.setChecksum(CryptoUtil.createChecksum(keyCode, info.getPackageCode()));
 		FinalizePackageResponse response = send();
 		
 		if(response.getResponse() == APIResponse.SUCCESS || response.getResponse() == APIResponse.PACKAGE_NEEDS_APPROVAL) 
@@ -59,6 +59,23 @@ public class FinalizePackageHandler extends BaseHandler
 		{
 			throw new FinalizePackageFailedException(response.getMessage(), response.getErrors());
 		}
+	}
+	
+	public PackageURL makeRequest(String packageId, String keyCode, boolean undisclosedRecipients, String password) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException {
+		
+		if(password != null) {
+			request.setPassword(password);
+		}
+		request.setUndisclosedRecipients(undisclosedRecipients);
+		
+		return makeRequest(packageId, keyCode);
+	}
+	
+	public PackageURL makeRequest(String packageId, String keyCode, boolean undisclosedRecipients) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException {
+		
+		request.setUndisclosedRecipients(undisclosedRecipients);
+		
+		return makeRequest(packageId, keyCode);
 	}
 	
 	protected PackageURL convert(FinalizePackageResponse response, String keyCode) throws FinalizePackageFailedException
@@ -85,14 +102,9 @@ public class FinalizePackageHandler extends BaseHandler
 		}
 	}
 	
-	protected String createChecksum(String keyCode, String packageCode)
+	protected Package convert(CreatePackageResponse obj)
 	{
-		return CryptoUtil.PBKDF2(keyCode, packageCode, 1024);
-	}
-	
-	protected PackageInformation convert(CreatePackageResponse obj)
-	{
-		PackageInformation info = new PackageInformation();
+		Package info = new Package();
 		info.setPackageCode(obj.getPackageCode());
 		info.setPackageId(obj.getPackageId());
 		info.setServerSecret(obj.getServerSecret());

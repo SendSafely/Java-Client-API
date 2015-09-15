@@ -1,23 +1,23 @@
 package com.sendsafely.exceptions;
 
-public class AddRecipientFailedException extends Exception
+public class DownloadFileException extends Exception
 {
 	private static final long serialVersionUID = 1L;
 	
 	String error;
 	
-	public AddRecipientFailedException()
+	public DownloadFileException()
 	{
 		super();
 		error = "unknown";
 	}
 	
-	public AddRecipientFailedException(String err){
+	public DownloadFileException(String err){
 		super(err);
 		error = err;
 	}
 	
-	public AddRecipientFailedException(Exception e){
+	public DownloadFileException(Exception e){
 		super(e);
 		error = e.getMessage();
 	}

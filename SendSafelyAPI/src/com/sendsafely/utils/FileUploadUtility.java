@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import org.bouncycastle.openpgp.PGPException;
 
 import com.sendsafely.dto.request.UploadFileRequest;
+import com.sendsafely.dto.response.FileResponse;
 import com.sendsafely.dto.response.UploadFileResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.exceptions.LimitExceededException;
@@ -20,8 +21,9 @@ import com.sendsafely.upload.UploadManager;
 public class FileUploadUtility 
 {
 	private final String UPLOAD_TYPE = "JAVA_API";
-	private final long SEGMENT_SIZE = 10485760;
+	private final long SEGMENT_SIZE = 2621440;
 	private int filePart = 1;
+	private FileResponse response;
 	
 	private UploadManager uploadManager;
 	
@@ -43,6 +45,11 @@ public class FileUploadUtility
         return parts;
 	}
 	
+	public FileResponse getFileObject()
+	{
+		return this.response;
+	}
+	
 	public long encryptAndUploadFile(String fileId, String encryptionKey, File file, UploadFileRequest request, long offset, Progress progress) throws IOException, UploadFileException, SendFailedException, LimitExceededException
 	{
 		request = populateRequest(request);
@@ -56,6 +63,11 @@ public class FileUploadUtility
 		File encryptedFile = encrypt(file, offset, encryptionKey, bytesToRead);
 		
 		UploadFileResponse response = upload(encryptedFile, file.getName(), request, progress);
+		//this.response = response.getFile();
+		this.response = new FileResponse();
+		this.response.setFileId(response.getMessage());
+		this.response.setFileName(file.getName());
+		this.response.setFileSize("" + file.length());
 		
 		parseResponse(response);
 		

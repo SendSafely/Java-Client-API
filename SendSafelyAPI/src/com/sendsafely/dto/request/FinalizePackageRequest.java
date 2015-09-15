@@ -6,11 +6,11 @@ import com.sendsafely.enums.HTTPMethod;
 public class FinalizePackageRequest extends BaseRequest 
 {	
 	
-	private static HTTPMethod method = HTTPMethod.POST;
-	private static String path = "/package/" + GetParam.PACKAGE_ID + "/finalize/";
+	private HTTPMethod method = HTTPMethod.POST;
+	private String path = "/package/" + GetParam.PACKAGE_ID + "/finalize/";
 	
 	public FinalizePackageRequest() {
-		super(method, path);
+		initialize(method, path);
 	}
 	
 	public void setPackageId(String packageId)
@@ -24,6 +24,10 @@ public class FinalizePackageRequest extends BaseRequest
 	
 	public void setChecksum(String checksum) {
 		super.setPostParam("checksum", checksum);
+	}
+	
+	public void setUndisclosedRecipients(boolean undisclosedRecipients) {
+		super.setPostParam("undisclosedRecipients", undisclosedRecipients);
 	}
 	
 }

@@ -1,4 +1,4 @@
-package com.sendsafely.dto;
+package com.sendsafely;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import com.sendsafely.enums.PackageState;
  * @author Erik Larsson
  *
  */
-public class PackageInformation {
+public class Package {
 
 	private String packageId;
 	private String packageCode;

@@ -1,4 +1,4 @@
-package com.sendsafely.dto;
+package com.sendsafely;
 
 /**
  * A Java Bean containing information about a file. 
@@ -12,6 +12,8 @@ public class File {
 	private String fileId;
 	private String fileName;
 	private long fileSize;
+	//private String createdBy;
+	private int parts;
 	
 	/**
 	 * @description Get the unique file ID associated with the file.
@@ -59,6 +61,31 @@ public class File {
 	 */
 	public void setFileSize(long fileSize) {
 		this.fileSize = fileSize;
+	}
+
+	/*
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}*/
+
+	/**
+	 * @description Returns the number of parts this file is internally split up into when stored on the SendSafely servers.
+	 * @return
+	 */
+	public int getParts() {
+		return parts;
+	}
+
+	/**
+	 * @description Set internally by the API.
+	 * @param parts
+	 */
+	public void setParts(int parts) {
+		this.parts = parts;
 	}
 	
 }

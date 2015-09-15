@@ -6,11 +6,11 @@ import com.sendsafely.enums.HTTPMethod;
 public class VerifyCredentialsRequest extends BaseRequest 
 {	
 	
-	private static HTTPMethod method = HTTPMethod.GET;
-	private static String path = "/config/verify-credentials/";
+	private HTTPMethod method = HTTPMethod.GET;
+	private String path = "/config/verify-credentials/";
 	
 	public VerifyCredentialsRequest() {
-		super(method, path);
+		initialize(method, path);
 	}
 	
 	public void setVersion(double version)

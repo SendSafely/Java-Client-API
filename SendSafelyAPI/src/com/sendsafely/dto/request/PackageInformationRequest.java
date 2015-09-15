@@ -6,11 +6,11 @@ import com.sendsafely.enums.HTTPMethod;
 public class PackageInformationRequest extends BaseRequest 
 {	
 	
-	private static HTTPMethod method = HTTPMethod.GET;
-	private static String path = "/package/" + GetParam.PACKAGE_ID + "/";
+	private HTTPMethod method = HTTPMethod.GET;
+	private String path = "/package/" + GetParam.PACKAGE_ID + "/";
 	
 	public PackageInformationRequest() {
-		super(method, path);
+		initialize(method, path);
 	}
 	
 	public void setPackageId(String packageId)

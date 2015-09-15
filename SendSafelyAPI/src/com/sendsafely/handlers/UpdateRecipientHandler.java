@@ -2,7 +2,7 @@ package com.sendsafely.handlers;
 
 import java.io.IOException;
 
-import com.sendsafely.dto.Recipient;
+import com.sendsafely.Recipient;
 import com.sendsafely.dto.request.UpdateRecipientRequest;
 import com.sendsafely.dto.response.AddRecipientResponse;
 import com.sendsafely.dto.response.BaseResponse;
@@ -26,6 +26,7 @@ public class UpdateRecipientHandler extends BaseHandler
 	public void makeRequest(String packageId, String recipientId, String phonenumber, CountryCode countryCode) throws UpdateRecipientFailedException {
 		request.setPackageId(packageId);
 		request.setRecipientId(recipientId);
+		request.addPhonenumber(phonenumber, countryCode);
 		BaseResponse response = send();
 		
 		if(response.getResponse() != APIResponse.SUCCESS) 

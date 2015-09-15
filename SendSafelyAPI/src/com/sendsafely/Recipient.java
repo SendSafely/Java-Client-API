@@ -1,7 +1,9 @@
-package com.sendsafely.dto;
+package com.sendsafely;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.sendsafely.dto.Confirmation;
 
 /**
  * A Java Bean containing information about a recipient. 
@@ -15,6 +17,9 @@ public class Recipient {
 	private String recipientId;
 	private String email;
 	private boolean needsApproval;
+	private boolean canAddFiles;
+	private boolean canAddMessages;
+	private boolean canAddRecipients;
 	private List<Confirmation> confirmations = new ArrayList<Confirmation>();
 	
 	/**
@@ -82,4 +87,28 @@ public class Recipient {
 		this.confirmations = confirmations;
 	}
 	
+	/*
+	public boolean canAddFiles() {
+		return this.canAddFiles;
+	}
+	
+	public void setCanAddFiles(boolean canAddFiles) {
+		this.canAddFiles = canAddFiles;
+	}
+	
+	public boolean canAddMessages() {
+		return this.canAddMessages;
+	}
+	
+	public void setCanAddMessages(boolean canAddMessages) {
+		this.canAddMessages = canAddMessages;
+	}
+	
+	public boolean canAddRecipients() {
+		return this.canAddRecipients;
+	}
+	
+	public void setCanAddRecipients(boolean canAddRecipients) {
+		this.canAddRecipients = canAddRecipients;
+	}*/
 }

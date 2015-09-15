@@ -7,11 +7,11 @@ import com.sendsafely.enums.HTTPMethod;
 public class UpdateRecipientRequest extends BaseRequest 
 {	
 	
-	private static HTTPMethod method = HTTPMethod.POST;
-	private static String path = "/package/" + GetParam.PACKAGE_ID + "/recipient/" + GetParam.RECIPIENT_ID + "/";
+	private HTTPMethod method = HTTPMethod.POST;
+	private String path = "/package/" + GetParam.PACKAGE_ID + "/recipient/" + GetParam.RECIPIENT_ID + "/";
 	
 	public UpdateRecipientRequest() {
-		super(method, path);
+		initialize(method, path);
 	}
 	
 	public void setPhonenumber(String email)

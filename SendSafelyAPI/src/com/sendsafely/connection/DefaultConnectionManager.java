@@ -2,6 +2,7 @@ package com.sendsafely.connection;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -65,24 +66,21 @@ public class DefaultConnectionManager implements ConnectionManager {
 	}
 	
 	@Override
-	public String getResponse() throws IOException
+	public InputStream getResponse() throws IOException
 	{
-		// Wait for response
-		BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-		String responseVal = "";
-		String line = null;
-		while((line = in.readLine()) != null) 
-		{
-			responseVal += line;
-		}
-		
-		return responseVal;
+		return conn.getInputStream();
 	}
 	
 	@Override
 	public OutputStream getOutputStream() throws IOException
 	{
 		return conn.getOutputStream();
+	}
+	
+	@Override
+	public String getHeader(String header)
+	{
+		return conn.getHeaderField(header);
 	}
 
 }

@@ -1,13 +1,17 @@
 package com.sendsafely.handlers;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sendsafely.File;
+import com.sendsafely.Package;
+import com.sendsafely.Recipient;
 import com.sendsafely.dto.Confirmation;
-import com.sendsafely.dto.File;
-import com.sendsafely.dto.PackageInformation;
-import com.sendsafely.dto.Recipient;
 import com.sendsafely.dto.request.PackageInformationRequest;
 import com.sendsafely.dto.response.ConfirmationResponse;
 import com.sendsafely.dto.response.FileResponse;
@@ -16,6 +20,7 @@ import com.sendsafely.dto.response.RecipientResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.exceptions.MessageException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
 import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.upload.UploadManager;
@@ -29,7 +34,7 @@ public class PackageInformationHandler extends BaseHandler
 		super(uploadManager);
 	}
 
-	public PackageInformation makeRequest(String packageId) throws PackageInformationFailedException {
+	public Package makeRequest(String packageId) throws PackageInformationFailedException {
 		request.setPackageId(packageId);
 		PackageInformationResponse response = send();
 		
@@ -43,6 +48,21 @@ public class PackageInformationHandler extends BaseHandler
 		}
 	}
 	
+	public Package makeRequestFromLink(String link) throws PackageInformationFailedException {
+		URL url = createUrl(link);
+		return makeRequestFromLink(url);
+	}
+	
+	public Package makeRequestFromLink(URL link) throws PackageInformationFailedException {
+		// Parse the link
+		String packageCode = getPackageCode(link);
+		String keyCode = getKeyCode(link);
+		
+		Package pkg = makeRequest(packageCode);
+		pkg.setKeyCode(keyCode);
+		return pkg;
+	}
+	
 	protected PackageInformationResponse send() throws PackageInformationFailedException
 	{
 		try {
@@ -54,9 +74,9 @@ public class PackageInformationHandler extends BaseHandler
 		}
 	}
 	
-	protected PackageInformation convert(PackageInformationResponse obj)
+	protected Package convert(PackageInformationResponse obj)
 	{
-		PackageInformation info = new PackageInformation();
+		Package info = new Package();
 		info.setApproverList(obj.getApproverList());
 		info.setFiles(convertFiles(obj.getFiles()));
 		info.setLife(obj.getLife());
@@ -64,6 +84,7 @@ public class PackageInformationHandler extends BaseHandler
 		info.setPackageCode(obj.getPackageCode());
 		info.setPackageId(obj.getPackageId());
 		info.setRecipients(convertRecipients(obj.getRecipients()));
+		//info.setTopics(obj.getTopics());
 		info.setServerSecret(obj.getServerSecret());
 		info.setState(obj.getState());
 		return info;
@@ -102,6 +123,8 @@ public class PackageInformationHandler extends BaseHandler
 		f.setFileId(resp.getFileId());
 		f.setFileName(resp.getFileName());
 		f.setFileSize(Long.parseLong(resp.getFileSize()));
+		//f.setCreatedBy(resp.getCreatedByEmail());
+		f.setParts(resp.getParts());
 		return f;
 	}
 	
@@ -118,6 +141,67 @@ public class PackageInformationHandler extends BaseHandler
 		}
 		
 		return retval;
+	}
+	
+	private String getPackageCode(URL url) throws PackageInformationFailedException
+	{
+		String query = url.getQuery();
+		
+		// We only expect one parameter in the URL, the package code..
+		String[] parameters = query.split("&");
+		
+		String packageCode = null; 
+		for(String param : parameters) {
+			// Parse out the key and the value.
+			String[] parts = param.split("=");
+			if(parts.length < 2) {
+				throw new PackageInformationFailedException("Package Code Parameter not found");
+			}
+			
+			String key = parts[0];
+			String value = parts[1];
+			
+			if(parts.length > 2) {
+				for(int i = 2; i<parts.length; i++) {
+					value += parts[i];
+				}
+			}
+			
+			if(key.equals("packageCode")) {
+				packageCode = value;
+			}
+		}
+		
+		if(packageCode == null) {
+			throw new PackageInformationFailedException("Package Code Parameter not found");
+		}
+		
+		return packageCode;
+	}
+	
+	private String getKeyCode(URL url) throws PackageInformationFailedException
+	{
+		String query = url.toString();
+		
+		// We only expect one parameter in the URL, the package code..
+		String[] parameters = query.split("#");
+		
+		if(parameters.length != 2) {
+			throw new PackageInformationFailedException("Keycode could not be found");
+		}
+		
+		String hash = parameters[1];
+		String keyCode = hash.substring(hash.indexOf('=')+1);
+				
+		return keyCode;
+	}
+	
+	private URL createUrl(String link) throws PackageInformationFailedException {
+		try {
+			return new URL(link);
+		} catch (MalformedURLException e) {
+			throw new PackageInformationFailedException(e);
+		}
 	}
 	
 }

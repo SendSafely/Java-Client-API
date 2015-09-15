@@ -2,12 +2,17 @@ package com.sendsafely.dto.response;
 
 import java.util.List;
 
-public class RecipientResponse {
+import com.sendsafely.Phonenumber;
+
+
+public class RecipientResponse extends BaseResponse {
 	
 	private String recipientId;
 	private String email;
-	private boolean needsApproval;
+	private Boolean needsApproval;
+	private List<Phonenumber> phonenumbers;
 	private List<ConfirmationResponse> confirmations;
+	private String autoEnabledNumber;
 	
 	public String getRecipientId() {
 		return recipientId;
@@ -21,11 +26,23 @@ public class RecipientResponse {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public boolean getNeedsApproval() {
+	public Boolean getNeedsApproval() {
 		return needsApproval;
 	}
-	public void setNeedsApproval(boolean needsApproval) {
+	public void setNeedsApproval(Boolean needsApproval) {
 		this.needsApproval = needsApproval;
+	}
+	public List<Phonenumber> getPhonenumbers() {
+		return phonenumbers;
+	}
+	public void setPhonenumbers(List<Phonenumber> phonenumbers) {
+		this.phonenumbers = phonenumbers;
+	}
+	public String getAutoEnabledNumber() {
+		return autoEnabledNumber;
+	}
+	public void setAutoEnabledNumber(String autoEnabledNumber) {
+		this.autoEnabledNumber = autoEnabledNumber;
 	}
 	public List<ConfirmationResponse> getConfirmations() {
 		return confirmations;
@@ -34,5 +51,4 @@ public class RecipientResponse {
 		this.confirmations = confirmations;
 	}
 	
-
 }
