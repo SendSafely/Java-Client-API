@@ -12,7 +12,7 @@ import com.sendsafely.file.FileManager;
 
 public class SendSafelyRefApp {
 	
-	public static void main(String[] args) throws SendFailedException, IOException, InvalidCredentialsException, CreatePackageFailedException, LimitExceededException, FinalizePackageFailedException, UploadFileException, ApproverRequiredException, RecipientFailedException
+	public static void main(String[] args) throws SendFailedException, IOException, InvalidCredentialsException, CreatePackageFailedException, LimitExceededException, FinalizePackageFailedException, UploadFileException, ApproverRequiredException, RecipientFailedException, PackageInformationFailedException, DownloadFileException, PasswordRequiredException
 	{
 		/*
 		 * This example will read in the following command line arguments:
@@ -70,9 +70,16 @@ public class SendSafelyRefApp {
             // Package is finished, call the finalize method to make the package available for pickup and print the URL for access.
             PackageURL packageLink = sendSafely.finalizePackage(packageId, pkgInfo.getKeyCode());
             System.out.println("Success: " + packageLink.getSecureLink());
-            
+
+            // Now download the file and save a copy	
+            System.out.println("Downloading the file");
+            Package pkgToDownload = sendSafely.getPackageInformationFromLink(packageLink.getSecureLink());
+            for(File file : pkgToDownload.getFiles()) 
+            {		
+            	java.io.File downloadedFile = sendSafely.downloadFile(pkgToDownload.getPackageId(), file.getFileId(), pkgToDownload.getKeyCode(), new ProgressCallback());		
+            	System.out.println("Downloaded File to path: " + downloadedFile.getAbsolutePath());		
+            }
 		}
-		
 	}
 	
 }
