@@ -59,20 +59,24 @@ public class FileUploadUtility
 		if(bytesToRead == 0) {
 			return 0;
 		}
-		
-		File encryptedFile = encrypt(file, offset, encryptionKey, bytesToRead);
-		
-		UploadFileResponse response = upload(encryptedFile, file.getName(), request, progress);
-		//this.response = response.getFile();
-		this.response = new FileResponse();
-		this.response.setFileId(response.getMessage());
-		this.response.setFileName(file.getName());
-		this.response.setFileSize("" + file.length());
-		
-		parseResponse(response);
-		
-		filePart++;
-		return bytesToRead;
+
+		final File encryptedFile = encrypt(file, offset, encryptionKey, bytesToRead);
+		try {
+
+			UploadFileResponse response = upload(encryptedFile, file.getName(), request, progress);
+			//this.response = response.getFile();
+			this.response = new FileResponse();
+			this.response.setFileId(response.getMessage());
+			this.response.setFileName(file.getName());
+			this.response.setFileSize("" + file.length());
+
+			parseResponse(response);
+
+			filePart++;
+			return bytesToRead;
+		} finally {
+			encryptedFile.delete();
+		}
 	}
 	
 	protected void parseResponse(UploadFileResponse response) throws UploadFileException, LimitExceededException
@@ -109,18 +113,22 @@ public class FileUploadUtility
 	{
 		// Create a temp file to store the segment in.
 		File encryptedTempFile = File.createTempFile(file.getName() + "-" + offset, "tmp");
-		OutputStream tmpFileOut = new FileOutputStream(encryptedTempFile);
-		
-		InputStream in = new FileInputStream(file);
-		in.skip(offset);
-		
-		char[] passPhrase = encryptionKey.toCharArray();
-		
 		try {
-			CryptoUtil.encryptFile(tmpFileOut, in, passPhrase, file.getName(), bytesToRead);
-		} catch (PGPException e)
-		{
-			throw new UploadFileException(e);
+			OutputStream tmpFileOut = new FileOutputStream(encryptedTempFile);
+
+			InputStream in = new FileInputStream(file);
+			in.skip(offset);
+
+			char[] passPhrase = encryptionKey.toCharArray();
+
+			try {
+				CryptoUtil.encryptFile(tmpFileOut, in, passPhrase, file.getName(), bytesToRead);
+			} catch (PGPException e) {
+				throw new UploadFileException(e);
+			}
+		} catch (Throwable e){
+			encryptedTempFile.delete();
+			throw e;
 		}
 		
 		return encryptedTempFile;
