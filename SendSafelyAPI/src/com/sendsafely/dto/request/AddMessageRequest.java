@@ -2,20 +2,21 @@ package com.sendsafely.dto.request;
 
 import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.json.JsonManager;
 
 public class AddMessageRequest extends BaseRequest {
 
 	protected HTTPMethod method = HTTPMethod.PUT;
 	protected String path = "/package/" + GetParam.PACKAGE_ID + "/message/";
 	
-	public AddMessageRequest() {
-		initialize(method, path);
+	public AddMessageRequest(JsonManager jsonManager) {
+		initialize(jsonManager, method, path);
 	}
 	
-	public AddMessageRequest(HTTPMethod method, String path) {
+	public AddMessageRequest(JsonManager jsonManager, HTTPMethod method, String path) {
 		this.method = method;
 		this.path = path;
-		initialize(method, path);
+		initialize(jsonManager, method, path);
 	}
 	
 	public void setUploadType(String uploadType) 

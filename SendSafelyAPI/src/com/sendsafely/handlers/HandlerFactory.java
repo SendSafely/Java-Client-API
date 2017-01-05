@@ -34,8 +34,8 @@ public class HandlerFactory
 	
 	private void initialize(UploadManager uploadManager)
 	{
-		GetPackagesRequest activePackageRequest = new GetPackagesRequest(HTTPMethod.GET, "/package/");
-		GetPackagesRequest archivedPackageRequest = new GetPackagesRequest(HTTPMethod.GET, "/package/archived/");
+		GetPackagesRequest activePackageRequest = new GetPackagesRequest(uploadManager.getJsonManager(), HTTPMethod.GET, "/package/");
+		GetPackagesRequest archivedPackageRequest = new GetPackagesRequest(uploadManager.getJsonManager(), HTTPMethod.GET, "/package/archived/");
 		
 		endpoints.put(Endpoint.VerifyVersion, new VerifyVersionHandler(uploadManager));
 		endpoints.put(Endpoint.VerifyCredentials, new VerifyCredentialsHandler(uploadManager));

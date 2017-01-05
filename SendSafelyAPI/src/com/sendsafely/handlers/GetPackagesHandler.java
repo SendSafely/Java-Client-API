@@ -18,6 +18,7 @@ import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.upload.UploadManager;
 import com.sendsafely.File;
 import com.sendsafely.Package;
+import com.sendsafely.PackageReference;
 import com.sendsafely.Recipient;
 
 public class GetPackagesHandler extends BaseHandler 
@@ -31,7 +32,7 @@ public class GetPackagesHandler extends BaseHandler
 		this.request = request;
 	}
 
-	public List<Package> makeRequest() throws GetPackagesException {
+	public List<PackageReference> makeRequest() throws GetPackagesException {
 		GetPackagesResponse response = send();
 		
 		if(response.getResponse() == APIResponse.SUCCESS) 
@@ -44,17 +45,17 @@ public class GetPackagesHandler extends BaseHandler
 		}
 	}
 	
-	protected List<Package> convert(List<PackageListResponse> rawPackages)
+	protected List<PackageReference> convert(List<PackageListResponse> rawPackages)
 	{
-		List<Package> packages = new ArrayList<Package>(rawPackages.size());
+		List<PackageReference> packages = new ArrayList<PackageReference>(rawPackages.size());
 		for(PackageListResponse resp : rawPackages) {
 			packages.add(convert(resp));
 		}
 		return packages;
 	}
 	
-	protected Package convert(PackageListResponse obj) {
-		Package info = new Package();
+	protected PackageReference convert(PackageListResponse obj) {
+		PackageReference info = new PackageReference();
 		info.setApproverList(obj.getApproverList());
 		info.setFiles(convertFiles(obj.getFiles()));
 		info.setLife(obj.getLife());
@@ -62,21 +63,18 @@ public class GetPackagesHandler extends BaseHandler
 		info.setPackageCode(obj.getPackageCode());
 		info.setPackageId(obj.getPackageId());
 		info.setRecipients(convertRecipients(obj.getRecipients()));
-		//info.setTopics(obj.getTopics());
 		info.setServerSecret(obj.getServerSecret());
 		info.setState(obj.getState());
 		
 		return info;
 	}
 	
-	protected List<Recipient> convertRecipients(List<String> responses) 
+	protected List<String> convertRecipients(List<String> responses) 
 	{
-		List<Recipient> retval = new ArrayList<Recipient>(responses.size());
+		List<String> retval = new ArrayList<String>(responses.size());
 		for (String resp : responses)
 		{
-			Recipient r = new Recipient();
-			r.setEmail(resp);
-			retval.add(r);
+			retval.add(resp);
 		}
 		
 		return retval;
@@ -102,7 +100,7 @@ public class GetPackagesHandler extends BaseHandler
 		File f = new File();
 		f.setFileId(resp.getFileId());
 		f.setFileName(resp.getFileName());
-		f.setFileSize(Long.parseLong(resp.getFileSize()));
+		f.setFileSize(resp.getFileSize());
 		//f.setCreatedBy(resp.getCreatedByEmail());
 		return f;
 	}

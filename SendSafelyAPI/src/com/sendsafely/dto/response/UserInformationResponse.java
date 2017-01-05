@@ -6,6 +6,7 @@ public class UserInformationResponse extends BaseResponse {
 	private String clientKey;
 	private String firstName;
 	private String lastName;
+	private boolean betaUser;
 	
 	/**
 	 * The email address connected to the user.
@@ -71,5 +72,23 @@ public class UserInformationResponse extends BaseResponse {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+
+	/**
+	 * Flag indicating if user is eligible to receive beta features.
+	 * @return betaUser
+	 */
+	public boolean getBetaUser() {
+		return betaUser;
+	}
+	
+	/**
+	 * Set the betaUser flag
+	 * @param betaUser
+	 */
+	public void setBetaUser(boolean betaUser) {
+		this.betaUser = betaUser;
+	}
+	
+	
 	
 }

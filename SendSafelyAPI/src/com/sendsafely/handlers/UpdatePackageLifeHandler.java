@@ -22,10 +22,11 @@ import com.sendsafely.upload.UploadManager;
 public class UpdatePackageLifeHandler extends BaseHandler 
 {	
 	
-	private UpdatePackageLifeRequest request = new UpdatePackageLifeRequest();
+	private UpdatePackageLifeRequest request;
 	
 	public UpdatePackageLifeHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new UpdatePackageLifeRequest(uploadManager.getJsonManager());
 	}
 
 	public void makeRequest(String packageId, int life) throws UpdatePackageLifeException {
@@ -97,7 +98,7 @@ public class UpdatePackageLifeHandler extends BaseHandler
 		File f = new File();
 		f.setFileId(resp.getFileId());
 		f.setFileName(resp.getFileName());
-		f.setFileSize(Long.parseLong(resp.getFileSize()));
+		f.setFileSize(resp.getFileSize());
 		return f;
 	}
 	

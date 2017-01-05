@@ -1,8 +1,5 @@
 package com.sendsafely.utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,15 +10,20 @@ import com.sendsafely.dto.request.UploadFileRequest;
 import com.sendsafely.dto.response.FileResponse;
 import com.sendsafely.dto.response.UploadFileResponse;
 import com.sendsafely.enums.APIResponse;
+import com.sendsafely.exceptions.DownloadFileException;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.exceptions.UploadFileException;
+import com.sendsafely.file.FileManager;
 import com.sendsafely.upload.UploadManager;
 
 public class FileUploadUtility 
 {
 	private final String UPLOAD_TYPE = "JAVA_API";
-	private final long SEGMENT_SIZE = 2621440;
+	private final long SEGMENT_SIZE = 10485760;
+    private final long PGP_HEADER_SIZE = 60;
+    private final double PGP_CONVERSION = 1.4;
+
 	private int filePart = 1;
 	private FileResponse response;
 	
@@ -32,17 +34,22 @@ public class FileUploadUtility
 		this.uploadManager = uploadManager;
 	}
 	
-	public int calculateParts(long filesize)
+	public int calculateParts(FileManager file) throws UploadFileException
 	{
-		if (filesize == 0)
-        {
-            return 1;
-        }
+		try {
+			long filesize = file.length();
+			if (filesize == 0)
+	        {
+	            return 1;
+	        }
 
-        int parts;
-        parts = (int)((filesize + SEGMENT_SIZE - 1) / SEGMENT_SIZE);
+	        int parts;
+	        parts = (int)((filesize + SEGMENT_SIZE - 1) / SEGMENT_SIZE);
 
-        return parts;
+	        return parts;
+		} catch(IOException e) {
+			throw new UploadFileException(e);
+		}
 	}
 	
 	public FileResponse getFileObject()
@@ -50,7 +57,7 @@ public class FileUploadUtility
 		return this.response;
 	}
 	
-	public long encryptAndUploadFile(String fileId, String encryptionKey, File file, UploadFileRequest request, long offset, Progress progress) throws IOException, UploadFileException, SendFailedException, LimitExceededException
+	public long encryptAndUploadFile(String fileId, String encryptionKey, FileManager file, UploadFileRequest request, long offset, Progress progress) throws IOException, UploadFileException, SendFailedException, LimitExceededException
 	{
 		request = populateRequest(request);
 		
@@ -60,23 +67,26 @@ public class FileUploadUtility
 			return 0;
 		}
 
-		final File encryptedFile = encrypt(file, offset, encryptionKey, bytesToRead);
-		try {
-
-			UploadFileResponse response = upload(encryptedFile, file.getName(), request, progress);
-			//this.response = response.getFile();
-			this.response = new FileResponse();
-			this.response.setFileId(response.getMessage());
-			this.response.setFileName(file.getName());
-			this.response.setFileSize("" + file.length());
-
-			parseResponse(response);
-
-			filePart++;
-			return bytesToRead;
-		} finally {
-			encryptedFile.delete();
-		}
+        FileManager encryptedFile = encrypt(file, offset, encryptionKey, bytesToRead);
+		
+        try
+        {
+    		UploadFileResponse response = upload(encryptedFile, file.getName(), request, progress);
+            encryptedFile.remove();
+    		this.response = new FileResponse();
+    		this.response.setFileId(response.getMessage());
+    		this.response.setFileName(file.getName());
+    		this.response.setFileSize(file.length());
+    		
+    		parseResponse(response);
+    		
+    		filePart++;
+    		return bytesToRead;
+        }
+        finally
+        {
+        	encryptedFile.remove();
+        }
 	}
 	
 	protected void parseResponse(UploadFileResponse response) throws UploadFileException, LimitExceededException
@@ -98,7 +108,7 @@ public class FileUploadUtility
 		return request;
 	}
 
-	protected UploadFileResponse upload(File encryptedFile, String filename, UploadFileRequest request, Progress progress) throws SendFailedException, IOException
+	protected UploadFileResponse upload(FileManager encryptedFile, String filename, UploadFileRequest request, Progress progress) throws SendFailedException, IOException
 	{
 		SendUtil util = new SendUtil(this.uploadManager);
 		return util.sendFile(request.getPath(), request, encryptedFile, filename, progress);
@@ -109,28 +119,31 @@ public class FileUploadUtility
 		return null;
 	}
 	
-	protected File encrypt(File file, long offset, String encryptionKey, long bytesToRead) throws IOException, UploadFileException
+	protected FileManager encrypt(FileManager file, long offset, String encryptionKey, long bytesToRead) throws IOException, UploadFileException
 	{
 		// Create a temp file to store the segment in.
-		File encryptedTempFile = File.createTempFile(file.getName() + "-" + offset, "tmp");
-		try {
-			OutputStream tmpFileOut = new FileOutputStream(encryptedTempFile);
-
-			InputStream in = new FileInputStream(file);
-			in.skip(offset);
-
-			char[] passPhrase = encryptionKey.toCharArray();
-
-			try {
-				CryptoUtil.encryptFile(tmpFileOut, in, passPhrase, file.getName(), bytesToRead);
-			} catch (PGPException e) {
-				throw new UploadFileException(e);
-			}
-		} catch (Throwable e){
-			encryptedTempFile.delete();
-			throw e;
-		}
-		
+        FileManager encryptedTempFile = file.createTempFile(file.getName() + "-" + offset, "tmp", calculateFileSize(bytesToRead));
+        try
+        {
+    		OutputStream tmpFileOut = encryptedTempFile.getOutputStream();
+    		
+    		InputStream in = file.getInputStream();
+    		in.skip(offset);
+    		
+    		char[] passPhrase = encryptionKey.toCharArray();
+    		
+    		try {
+    			CryptoUtil.encryptFile(tmpFileOut, in, passPhrase, file.getName(), bytesToRead);
+    		} catch (PGPException e)
+    		{
+    			throw new UploadFileException(e);
+    		}
+        } 
+        catch (Throwable e)
+        {
+        	encryptedTempFile.remove();
+        	throw e;
+        }
 		return encryptedTempFile;
 	}
 	
@@ -145,4 +158,9 @@ public class FileUploadUtility
 			return totalSize - offset;
 		}
 	}
+
+    protected long calculateFileSize(long bytesToRead)
+    {
+        return (long) ((((double)bytesToRead*PGP_CONVERSION)) + PGP_HEADER_SIZE);
+    }
 }

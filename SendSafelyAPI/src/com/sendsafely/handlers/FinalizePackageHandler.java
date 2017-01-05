@@ -3,35 +3,44 @@ package com.sendsafely.handlers;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.sendsafely.Package;
+import com.sendsafely.dto.EncryptedKeycode;
 import com.sendsafely.dto.PackageURL;
+import com.sendsafely.dto.PublicKey;
 import com.sendsafely.dto.request.FinalizePackageRequest;
 import com.sendsafely.dto.response.CreatePackageResponse;
 import com.sendsafely.dto.response.FinalizePackageResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.Endpoint;
-import com.sendsafely.enums.GetParam;
-import com.sendsafely.enums.HTTPMethod;
-import com.sendsafely.exceptions.ApproverRequiredException;
-import com.sendsafely.exceptions.FinalizePackageFailedException;
-import com.sendsafely.exceptions.LimitExceededException;
-import com.sendsafely.exceptions.PackageInformationFailedException;
-import com.sendsafely.exceptions.SendFailedException;
+import com.sendsafely.exceptions.*;
 import com.sendsafely.upload.UploadManager;
 import com.sendsafely.utils.CryptoUtil;
 
 public class FinalizePackageHandler extends BaseHandler 
 {	
 	
-	private FinalizePackageRequest request = new FinalizePackageRequest();
+	private FinalizePackageRequest request;
 	
 	public FinalizePackageHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new FinalizePackageRequest(uploadManager.getJsonManager());
 	}
 
 	public PackageURL makeRequest(String packageId, String keyCode) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException {
-		request.setPackageId(packageId);
+		// Get the public keys available for the users.
+        List<PublicKey> publicKeys = getPublicKeys(packageId);
+
+        // Encrypt the keycode with the public keys.
+        List<EncryptedKeycode> encryptedKeycodes = encryptKeycode(publicKeys, keyCode);
+
+        // Upload the keycodes
+        uploadKeycodes(packageId, encryptedKeycodes);
+
+        // Finalize
+        request.setPackageId(packageId);
 		
 		Package info;
 		try {
@@ -40,25 +49,7 @@ public class FinalizePackageHandler extends BaseHandler
 			throw new FinalizePackageFailedException(e);
 		}
 		
-		request.setChecksum(CryptoUtil.createChecksum(keyCode, info.getPackageCode()));
-		FinalizePackageResponse response = send();
-		
-		if(response.getResponse() == APIResponse.SUCCESS || response.getResponse() == APIResponse.PACKAGE_NEEDS_APPROVAL) 
-		{
-			return convert(response, keyCode);
-		}
-		else if(response.getResponse() == APIResponse.LIMIT_EXCEEDED)
-		{
-			throw new LimitExceededException(response.getMessage());
-		}
-		else if(response.getResponse() == APIResponse.APPROVER_REQUIRED)
-		{
-			throw new ApproverRequiredException();
-		}
-		else
-		{
-			throw new FinalizePackageFailedException(response.getMessage(), response.getErrors());
-		}
+		return makeRequest(packageId, info.getPackageCode(), keyCode);
 	}
 	
 	public PackageURL makeRequest(String packageId, String keyCode, boolean undisclosedRecipients, String password) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException {
@@ -77,7 +68,60 @@ public class FinalizePackageHandler extends BaseHandler
 		
 		return makeRequest(packageId, keyCode);
 	}
+
+	protected PackageURL makeRequest(String packageId, String packageCode, String keyCode) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException {
+		request.setPackageId(packageId);
+		
+		request.setChecksum(CryptoUtil.createChecksum(keyCode, packageCode));
+		FinalizePackageResponse response = send();
+		
+		if(response.getResponse() == APIResponse.SUCCESS || response.getResponse() == APIResponse.PACKAGE_NEEDS_APPROVAL) 
+		{
+			return convert(response, keyCode);
+		}
+		else if(response.getResponse() == APIResponse.LIMIT_EXCEEDED)
+		{
+			throw new LimitExceededException(response.getMessage());
+		}
+		else if(response.getResponse() == APIResponse.APPROVER_REQUIRED)
+		{
+			throw new ApproverRequiredException(response.getMessage());
+		}
+		else
+		{
+			throw new FinalizePackageFailedException(response.getMessage(), response.getErrors());
+		}
+	}
 	
+    protected void uploadKeycodes(String packageId, List<EncryptedKeycode> encryptedKeycodes) throws FinalizePackageFailedException {
+        UploadKeycodesHandler handler = new UploadKeycodesHandler(this.uploadManager);
+        try {
+            handler.makeRequest(packageId, encryptedKeycodes);
+        } catch (UploadKeycodeException e) {
+            throw new FinalizePackageFailedException(e);
+        }
+    }
+
+    protected List<PublicKey> getPublicKeys(String packageId) throws FinalizePackageFailedException {
+        GetPublicKeysHandler handler = new GetPublicKeysHandler(this.uploadManager);
+        try {
+            return handler.makeRequest(packageId);
+        } catch (PublicKeysFailedException e) {
+            throw new FinalizePackageFailedException(e);
+        }
+    }
+
+    protected List<EncryptedKeycode> encryptKeycode(List<PublicKey> publicKeys, String keyCode) throws FinalizePackageFailedException {
+
+        EncryptKeycodeHandler handler = new EncryptKeycodeHandler(uploadManager);
+
+        try {
+            return handler.encrypt(publicKeys, keyCode);
+        } catch (PublicKeyEncryptionFailedException e) {
+            throw new FinalizePackageFailedException(e);
+        }
+    }
+
 	protected PackageURL convert(FinalizePackageResponse response, String keyCode) throws FinalizePackageFailedException
 	{
 		try {

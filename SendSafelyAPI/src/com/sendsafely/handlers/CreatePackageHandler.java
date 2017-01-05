@@ -1,8 +1,17 @@
 package com.sendsafely.handlers;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import javax.xml.bind.DatatypeConverter;
+
+import org.bouncycastle.util.encoders.Base64Encoder;
+import org.bouncycastle.util.encoders.UrlBase64;
+import org.bouncycastle.util.encoders.UrlBase64Encoder;
+
+import com.sendsafely.File;
 import com.sendsafely.Package;
+import com.sendsafely.Recipient;
 import com.sendsafely.dto.request.CreatePackageRequest;
 import com.sendsafely.dto.response.CreatePackageResponse;
 import com.sendsafely.enums.APIResponse;
@@ -19,15 +28,22 @@ import com.sendsafely.utils.CryptoUtil;
 public class CreatePackageHandler extends BaseHandler 
 {	
 	
-	private CreatePackageRequest request = new CreatePackageRequest();
+	private CreatePackageRequest request;
 	private boolean isVDR = false;
+	private String packageUserEmail = null;
 	
 	public CreatePackageHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new CreatePackageRequest(uploadManager.getJsonManager());
 	}
-
+	
 	public void setVDR(boolean isVDR) {
 		this.isVDR = isVDR;
+	}
+	
+	public Package makeRequest(String email) throws CreatePackageFailedException, LimitExceededException {
+		this.packageUserEmail = email;
+		return makeRequest();
 	}
 	
 	public Package makeRequest() throws CreatePackageFailedException, LimitExceededException {
@@ -50,6 +66,8 @@ public class CreatePackageHandler extends BaseHandler
 	protected CreatePackageResponse send() throws CreatePackageFailedException
 	{
 		this.request.setIsVDR(this.isVDR);
+		this.request.setPackageUserEmail(this.packageUserEmail);
+
 		try {
 			return send(request, new CreatePackageResponse());
 		} catch (SendFailedException e) {
@@ -63,8 +81,10 @@ public class CreatePackageHandler extends BaseHandler
 	{
 		try
 		{
-			Package info = getPackageInformation(obj.getPackageId());
-			info.setKeyCode(CryptoUtil.GenerateKeyCode());
+			Package info = getPackageInformation(obj);
+			String b64String = CryptoUtil.GenerateKeyCode();
+			String decodedString = DatatypeConverter.printBase64Binary(b64String.getBytes());
+			info.setKeyCode(new String(UrlBase64.encode(decodedString.getBytes())));
 			return info;
 		}
 		catch (TokenGenerationFailedException e)
@@ -73,13 +93,17 @@ public class CreatePackageHandler extends BaseHandler
 		}
 	}
 	
-	protected Package getPackageInformation(String packageId) throws CreatePackageFailedException
-	{
-		Package info;
+	protected Package getPackageInformation(CreatePackageResponse obj) throws CreatePackageFailedException
+	{	
+		Package info = new Package();
 		try {
-			info = ((PackageInformationHandler)(HandlerFactory.getInstance(uploadManager, Endpoint.PACKAGE_INFORMATION))).makeRequest(packageId);
+			info = ((PackageInformationHandler)(HandlerFactory.getInstance(uploadManager, Endpoint.PACKAGE_INFORMATION))).makeRequest(obj.getPackageId());
 		} catch (PackageInformationFailedException e) {
-			throw new CreatePackageFailedException(e);
+			info.setPackageId(obj.getPackageId());
+			info.setPackageCode(obj.getPackageCode());
+			info.setServerSecret(obj.getServerSecret());
+			info.setFiles(new ArrayList<File>());
+			info.setRecipients(new ArrayList<Recipient>());
 		}
 		
 		return info;

@@ -4,7 +4,7 @@ public class FileResponse {
 
 	private String fileId;
 	private String fileName;
-	private String fileSize;
+	private long fileSize;
 	private String createdByEmail;
 	private int parts;
 	
@@ -20,10 +20,10 @@ public class FileResponse {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	public String getFileSize() {
+	public long getFileSize() {
 		return fileSize;
 	}
-	public void setFileSize(String fileSize) {
+	public void setFileSize(long fileSize) {
 		this.fileSize = fileSize;
 	}
 	public String getCreatedByEmail() {

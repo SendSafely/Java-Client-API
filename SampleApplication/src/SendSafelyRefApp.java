@@ -2,26 +2,17 @@
 
 import java.io.IOException;
 
-import com.sendsafely.File;
-import com.sendsafely.Recipient;
-import com.sendsafely.SendSafely;
+import com.sendsafely.File.*;
 import com.sendsafely.Package;
+import com.sendsafely.*;
 import com.sendsafely.dto.PackageURL;
-import com.sendsafely.exceptions.ApproverRequiredException;
-import com.sendsafely.exceptions.CreatePackageFailedException;
-import com.sendsafely.exceptions.DownloadFileException;
-import com.sendsafely.exceptions.FinalizePackageFailedException;
-import com.sendsafely.exceptions.InvalidCredentialsException;
-import com.sendsafely.exceptions.LimitExceededException;
-import com.sendsafely.exceptions.PackageInformationFailedException;
-import com.sendsafely.exceptions.PasswordRequiredException;
-import com.sendsafely.exceptions.RecipientFailedException;
-import com.sendsafely.exceptions.SendFailedException;
-import com.sendsafely.exceptions.UploadFileException;
+import com.sendsafely.exceptions.*;
+import com.sendsafely.file.DefaultFileManager;
+import com.sendsafely.file.FileManager;
 
 public class SendSafelyRefApp {
 	
-	public static void main(String[] args) throws SendFailedException, IOException, InvalidCredentialsException, CreatePackageFailedException, LimitExceededException, FinalizePackageFailedException, UploadFileException, ApproverRequiredException, RecipientFailedException, PackageInformationFailedException, DownloadFileException, PasswordRequiredException
+	public static void main(String[] args) throws SendFailedException, IOException, InvalidCredentialsException, CreatePackageFailedException, LimitExceededException, FinalizePackageFailedException, UploadFileException, ApproverRequiredException, RecipientFailedException
 	{
 		/*
 		 * This example will read in the following command line arguments:
@@ -35,7 +26,7 @@ public class SendSafelyRefApp {
 		 * UserApiSecret: The API Secret associated with the API Key used above.  The API Secret is provided to  
 		 *  you when you generate a new API Key.  
 		 *
-		 * FileToUpload: Local path to the file you want to upload. Can be any file up to 10GB in size. 
+		 * FileToUpload: Local path to the file you want to upload. Can be any file up to 2GB in size. 
 		 *
 		 * RecipientEmailAddress: The email address of the person you want to send the file to. 
 		 */
@@ -72,19 +63,14 @@ public class SendSafelyRefApp {
             System.out.println("Adding Recipient (Recipient ID#" + newRecipient.getRecipientId() + ")");
             
             System.out.println("Uploading File");
-            File addedFile = sendSafely.encryptAndUploadFile(packageId, pkgInfo.getKeyCode(), new java.io.File(fileToUpload), new ProgressCallback());
+            FileManager uploadManager = new DefaultFileManager(new java.io.File(fileToUpload));
+            File addedFile = sendSafely.encryptAndUploadFile(packageId, pkgInfo.getKeyCode(), uploadManager, new ProgressCallback());
             System.out.println("Upload Complete - File Id#" + addedFile.getFileId() + ".  Finalizing Package.");
 
             // Package is finished, call the finalize method to make the package available for pickup and print the URL for access.
             PackageURL packageLink = sendSafely.finalizePackage(packageId, pkgInfo.getKeyCode());
             System.out.println("Success: " + packageLink.getSecureLink());
             
-            // Download the file again.
-            Package pkgToDownload = sendSafely.getPackageInformationFromLink(packageLink.getSecureLink());
-            for(File file : pkgToDownload.getFiles()) {
-            	java.io.File downloadedFile = sendSafely.downloadFile(pkgToDownload.getPackageId(), file.getFileId(), pkgToDownload.getKeyCode(), new ProgressCallback());
-            	System.out.println("Downloaded File to path: " + downloadedFile.getAbsolutePath());
-            }
 		}
 		
 	}

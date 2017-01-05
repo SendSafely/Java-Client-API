@@ -12,10 +12,11 @@ import com.sendsafely.upload.UploadManager;
 public class DeletePackageHandler extends BaseHandler 
 {	
 	
-	private DeletePackageRequest request = new DeletePackageRequest();
+	private DeletePackageRequest request;
 	
 	public DeletePackageHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new DeletePackageRequest(uploadManager.getJsonManager());
 	}
 
 	public void makeRequest(String packageId) throws DeletePackageException {

@@ -6,6 +6,7 @@ public class UserInformation {
 	private String clientKey;
 	private String firstName;
 	private String lastName;
+	private boolean betaUser;
 	
 	/**
 	 * @description The email address connected to the user.
@@ -70,5 +71,23 @@ public class UserInformation {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+
+	/**
+	 * @description Flag to determine if user is eligible to receive beta features.
+	 * @param betaUser
+	 */
+	public boolean getBetaUser() {
+		return betaUser;
+	}
+
+	/**
+	 * @description Set internally by the API.
+	 * @param betaUser
+	 */
+	public void setBetaUser(boolean betaUser) {
+		this.betaUser = betaUser;
+	}
+	
+	
 	
 }

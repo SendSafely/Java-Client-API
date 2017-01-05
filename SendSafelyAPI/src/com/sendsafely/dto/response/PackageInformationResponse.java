@@ -9,6 +9,8 @@ public class PackageInformationResponse extends BaseResponse {
 	private String packageId;
 	private String packageCode;
 	private String serverSecret;
+	private String packageUserName;
+	private String packageUserId;
 	private List<RecipientResponse> recipients;
 	private List<FileResponse> files;
 	private List<String> approverList;

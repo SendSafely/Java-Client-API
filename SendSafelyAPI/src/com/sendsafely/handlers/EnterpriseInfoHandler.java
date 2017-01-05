@@ -13,10 +13,11 @@ import com.sendsafely.upload.UploadManager;
 
 public class EnterpriseInfoHandler extends BaseHandler 
 {	
-	private EnterpriseInfoRequest request = new EnterpriseInfoRequest();
+	private EnterpriseInfoRequest request;
 	
 	public EnterpriseInfoHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new EnterpriseInfoRequest(uploadManager.getJsonManager());
 	}
 
 	public EnterpriseInfo makeRequest() throws EnterpriseInfoFailedException {
@@ -49,6 +50,7 @@ public class EnterpriseInfoHandler extends BaseHandler
 		info.setHost(obj.getHost());
 		info.setSystemName(obj.getSystemName());
 		info.setAllowUndisclosedRecipients(obj.getAllowUndisclosedRecipients());
+		info.setMessageEncryption(obj.getMessageEncryption());
 		return info;
 	}
 	

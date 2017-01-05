@@ -13,10 +13,11 @@ import com.sendsafely.upload.UploadManager;
 public class UserInformationHandler extends BaseHandler 
 {	
 	
-	private UserInformationRequest request = new UserInformationRequest();
+	private UserInformationRequest request;
 	
 	public UserInformationHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new UserInformationRequest(uploadManager.getJsonManager());
 	}
 
 	public UserInformation makeRequest() throws UserInformationFailedException {
@@ -47,6 +48,7 @@ public class UserInformationHandler extends BaseHandler
 		info.setEmail(obj.getEmail());
 		info.setFirstName(obj.getFirstName());
 		info.setLastName(obj.getLastName());
+		info.setBetaUser(obj.getBetaUser());
 		return info;
 	}
 	

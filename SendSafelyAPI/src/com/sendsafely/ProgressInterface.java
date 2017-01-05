@@ -11,6 +11,8 @@ public interface ProgressInterface {
 	 * @description Implement this function in order to get progress information which can be used to update the user on the progress of the current file uploads. Will return a double between 0 and 1.
 	 * @param progress
 	 */
-	public void updateProgress(double progress);
+	public void updateProgress(String fileId, double progress);
+
+    public void gotFileId(String fileId);
 	
 }

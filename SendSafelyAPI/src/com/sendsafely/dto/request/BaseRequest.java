@@ -3,25 +3,27 @@ package com.sendsafely.dto.request;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gson.Gson;
 import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.json.JsonManager;
 
 public class BaseRequest 
 {
 	private HTTPMethod method;
 	private String path;
 	private Map<String, Object> postParams;
+    private JsonManager jsonManager;
 	
 	public BaseRequest()
 	{
 		this.postParams = new HashMap<String, Object>();
 	}
 	
-	protected void initialize(HTTPMethod method, String path)
+	protected void initialize(JsonManager jsonManager, HTTPMethod method, String path)
 	{
 		this.method = method;
 		this.path = path;
+        this.jsonManager = jsonManager;
 	}
 	
 	protected void setGetParam(GetParam key, Object value)
@@ -36,8 +38,7 @@ public class BaseRequest
 	
 	public String getPostBody()
 	{
-		Gson gson = new Gson();
-		return gson.toJson(postParams);
+        return jsonManager.toJson(postParams);
 	}
 	
 	public boolean hasPostBody()

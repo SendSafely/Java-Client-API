@@ -17,6 +17,8 @@ import com.sendsafely.credentials.CredentialsManager;
 import com.sendsafely.enums.HTTPMethod;
 import com.sendsafely.exceptions.CredentialsException;
 import com.sendsafely.exceptions.SendFailedException;
+import com.sendsafely.file.FileManager;
+import com.sendsafely.json.JsonManager;
 import com.sendsafely.utils.Progress;
 
 public class DefaultUploadManager implements UploadManager {
@@ -28,12 +30,14 @@ public class DefaultUploadManager implements UploadManager {
 	
 	private CredentialsManager credentialsManager;
 	private ConnectionManager conn;
+    private JsonManager jsonManager;
 	private InputStream content;
 	
-	public DefaultUploadManager(ConnectionManager connManager, CredentialsManager credentialsManager)
+	public DefaultUploadManager(ConnectionManager connManager, CredentialsManager credentialsManager, JsonManager jsonManager)
 	{
 		this.credentialsManager = credentialsManager;
 		this.conn = connManager;
+        this.jsonManager = jsonManager;
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public class DefaultUploadManager implements UploadManager {
 	}
 	
 	@Override
-	public String sendFile(String path, File file, String filename, String data, Progress progress) throws SendFailedException, IOException
+	public String sendFile(String path, FileManager file, String filename, String data, Progress progress) throws SendFailedException, IOException
 	{
 		URL url = createUrl(path);
 		
@@ -75,7 +79,7 @@ public class DefaultUploadManager implements UploadManager {
 		
 		setParam("requestData", data, boundary, writer);
 		
-		sendBinaryFile(filename, new FileInputStream(file), output, writer, boundary, progress);
+		sendBinaryFile(filename, file.getInputStream(), output, writer, boundary, progress);
 		
 		// End of multipart/form-data.
 		writer.append("--" + boundary + "--").append(CRLF);
@@ -100,6 +104,11 @@ public class DefaultUploadManager implements UploadManager {
 		
 		return responseVal;
 	}
+
+    @Override
+    public JsonManager getJsonManager() {
+        return this.jsonManager;
+    }
 	
 	@Override
 	public String getContentType() {

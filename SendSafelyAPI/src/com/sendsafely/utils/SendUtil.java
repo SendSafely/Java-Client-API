@@ -1,6 +1,5 @@
 package com.sendsafely.utils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -16,6 +15,7 @@ import com.sendsafely.dto.response.UploadFileResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.HTTPMethod;
 import com.sendsafely.exceptions.SendFailedException;
+import com.sendsafely.file.FileManager;
 import com.sendsafely.upload.UploadManager;
 
 public class SendUtil {
@@ -33,12 +33,12 @@ public class SendUtil {
 		return send(path, request.getMethod(), data, returnObject);
 	}
 	
-	public UploadFileResponse sendFile(String path, UploadFileRequest request, File file, String filename, Progress progress) throws SendFailedException, IOException
+	public UploadFileResponse sendFile(String path, UploadFileRequest request, FileManager file, String filename, Progress progress) throws SendFailedException, IOException
 	{
 		String data = request.getPostBody();
 	
 		String response = connection.sendFile(path, file, filename, data, progress);
-		return ResponseFactory.getInstanceFromString(response, new UploadFileResponse());
+		return ResponseFactory.getInstanceFromString(response, new UploadFileResponse(), connection.getJsonManager());
 	}
 	
 	protected <T> T send(String path, HTTPMethod method, String data, T clazz) throws IOException, SendFailedException
@@ -49,11 +49,11 @@ public class SendUtil {
 	
 	protected <T> T handleResponse(T clazz) throws IOException, SendFailedException
 	{
-		if(connection.getContentType().equals("application/octet-stream")) {
+		if(connection.getContentType() != null && connection.getContentType().equals("application/octet-stream")) {
 			return handleFileDownload(clazz);
 		} else {
 			String response = connection.getResponse();
-			return ResponseFactory.getInstanceFromString(response, clazz);
+			return ResponseFactory.getInstanceFromString(response, clazz, connection.getJsonManager());
 		}
 	}
 	

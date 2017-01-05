@@ -13,10 +13,11 @@ import com.sendsafely.upload.UploadManager;
 public class VerifyCredentialsHandler extends BaseHandler 
 {	
 	
-	private VerifyCredentialsRequest request = new VerifyCredentialsRequest();
+	private VerifyCredentialsRequest request;
 	
 	public VerifyCredentialsHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new VerifyCredentialsRequest(uploadManager.getJsonManager());
 	}
 
 	public String verify() throws InvalidCredentialsException {

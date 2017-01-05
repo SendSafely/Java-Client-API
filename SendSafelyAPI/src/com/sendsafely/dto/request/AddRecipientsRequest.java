@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.json.JsonManager;
 
 public class AddRecipientsRequest extends AddRecipientRequest 
 {	
@@ -11,8 +12,8 @@ public class AddRecipientsRequest extends AddRecipientRequest
 	private HTTPMethod method = HTTPMethod.PUT;
 	private String path = "/package/" + GetParam.PACKAGE_ID + "/recipients/";
 	
-	public AddRecipientsRequest(List<String> emails) {
-		initialize(method, path);
+	public AddRecipientsRequest(JsonManager jsonManager, List<String> emails) {
+		initialize(jsonManager, method, path);
 	
 		super.setPostParam("emails", emails);
 	}

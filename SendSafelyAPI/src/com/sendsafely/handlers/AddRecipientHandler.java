@@ -1,14 +1,11 @@
 package com.sendsafely.handlers;
 
 import java.io.IOException;
-import java.util.List;
 
 import com.sendsafely.Recipient;
 import com.sendsafely.dto.request.AddRecipientRequest;
 import com.sendsafely.dto.response.AddRecipientResponse;
 import com.sendsafely.enums.APIResponse;
-import com.sendsafely.enums.GetParam;
-import com.sendsafely.enums.HTTPMethod;
 import com.sendsafely.exceptions.RecipientFailedException;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.SendFailedException;
@@ -58,8 +55,9 @@ public class AddRecipientHandler extends BaseHandler
 	{
 		Recipient recipient = new Recipient();
 		recipient.setEmail(obj.getEmail());
-		recipient.setNeedsApproval(obj.getNeedsApproval());
+		recipient.setNeedsApproval(obj.getApprovalRequired());
 		recipient.setRecipientId(obj.getRecipientId());
+		
 		//recipient.setCanAddFiles(obj.getCanAddFiles());
 		//recipient.setCanAddMessages(obj.getCanAddMessages());
 		//recipient.setCanAddRecipients(obj.getCanAddRecipients());

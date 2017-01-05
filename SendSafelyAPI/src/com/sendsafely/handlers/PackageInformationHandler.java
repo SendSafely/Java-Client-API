@@ -28,10 +28,11 @@ import com.sendsafely.upload.UploadManager;
 public class PackageInformationHandler extends BaseHandler 
 {	
 	
-	private PackageInformationRequest request = new PackageInformationRequest();
+	private PackageInformationRequest request;
 	
 	public PackageInformationHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new PackageInformationRequest(uploadManager.getJsonManager());
 	}
 
 	public Package makeRequest(String packageId) throws PackageInformationFailedException {
@@ -122,8 +123,7 @@ public class PackageInformationHandler extends BaseHandler
 		File f = new File();
 		f.setFileId(resp.getFileId());
 		f.setFileName(resp.getFileName());
-		f.setFileSize(Long.parseLong(resp.getFileSize()));
-		//f.setCreatedBy(resp.getCreatedByEmail());
+		f.setFileSize(resp.getFileSize());
 		f.setParts(resp.getParts());
 		return f;
 	}
@@ -136,7 +136,9 @@ public class PackageInformationHandler extends BaseHandler
 			Confirmation c = new Confirmation();
 			c.setIpAddress(cr.getIpAddress());
 			c.setTimestamp(cr.getTimestamp());
-			c.setFile(createFile(cr.getFile()));
+			if(cr.getFile() != null) {
+				c.setFile(createFile(cr.getFile()));
+			}
 			retval.add(c);
 		}
 		

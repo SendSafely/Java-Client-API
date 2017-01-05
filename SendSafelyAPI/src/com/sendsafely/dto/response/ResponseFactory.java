@@ -1,14 +1,13 @@
 package com.sendsafely.dto.response;
 
-import com.google.gson.Gson;
+import com.sendsafely.json.JsonManager;
 
 public class ResponseFactory {
 
 	@SuppressWarnings("unchecked")
-	public static <T> T getInstanceFromString(String objectStr, T clazz)
+	public static <T> T getInstanceFromString(String objectStr, T clazz, JsonManager jsonManager)
 	{
-		Gson gson = new Gson();
-		return (T) gson.fromJson(objectStr, clazz.getClass());
+        return (T) jsonManager.fromJson(objectStr, clazz);
 	}
 	
 }

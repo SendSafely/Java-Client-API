@@ -4,7 +4,7 @@ public class AddRecipientResponse extends BaseResponse {
 
 	private String recipientId;
 	private String email;
-	private boolean needsApproval;
+	private boolean approvalRequired;
 	private boolean canAddFiles;
 	private boolean canAddMessages;
 	private boolean canAddRecipients;
@@ -21,11 +21,11 @@ public class AddRecipientResponse extends BaseResponse {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public boolean getNeedsApproval() {
-		return needsApproval;
+	public boolean getApprovalRequired() {
+		return approvalRequired;
 	}
-	public void setNeedsApproval(boolean needsApproval) {
-		this.needsApproval = needsApproval;
+	public void setApprovalRequired(boolean approvalRequired) {
+		this.approvalRequired = approvalRequired;
 	}
 	public boolean getCanAddFiles() {
 		return canAddFiles;

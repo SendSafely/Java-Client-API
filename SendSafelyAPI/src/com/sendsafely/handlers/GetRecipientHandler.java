@@ -13,10 +13,11 @@ import com.sendsafely.upload.UploadManager;
 public class GetRecipientHandler extends BaseHandler 
 {	
 	
-	private GetRecipientRequest request = new GetRecipientRequest();
+	private GetRecipientRequest request;
 	
 	public GetRecipientHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new GetRecipientRequest(uploadManager.getJsonManager());
 	}
 
 	public Recipient makeRequest(String packageId, String recipientId) throws RecipientFailedException {
@@ -50,7 +51,7 @@ public class GetRecipientHandler extends BaseHandler
 	{
 		Recipient recipient = new Recipient();
 		recipient.setEmail(obj.getEmail());
-		recipient.setNeedsApproval(obj.getNeedsApproval());
+		recipient.setNeedsApproval(obj.getApprovalRequired());
 		recipient.setRecipientId(obj.getRecipientId());
 		//recipient.setCanAddFiles(obj.getCanAddFiles());
 		//recipient.setCanAddMessages(obj.getCanAddMessages());

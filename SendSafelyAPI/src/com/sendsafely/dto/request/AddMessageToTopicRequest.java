@@ -2,6 +2,7 @@ package com.sendsafely.dto.request;
 
 import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.json.JsonManager;
 
 public class AddMessageToTopicRequest extends AddMessageRequest {
 	
@@ -9,8 +10,8 @@ public class AddMessageToTopicRequest extends AddMessageRequest {
 	//private static String path = "/package/" + GetParam.PACKAGE_ID + "/topic/" + GetParam.TOPIC_ID + "/message";
 	private String topicId;
 	
-	public AddMessageToTopicRequest(String topicId) {
-		super(HTTPMethod.PUT, "/package/" + GetParam.PACKAGE_ID + "/topic/" + GetParam.TOPIC_ID + "/message");
+	public AddMessageToTopicRequest(JsonManager jsonManager, String topicId) {
+		super(jsonManager, HTTPMethod.PUT, "/package/" + GetParam.PACKAGE_ID + "/topic/" + GetParam.TOPIC_ID + "/message");
 		
 		this.topicId = topicId;
 		super.setGetParam(GetParam.TOPIC_ID, topicId);

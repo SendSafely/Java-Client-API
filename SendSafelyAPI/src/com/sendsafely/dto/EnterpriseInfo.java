@@ -6,6 +6,9 @@ public class EnterpriseInfo {
 	private String systemName;
 	private Boolean outlookBeta;
 	private Boolean allowUndisclosedRecipients;
+	private String headerColor;
+	private String linkColor;
+	private boolean messageEncryption;
 	
 	/**
 	 * @description Returns the host name for the organization.
@@ -54,5 +57,32 @@ public class EnterpriseInfo {
 	public void setAllowUndisclosedRecipients(Boolean allowUndisclosedRecipients) {
 		this.allowUndisclosedRecipients = allowUndisclosedRecipients;
 	}
+
+	public String getHeaderColor() {
+		return headerColor;
+	}
+
+	public void setHeaderColor(String headerColor) {
+		this.headerColor = headerColor;
+	}
+
+	public String getLinkColor() {
+		return linkColor;
+	}
+
+	public void setLinkColor(String linkColor) {
+		this.linkColor = linkColor;
+	}
+	
+	public boolean getMessageEncryption()
+	{
+		return this.messageEncryption;
+	}
+	
+	public void setMessageEncryption(boolean messageEncryption)
+	{
+		this.messageEncryption = messageEncryption;
+	}
+	
 	
 }

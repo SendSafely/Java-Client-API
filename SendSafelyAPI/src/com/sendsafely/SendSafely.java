@@ -1,24 +1,38 @@
 package com.sendsafely;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.Security;
 import java.util.List;
+import java.util.Map;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+
+import com.google.gson.Gson;
 import com.sendsafely.connection.ConnectionFactory;
 import com.sendsafely.connection.ConnectionManager;
 import com.sendsafely.credentials.CredentialsFactory;
 import com.sendsafely.credentials.CredentialsManager;
+import com.sendsafely.credentials.DefaultCredentials;
 import com.sendsafely.dto.EnterpriseInfo;
 import com.sendsafely.dto.PackageURL;
 import com.sendsafely.dto.UserInformation;
+import com.sendsafely.dto.request.AddDropzoneRecipientRequest;
 import com.sendsafely.dto.request.AddMessageRequest;
-import com.sendsafely.dto.request.AddMessageToTopicRequest;
 import com.sendsafely.dto.request.AddRecipientRequest;
 import com.sendsafely.dto.request.AddRecipientsRequest;
+import com.sendsafely.dto.request.GetDropzoneRecipientRequest;
 import com.sendsafely.dto.request.GetMessageRequest;
+import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.CountryCode;
 import com.sendsafely.enums.Endpoint;
 import com.sendsafely.enums.Version;
 import com.sendsafely.exceptions.DownloadFileException;
+import com.sendsafely.exceptions.DropzoneRecipientFailedException;
 import com.sendsafely.exceptions.PasswordRequiredException;
 import com.sendsafely.exceptions.RecipientFailedException;
 import com.sendsafely.exceptions.ApproverRequiredException;
@@ -32,10 +46,13 @@ import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.MessageException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
 import com.sendsafely.exceptions.SendFailedException;
+import com.sendsafely.exceptions.TwoFactorAuthException;
 import com.sendsafely.exceptions.UpdatePackageLifeException;
 import com.sendsafely.exceptions.UpdateRecipientFailedException;
 import com.sendsafely.exceptions.UploadFileException;
 import com.sendsafely.exceptions.UserInformationFailedException;
+import com.sendsafely.file.FileManager;
+import com.sendsafely.handlers.AddDropzoneRecipientHandler;
 import com.sendsafely.handlers.AddFileHandler;
 import com.sendsafely.handlers.AddMessageHandler;
 import com.sendsafely.handlers.AddRecipientHandler;
@@ -45,17 +62,21 @@ import com.sendsafely.handlers.DeletePackageHandler;
 import com.sendsafely.handlers.DownloadAndDecryptFileHandler;
 import com.sendsafely.handlers.EnterpriseInfoHandler;
 import com.sendsafely.handlers.FinalizePackageHandler;
+import com.sendsafely.handlers.GetDropzoneRecipientHandler;
 import com.sendsafely.handlers.GetMessageHandler;
 import com.sendsafely.handlers.GetPackagesHandler;
 import com.sendsafely.handlers.GetRecipientHandler;
 import com.sendsafely.handlers.HandlerFactory;
 import com.sendsafely.handlers.PackageInformationHandler;
 import com.sendsafely.handlers.ParseLinksHandler;
+import com.sendsafely.handlers.RemoveDropzoneRecipientHandler;
+import com.sendsafely.handlers.RemoveRecipientHandler;
 import com.sendsafely.handlers.UpdatePackageLifeHandler;
 import com.sendsafely.handlers.UpdateRecipientHandler;
 import com.sendsafely.handlers.UserInformationHandler;
 import com.sendsafely.handlers.VerifyCredentialsHandler;
 import com.sendsafely.handlers.VerifyVersionHandler;
+import com.sendsafely.json.JsonManager;
 import com.sendsafely.upload.UploadFactory;
 import com.sendsafely.upload.UploadManager;
 
@@ -66,6 +87,7 @@ import com.sendsafely.upload.UploadManager;
 public class SendSafely {
 
 	private UploadManager uploadManager;
+    private JsonManager jsonManager = null;
 	
 	protected double version = 0.3;
 	
@@ -77,6 +99,7 @@ public class SendSafely {
 	 */
 	public SendSafely(String host, String apiKey, String apiSecret)
 	{
+		Security.addProvider(new BouncyCastleProvider());
 		CredentialsManager credentialsManager = CredentialsFactory.getDefaultCredentials(apiKey, apiSecret);
 		ConnectionManager connection = ConnectionFactory.getDefaultManager(host);
 		
@@ -85,8 +108,8 @@ public class SendSafely {
 	
 	public SendSafely(String host, CredentialsManager credentialsManager)
 	{
+		Security.addProvider(new BouncyCastleProvider());
 		ConnectionManager connection = ConnectionFactory.getDefaultManager(host);
-		
 		this.uploadManager = UploadFactory.getManager(connection, credentialsManager);
 	}
 	
@@ -98,13 +121,30 @@ public class SendSafely {
 	 */
 	public SendSafely(ConnectionManager connectionManager, String apiKey, String apiSecret)
 	{
+		Security.addProvider(new BouncyCastleProvider());
 		CredentialsManager credentialsManager = CredentialsFactory.getDefaultCredentials(apiKey, apiSecret);
 		this.uploadManager = UploadFactory.getManager(connectionManager, credentialsManager);
 	}
 	
 	public SendSafely(String host, ConnectionManager connectionManager, CredentialsManager credentialsManager)
 	{	
+		Security.addProvider(new BouncyCastleProvider());
 		this.uploadManager = UploadFactory.getManager(connectionManager, credentialsManager);
+	}
+
+    public SendSafely(UploadManager uploadManager)
+    {
+        this.uploadManager = uploadManager;
+    }
+
+    /**
+     * needed this constructor for the creation of the send safely api 
+     * which will enable us to start calling the login processes.
+     * @param host
+     */
+	public SendSafely(String host) {
+		// TODO Auto-generated constructor stub
+		this(host, (ConnectionManager)null, (CredentialsManager)null);
 	}
 
 	/**
@@ -171,6 +211,19 @@ public class SendSafely {
 		CreatePackageHandler handler = (CreatePackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.CREATE_PACKAGE);
 		return handler.makeRequest();
 	}
+		
+	/**
+	 * @description Creates a new package belonging to another user. This method can only be called by Enterprise Admins and can only target a user within the same organization. 
+	 * @param email The email address of the user the package will belong to
+	 * @return A {@link Package} object containing information about the package.
+	 * @throws CreatePackageFailedException
+	 * @throws LimitExceededException
+	 */
+	public Package createPackageForUser(String email) throws CreatePackageFailedException, LimitExceededException
+	{
+		CreatePackageHandler handler = (CreatePackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.CREATE_PACKAGE);
+		return handler.makeRequest(email);
+	}
 	
 	/**
 	 * @description Adds a recipient to a given package.
@@ -182,7 +235,7 @@ public class SendSafely {
 	 */
 	public Recipient addRecipient(String packageId, String email) throws LimitExceededException, RecipientFailedException
 	{
-		AddRecipientHandler handler = new AddRecipientHandler(uploadManager, new AddRecipientRequest(email));
+		AddRecipientHandler handler = new AddRecipientHandler(uploadManager, new AddRecipientRequest(uploadManager.getJsonManager(), email));
 		return handler.addRecipient(packageId);
 	}
 	
@@ -196,7 +249,7 @@ public class SendSafely {
 	 */
 	public List<Recipient> addRecipients(String packageId, List<String> emails) throws LimitExceededException, RecipientFailedException
 	{
-		AddRecipientsRequest request = new AddRecipientsRequest(emails);
+		AddRecipientsRequest request = new AddRecipientsRequest(uploadManager.getJsonManager(), emails);
 		AddRecipientsHandler handler = new AddRecipientsHandler(uploadManager, request);
 		return handler.makeRequest(packageId);
 	}
@@ -213,6 +266,18 @@ public class SendSafely {
 	{
 		GetRecipientHandler handler = new GetRecipientHandler(uploadManager);
 		return handler.makeRequest(packageId, recipientId);
+	}
+	
+	/**
+	 * @description Removes a recipient from a given package
+	 * @param packageId The unique packageId that you working on
+	 * @param recipientId The recipientId to grab
+	 * @throws RecipientFailedException
+	 */
+	public void removeRecipient(String packageId, String recipientId) throws RecipientFailedException
+	{
+		RemoveRecipientHandler handler = new RemoveRecipientHandler(uploadManager);
+		handler.makeRequest(packageId, recipientId);
 	}
 	
 	/**
@@ -243,6 +308,43 @@ public class SendSafely {
 	}
 	
 	/**
+	 * @description Adds a dropzone recipient.
+	 * @param email The recipient email to be added
+	 * @return A {@link String} string containing information about the recipient.
+	 * @throws RecipientFailedException
+	 */
+	public void addDropzoneRecipient(String email) throws RecipientFailedException
+	{
+		AddDropzoneRecipientHandler handler = new AddDropzoneRecipientHandler(uploadManager, new AddDropzoneRecipientRequest(uploadManager.getJsonManager(), email));
+		handler.addDropzoneRecipient(email);
+	}
+	
+	/**
+	 * @throws DropzoneRecipientFailedException 
+	 * @description Get all dropzone recipients.
+	 * @return List<String> a list of all dropzone recipients.
+	 * @throws DropzoneRecipientFailedException
+	 */
+	public List<String> getDropzoneRecipient() throws DropzoneRecipientFailedException
+	{
+		GetDropzoneRecipientHandler handler = new GetDropzoneRecipientHandler(uploadManager, new GetDropzoneRecipientRequest(uploadManager.getJsonManager()));
+		return handler.makeRequest();
+	}
+	
+	/**
+	 * @description Deletes a dropzone recipient for a given email address.
+	 * @param email The unique email address that you want to delete within your dropzone list.
+	 * @return 
+	 * @throws DropzoneRecipientFailedException
+	 */
+	public void removeDropzoneRecipient(String email) throws DropzoneRecipientFailedException
+	{
+		RemoveDropzoneRecipientHandler handler = new RemoveDropzoneRecipientHandler(uploadManager);
+		handler.makeRequest(email);
+	}
+	
+	
+	/**
 	 * @description Deletes a package given a package ID.
 	 * @param packageId The unique packageId that you want to delete.
 	 * @throws DeletePackageException
@@ -258,7 +360,7 @@ public class SendSafely {
 	 * @return List<String> a list of all active package IDs.
 	 * @throws GetPackagesException
 	 */
-	public List<Package> getActivePackages() throws GetPackagesException
+	public List<PackageReference> getActivePackages() throws GetPackagesException
 	{
 		GetPackagesHandler handler = (GetPackagesHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ACTIVE_PACKAGES);
 		return handler.makeRequest();
@@ -269,7 +371,7 @@ public class SendSafely {
 	 * @return List<String> a list of all archived package IDs.
 	 * @throws GetPackagesException
 	 */
-	public List<Package> getArchivedPackages() throws GetPackagesException
+	public List<PackageReference> getArchivedPackages() throws GetPackagesException
 	{
 		GetPackagesHandler handler = (GetPackagesHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ARCHIVED_PACKAGES);
 		return handler.makeRequest();
@@ -333,7 +435,7 @@ public class SendSafely {
 	 * @throws LimitExceededException
 	 * @throws UploadFileException
 	 */
-	public File encryptAndUploadFile(String packageId, String keyCode, java.io.File file) throws LimitExceededException, UploadFileException
+	public File encryptAndUploadFile(String packageId, String keyCode, FileManager file) throws LimitExceededException, UploadFileException
 	{
 		AddFileHandler handler = (AddFileHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ADD_FILE);
 		return handler.makeRequest(packageId, keyCode, file);
@@ -349,10 +451,27 @@ public class SendSafely {
 	 * @throws LimitExceededException
 	 * @throws UploadFileException
 	 */
-	public File encryptAndUploadFile(String packageId, String keyCode, java.io.File file, ProgressInterface progress) throws LimitExceededException, UploadFileException
+	public File encryptAndUploadFile(String packageId, String keyCode, FileManager file, ProgressInterface progress) throws LimitExceededException, UploadFileException
 	{
 		AddFileHandler handler = (AddFileHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ADD_FILE);
 		return handler.makeRequest(packageId, keyCode, file, progress);
+	}
+	
+	/**
+	 * @description Encrypt and upload a new file. The file will be encrypted before being uploaded to the server. The function will block until the file is uploaded.
+	 * @param packageId The packageId to attach the file to. 
+	 * @param keyCode The keycode belonging to the package.
+	 * @param serverSecret The serverSecret belonging to the package. 
+	 * @param file The given file to encrypt and upload. This can not be a folder.
+	 * @param progress A progress callback object which can be used to report back progress on how the upload is progressing.
+	 * @return {@link File} a file object with metadata for the file.
+	 * @throws LimitExceededException
+	 * @throws UploadFileException
+	 */
+	public File encryptAndUploadFile(String packageId, String keyCode, String serverSecret, FileManager file, ProgressInterface progress) throws LimitExceededException, UploadFileException
+	{
+		AddFileHandler handler = (AddFileHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ADD_FILE);
+		return handler.makeRequest(packageId, keyCode, serverSecret, file, progress);
 	}
 	
 	/**
@@ -365,8 +484,8 @@ public class SendSafely {
 	 */
 	public void encryptAndUploadMessage(String packageId, String keyCode, String message) throws MessageException
 	{
-		new AddMessageHandler(uploadManager, new AddMessageRequest());
-		AddMessageHandler handler = new AddMessageHandler(uploadManager, new AddMessageRequest());
+		new AddMessageHandler(uploadManager, new AddMessageRequest(uploadManager.getJsonManager()));
+		AddMessageHandler handler = new AddMessageHandler(uploadManager, new AddMessageRequest(uploadManager.getJsonManager()));
 		handler.makeRequest(packageId, keyCode, message);
 	}
 	
@@ -380,7 +499,7 @@ public class SendSafely {
 	 */
 	public java.io.File downloadFile(String packageId, String fileId, String keyCode) throws DownloadFileException, PasswordRequiredException
 	{
-		return downloadFile(packageId, fileId, keyCode, null, null);
+		return downloadFile(packageId, fileId, keyCode, null, (String)null);
 	}
 	
 	/**
@@ -403,7 +522,7 @@ public class SendSafely {
 	 * @param fileId The fileId to download.
 	 * @param keyCode The keycode belonging to the package. 
 	 * @param progress An optional progress interface to keep track of the download progress.
-	 * @return void
+	 * @return a file object containing a temporary file name. The file must be renamed to be usable through any program using this function.
 	 * @throws DownloadFileException 
 	 */
 	public java.io.File downloadFile(String packageId, String fileId, String keyCode, ProgressInterface progress) throws DownloadFileException, PasswordRequiredException
@@ -436,7 +555,7 @@ public class SendSafely {
 	 */
 	public String getPackageMessage(String secureLink) throws MessageException
 	{
-		GetMessageHandler handler = new GetMessageHandler(uploadManager, new GetMessageRequest());
+		GetMessageHandler handler = new GetMessageHandler(uploadManager, new GetMessageRequest(uploadManager.getJsonManager()));
 		return handler.makeRequest(secureLink);
 	}
 	
@@ -450,6 +569,22 @@ public class SendSafely {
 	 * @throws ApproverRequiredException 
 	 */
 	public PackageURL finalizePackage(String packageId, String keycode) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException
+	{
+		FinalizePackageHandler handler = (FinalizePackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.FINALIZE_PACKAGE);
+		return handler.makeRequest(packageId, keycode);
+	}
+	
+	/**
+	 * @description Finalizes the package so it can be delivered to the recipients
+	 * @param packageId The packageId which is to be finalized.
+	 * @param packageCode The packageCode belonging to the package. 
+	 * @param keycode The keycode belonging to the package.
+	 * @return A link to access the package. This link can be sent to the recipients.
+	 * @throws LimitExceededException
+	 * @throws FinalizePackageFailedException
+	 * @throws ApproverRequiredException 
+	 */
+	public PackageURL finalizePackage(String packageId, String packageCode, String keycode) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException
 	{
 		FinalizePackageHandler handler = (FinalizePackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.FINALIZE_PACKAGE);
 		return handler.makeRequest(packageId, keycode);
@@ -484,6 +619,132 @@ public class SendSafely {
 	{
 		FinalizePackageHandler handler = (FinalizePackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.FINALIZE_PACKAGE);
 		return handler.makeRequest(packageId, keycode, true);
+	}
+	
+	/**
+	 * @description Starts the process to login with a username and password. Will
+	 * throw an exception if two factor authentication is required which will force the caller
+	 * to handle asking for more input and call its sister method to complete the second part of the
+	 * login verification
+	 * @param host - host name.
+	 * @param email The recipient email to be added
+	 * @param password - users password
+	 * @param keyDescription - which for now is hard coded by the caller... typically "SendSafely CLI Key (auto generated)"
+	 * @return A {@link String} string containing information about the recipient.
+	 * @throws Exception 
+	 * @throws RecipientFailedException
+	 */
+	public DefaultCredentials generateAPIKey(String host, String email, String password, String keyDescription) throws Exception
+	{
+		ConnectionManager connection = ConnectionFactory.getDefaultManager(host);
+		String targetURL = connection.getHost()+"/auth-api/generate-key/";
+		String urlParameters = "{email:'"+email+"', password:'"+password+"', keyDescription:'"+keyDescription+"'}";
+		String result = executePostHttpSend(targetURL, urlParameters, "PUT");
+		Map gsonJavaObj = new Gson().fromJson(result, Map.class);
+		String apiKey = gsonJavaObj.get("apiKey")==null?"":gsonJavaObj.get("apiKey").toString();
+		String apiSecret = gsonJavaObj.get("apiSecret")==null?"":gsonJavaObj.get("apiSecret").toString();
+		DefaultCredentials defaultCredentials = new DefaultCredentials(apiKey, apiSecret);
+		Object response = gsonJavaObj.get("response");
+		Object message = gsonJavaObj.get("message");
+		if (response.equals(APIResponse.TWO_FA_REQUIRED.toString()))
+        {
+            throw new TwoFactorAuthException(response.toString(), message.toString());
+        }
+        else if (response.equals(APIResponse.AUTHENTICATION_FAILED.toString()))
+        {
+            throw new InvalidCredentialsException(message.toString());
+        }
+        else if (!response.equals(APIResponse.SUCCESS.toString()))
+        {
+            throw new EnterpriseInfoFailedException(message.toString());
+        }
+		return defaultCredentials;
+	}
+	
+	/**
+	 * HELPER UTILITY FOR GENERATE KEY FOR UNAUTHENTICATED REQUESTS.
+	 * @param targetURL 
+	 * @param urlParameters - parameters (normally in json format)
+	 * @param method - http method
+	 * @return
+	 */
+	public static String executePostHttpSend(String targetURL, String urlParameters, String method) {
+		  HttpURLConnection connection = null;
+
+		  try {
+		    //Create connection
+		    URL url = new URL(targetURL);
+		    connection = (HttpURLConnection) url.openConnection();
+		    connection.setRequestMethod(method);
+		    connection.setRequestProperty("Content-Type", 
+		        "application/json");
+
+		    connection.setRequestProperty("Content-Length", 
+		        Integer.toString(urlParameters.getBytes().length));
+		    connection.setRequestProperty("Content-Language", "en-US");  
+
+		    connection.setUseCaches(false);
+		    connection.setDoOutput(true);
+
+		    //Send request
+		    DataOutputStream wr = new DataOutputStream (
+		        connection.getOutputStream());
+		    wr.writeBytes(urlParameters);
+		    wr.close();
+
+		    //Get Response  
+		    InputStream is = connection.getInputStream();
+		    BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+		    StringBuilder response = new StringBuilder(); // or StringBuffer if Java version 5+
+		    String line;
+		    while ((line = rd.readLine()) != null) {
+		      response.append(line);
+		      response.append('\r');
+		    }
+		    rd.close();
+		    return response.toString();
+		  } catch (Exception e) {
+		    e.printStackTrace();
+		    return null;
+		  } finally {
+		    if (connection != null) {
+		      connection.disconnect();
+		    }
+		  }
+		}
+
+	/**
+	 * This will accept a host, validation token, input(sms verification code), and a key description
+	 * and will complete the login verification process.
+	 * @param host
+	 * @param validationToken
+	 * @param input
+	 * @param keyDescription
+	 * @return
+	 * @throws InvalidCredentialsException
+	 * @throws EnterpriseInfoFailedException
+	 */
+	public DefaultCredentials generateKey2FA(String host, String validationToken, String input, String keyDescription) throws InvalidCredentialsException, EnterpriseInfoFailedException {
+		ConnectionManager connection = ConnectionFactory.getDefaultManager(host);
+		String targetURL = connection.getHost()+"/auth-api/generate-key/"+validationToken+"/";
+		String urlParameters = "{smsCode:'"+input+"', keyDescription:'"+keyDescription+"'}";
+		String result = executePostHttpSend(targetURL, urlParameters, "POST");
+		Map gsonJavaObj = new Gson().fromJson(result, Map.class);
+		String apiKey = gsonJavaObj.get("apiKey").toString();
+		String apiSecret = gsonJavaObj.get("apiSecret").toString();
+		String response = gsonJavaObj.get("response").toString();
+		DefaultCredentials defaultCredentials = new DefaultCredentials(apiKey, apiSecret);
+		if (response.equals(APIResponse.AUTHENTICATION_FAILED.toString()))
+        {
+            throw new InvalidCredentialsException("Error on credentials");
+        }
+//TODO: Consider adding a pinrefreshexception to mirror the .net api
+        else if (!response.equals(APIResponse.SUCCESS.toString()))
+        {
+            throw new EnterpriseInfoFailedException("Error on credentials");
+        }
+		return defaultCredentials;
+		
 	}
 	
 }

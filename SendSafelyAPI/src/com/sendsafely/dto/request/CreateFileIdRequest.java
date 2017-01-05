@@ -2,14 +2,15 @@ package com.sendsafely.dto.request;
 
 import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.json.JsonManager;
 
 public class CreateFileIdRequest extends BaseRequest {
 
 	private HTTPMethod method = HTTPMethod.PUT;
 	private String path = "/package/" + GetParam.PACKAGE_ID + "/file/";
 	
-	public CreateFileIdRequest() {
-		initialize(method, path);
+	public CreateFileIdRequest(JsonManager jsonManager) {
+		initialize(jsonManager, method, path);
 	
 		super.setPostParam("uploadType", "JAVA_API");
 	}

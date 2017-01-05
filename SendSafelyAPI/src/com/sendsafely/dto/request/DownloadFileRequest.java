@@ -2,20 +2,21 @@ package com.sendsafely.dto.request;
 
 import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.json.JsonManager;
 
 public class DownloadFileRequest extends BaseRequest {
 
 	protected HTTPMethod method = HTTPMethod.POST;
 	protected String path = "/package/" + GetParam.PACKAGE_ID + "/file/" + GetParam.FILE_ID + "/download/";
 	
-	public DownloadFileRequest() {
-		initialize(method, path);
+	public DownloadFileRequest(JsonManager jsonManager) {
+		initialize(jsonManager, method, path);
 	}
 	
-	public DownloadFileRequest(HTTPMethod method, String path) {
+	public DownloadFileRequest(JsonManager jsonManager, HTTPMethod method, String path) {
 		this.method = method;
 		this.path = path;
-		initialize(method, path);
+		initialize(jsonManager, method, path);
 	}
 	
 	public void setUploadType(String api) 

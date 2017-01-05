@@ -54,7 +54,7 @@ public class DownloadFileHandler extends BaseHandler
 	
 	private DownloadFileRequest createRequest(int part)
 	{
-		DownloadFileRequest request = new DownloadFileRequest();
+		DownloadFileRequest request = new DownloadFileRequest(uploadManager.getJsonManager());
 		request.setPackageId(packageInfo.getPackageId());
 		request.setFileId(fileId);
 		request.setChecksum(checksum);

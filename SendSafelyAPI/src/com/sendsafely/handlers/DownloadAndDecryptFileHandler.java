@@ -12,6 +12,7 @@ import com.sendsafely.ProgressInterface;
 import com.sendsafely.exceptions.DownloadFileException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
 import com.sendsafely.exceptions.PasswordRequiredException;
+import com.sendsafely.exceptions.UploadFileException;
 import com.sendsafely.progress.DefaultProgress;
 import com.sendsafely.upload.UploadManager;
 import com.sendsafely.utils.Progress;
@@ -19,6 +20,8 @@ import com.sendsafely.Package;
 
 public class DownloadAndDecryptFileHandler extends BaseHandler 
 {	
+	private final int RETRY_ATTEMPTS = 10;
+	private final int RETRY_SLEEP_INCREMENT = 5000;
 	private Package packageInfo;
 	private String fileId;
 	private String password;
@@ -37,8 +40,16 @@ public class DownloadAndDecryptFileHandler extends BaseHandler
 		this.packageInfo = getPackageInfo(packageId);
 		this.packageInfo.setKeyCode(keyCode);
 		
+		File fileToDownload = findFile();		
+		java.io.File systemFile = getSystemFile(fileToDownload);
+		
 		// Download the file
-		return downloadFile();
+		return downloadFile(systemFile, fileToDownload);
+	}
+	
+	private java.io.File getSystemFile(File ssFile) throws DownloadFileException {
+		java.io.File systemFile = createTempFile(ssFile);
+		return systemFile;
 	}
 	
 	private void setupProgress(ProgressInterface progress)
@@ -60,27 +71,59 @@ public class DownloadAndDecryptFileHandler extends BaseHandler
 		}
 	}
 	
-	private java.io.File downloadFile() throws DownloadFileException, PasswordRequiredException {
+	private java.io.File downloadFile(java.io.File outFile, File ssFile) throws DownloadFileException, PasswordRequiredException {
 		
-		File fileToDownload = findFile();
-		
-		Progress progress = new Progress(this.progress);
-		progress.setTotal(fileToDownload.getFileSize());
+		Progress progress = new Progress(this.progress, ssFile.getFileId());
+		progress.setTotal(ssFile.getFileSize());
 		progress.resetCurrent();
 		
 		Timer timer = startTimer(progress);
-		
-		java.io.File newFile = createTempFile(fileToDownload);
-		OutputStream output = getOutputStream(newFile);
-		for(int part = 1; part<=fileToDownload.getParts(); part++) {
-			DownloadFileHandler handler = new DownloadFileHandler(uploadManager);
-			InputStream stream = handler.makeRequest(packageInfo, fileToDownload.getFileId(), part, password);
-			decrypt(stream, output, progress);
+
+		int failCounter = 0;
+		OutputStream output = getOutputStream(outFile);
+		try{
+			for(int part = 1; part<=ssFile.getParts(); part++) {
+				
+				//This is the fail/retry loop (on any exception)
+				for (failCounter = 0; failCounter <= RETRY_ATTEMPTS; failCounter++)
+				{
+					try
+					{
+						DownloadFileHandler handler = new DownloadFileHandler(uploadManager);
+						InputStream stream = handler.makeRequest(packageInfo, ssFile.getFileId(), part, password);
+						decrypt(stream, output, progress);
+						break;
+					}
+					catch(DownloadFileException e)
+					{
+						if(failCounter == RETRY_ATTEMPTS)
+						{
+							outFile.delete();
+							throw new DownloadFileException(e);
+						}
+						
+						//Download failed...retrying in sleepInterval milliseconds (increases on each failure)
+						int sleepInterval = failCounter * RETRY_SLEEP_INCREMENT;
+
+						try 
+						{
+							Thread.sleep(sleepInterval);
+						} 
+						catch (InterruptedException e1) 
+						{
+							throw new DownloadFileException(e);
+						}
+					}
+				}
+			}
 		}
-		closeStream(output);
-		stopTimer(timer);
-		
-		return newFile;
+		finally
+		{
+			closeStream(output);
+			progress.finished();
+			stopTimer(timer);
+		}
+		return outFile;
 	}
 	
 	private void stopTimer(Timer timer)

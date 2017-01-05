@@ -2,6 +2,7 @@ package com.sendsafely.dto.request;
 
 import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.json.JsonManager;
 
 public class FinalizePackageRequest extends BaseRequest 
 {	
@@ -9,8 +10,8 @@ public class FinalizePackageRequest extends BaseRequest
 	private HTTPMethod method = HTTPMethod.POST;
 	private String path = "/package/" + GetParam.PACKAGE_ID + "/finalize/";
 	
-	public FinalizePackageRequest() {
-		initialize(method, path);
+	public FinalizePackageRequest(JsonManager jsonManager) {
+		initialize(jsonManager, method, path);
 	}
 	
 	public void setPackageId(String packageId)

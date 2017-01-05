@@ -10,10 +10,11 @@ import com.sendsafely.upload.UploadManager;
 
 public class VerifyVersionHandler extends BaseHandler 
 {
-	private VerifyVersionRequest request = new VerifyVersionRequest();
+	private VerifyVersionRequest request;
 	
 	public VerifyVersionHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new VerifyVersionRequest(uploadManager.getJsonManager());
 	}
 
 	public Version makeRequest() throws SendFailedException {

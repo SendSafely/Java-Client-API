@@ -3,6 +3,7 @@ package com.sendsafely.dto.request;
 import com.sendsafely.enums.CountryCode;
 import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
+import com.sendsafely.json.JsonManager;
 
 public class UpdateRecipientRequest extends BaseRequest 
 {	
@@ -10,8 +11,8 @@ public class UpdateRecipientRequest extends BaseRequest
 	private HTTPMethod method = HTTPMethod.POST;
 	private String path = "/package/" + GetParam.PACKAGE_ID + "/recipient/" + GetParam.RECIPIENT_ID + "/";
 	
-	public UpdateRecipientRequest() {
-		initialize(method, path);
+	public UpdateRecipientRequest(JsonManager jsonManager) {
+		initialize(jsonManager, method, path);
 	}
 	
 	public void setPhonenumber(String email)

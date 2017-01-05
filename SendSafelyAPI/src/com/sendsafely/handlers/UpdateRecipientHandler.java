@@ -17,10 +17,11 @@ import com.sendsafely.upload.UploadManager;
 public class UpdateRecipientHandler extends BaseHandler 
 {	
 	
-	private UpdateRecipientRequest request = new UpdateRecipientRequest();
+	private UpdateRecipientRequest request;
 	
 	public UpdateRecipientHandler(UploadManager uploadManager) {
 		super(uploadManager);
+        request = new UpdateRecipientRequest(uploadManager.getJsonManager());
 	}
 
 	public void makeRequest(String packageId, String recipientId, String phonenumber, CountryCode countryCode) throws UpdateRecipientFailedException {
@@ -50,7 +51,7 @@ public class UpdateRecipientHandler extends BaseHandler
 	{
 		Recipient recipient = new Recipient();
 		recipient.setEmail(obj.getEmail());
-		recipient.setNeedsApproval(obj.getNeedsApproval());
+		recipient.setNeedsApproval(obj.getApprovalRequired());
 		recipient.setRecipientId(obj.getRecipientId());
 		return recipient;
 	}

@@ -10,20 +10,29 @@ public class Progress extends TimerTask {
 	private ProgressInterface callback;
 	private long total;
 	private long current;
+    private String fileId;
 	
-	public Progress(ProgressInterface callback)
+	public Progress(ProgressInterface callback, String fileId)
 	{
 		this.callback = callback;
+        this.fileId = fileId;
 	}
 	
 	@Override
 	public void run() {
 		if(callback != null) {
-			double progress = Math.min(((double)current)/((double)total), 1);
-			callback.updateProgress(progress);
+			double progress = (double)Math.min(((double)current)/((double)total), 1);
+			callback.updateProgress(fileId, progress);
 		}
 	}
 	
+	
+	
+
+	public void finished() {
+		callback.updateProgress(this.fileId, 1);
+	}
+
 	public void setTotal(long total)
 	{
 		this.total = total;
