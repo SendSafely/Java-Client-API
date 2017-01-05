@@ -26,7 +26,7 @@ public class SendSafelyRefApp {
 		 * UserApiSecret: The API Secret associated with the API Key used above.  The API Secret is provided to  
 		 *  you when you generate a new API Key.  
 		 *
-		 * FileToUpload: Local path to the file you want to upload. Can be any file up to 2GB in size. 
+		 * FileToUpload: Local path to the file you want to upload. 
 		 *
 		 * RecipientEmailAddress: The email address of the person you want to send the file to. 
 		 */

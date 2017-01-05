@@ -85,7 +85,6 @@ public class PackageInformationHandler extends BaseHandler
 		info.setPackageCode(obj.getPackageCode());
 		info.setPackageId(obj.getPackageId());
 		info.setRecipients(convertRecipients(obj.getRecipients()));
-		//info.setTopics(obj.getTopics());
 		info.setServerSecret(obj.getServerSecret());
 		info.setState(obj.getState());
 		return info;
