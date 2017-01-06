@@ -82,9 +82,7 @@ public class CreatePackageHandler extends BaseHandler
 		try
 		{
 			Package info = getPackageInformation(obj);
-			String b64String = CryptoUtil.GenerateKeyCode();
-			String decodedString = DatatypeConverter.printBase64Binary(b64String.getBytes());
-			info.setKeyCode(new String(UrlBase64.encode(decodedString.getBytes())));
+			info.setKeyCode(CryptoUtil.GenerateKeyCode());
 			return info;
 		}
 		catch (TokenGenerationFailedException e)

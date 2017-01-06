@@ -14,6 +14,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
 import com.sendsafely.exceptions.PublicKeyEncryptionFailedException;
+
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -26,15 +27,6 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.openpgp.*;
-import org.bouncycastle.openpgp.PGPCompressedData;
-import org.bouncycastle.openpgp.PGPEncryptedDataGenerator;
-import org.bouncycastle.openpgp.PGPEncryptedDataList;
-import org.bouncycastle.openpgp.PGPException;
-import org.bouncycastle.openpgp.PGPLiteralData;
-import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
-import org.bouncycastle.openpgp.PGPObjectFactory;
-import org.bouncycastle.openpgp.PGPPBEEncryptedData;
-import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.PBEDataDecryptorFactory;
 import org.bouncycastle.openpgp.operator.PGPKeyEncryptionMethodGenerator;
 import org.bouncycastle.openpgp.operator.PublicKeyKeyEncryptionMethodGenerator;
@@ -43,11 +35,13 @@ import org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.UrlBase64;
 
 import com.sendsafely.exceptions.MessageException;
 import com.sendsafely.exceptions.PublicKeyDecryptionFailedException;
 import com.sendsafely.exceptions.SignatureCreationFailedException;
 import com.sendsafely.exceptions.TokenGenerationFailedException;
+
 import org.bouncycastle.util.io.Streams;
 
 public class CryptoUtil 
@@ -91,8 +85,7 @@ public class CryptoUtil
 		} catch (NoSuchProviderException e) {
 			throw new TokenGenerationFailedException(e);
 		}
-		
-		return DatatypeConverter.printBase64Binary(randomBytes);
+		return new String(UrlBase64.encode(randomBytes)).replace(".", "");
 	}
 	
 	public static String PBKDF2(String token, String salt, int iterations)
