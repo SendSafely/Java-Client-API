@@ -11,6 +11,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import com.sendsafely.connection.ConnectionManager;
 import com.sendsafely.credentials.CredentialsManager;
@@ -32,6 +34,14 @@ public class DefaultUploadManager implements UploadManager {
 	private ConnectionManager conn;
     private JsonManager jsonManager;
 	private InputStream content;
+	private String responseVal = "";
+	
+	private String server;
+	private String date;
+	private int responseCode;
+	private String responseMessage;
+	private String responseContentType;
+	private String etc;
 	
 	public DefaultUploadManager(ConnectionManager connManager, CredentialsManager credentialsManager, JsonManager jsonManager)
 	{
@@ -54,10 +64,14 @@ public class DefaultUploadManager implements UploadManager {
 		{
 			conn.send(data);
 		}
-		
+		this.date = conn.getHeader("Date");
+		this.server = conn.getHeader("Server");
+		this.responseCode = conn.getResponseCode();
+		this.responseMessage = conn.getResponseMessage();
+		this.responseContentType = conn.getContentType();
 		this.content = conn.getResponse();
 	}
-	
+
 	@Override
 	public String sendFile(String path, FileManager file, String filename, String data, Progress progress) throws SendFailedException, IOException
 	{
@@ -90,6 +104,8 @@ public class DefaultUploadManager implements UploadManager {
 		return responseVal;
 	}
 	
+
+	
 	@Override
 	public String getResponse() throws IOException
 	{
@@ -120,6 +136,24 @@ public class DefaultUploadManager implements UploadManager {
 		return this.content;
 	}
 	
+	
+	@Override
+	public String getServer() {
+		return server;
+	}
+	@Override
+	public String getDate() {
+		return date;
+	}
+	@Override
+	public int getResponseCode() {
+		return responseCode;
+	}
+	@Override
+	public String getResponseMessage() {
+		return responseMessage;
+	}
+
 	private URL createUrl(String path) throws SendFailedException
 	{
 		try {

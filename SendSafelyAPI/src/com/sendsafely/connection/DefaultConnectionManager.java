@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import com.sendsafely.exceptions.SendFailedException;
 
@@ -81,6 +83,29 @@ public class DefaultConnectionManager implements ConnectionManager {
 	public String getHeader(String header)
 	{
 		return conn.getHeaderField(header);
+	}
+	
+	@Override
+	public Map<String,List<String>> getHeaders(){
+		return conn.getHeaderFields();
+	}
+	
+	public int getResponseCode() throws IOException{
+		return conn.getResponseCode();
+	}
+	
+	public String getResponseMessage() throws IOException{
+		return conn.getResponseMessage();
+	}
+	
+	public String getContentType(){
+		return conn.getContentType();
+	}
+	
+	@Override
+	public InputStream getErrorStream() throws IOException
+	{
+		return conn.getErrorStream();
 	}
 
 }

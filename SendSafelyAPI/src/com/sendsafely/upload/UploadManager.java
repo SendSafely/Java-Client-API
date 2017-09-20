@@ -17,5 +17,9 @@ public interface UploadManager {
 	public String getContentType();
 	public String getResponse() throws IOException;
 	public InputStream getStream();
+	public String getServer();
+	public String getDate();
+	public int getResponseCode();
+	public String getResponseMessage();
 	
 }

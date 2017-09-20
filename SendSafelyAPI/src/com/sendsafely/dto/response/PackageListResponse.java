@@ -10,6 +10,7 @@ public class PackageListResponse extends BaseResponse {
 	private String packageCode;
 	private String serverSecret;
 	private List<String> recipients;
+	private List<String> contactGroups;
 	private List<FileResponse> files;
 	private List<String> approverList;
 	private boolean needsApproval;
@@ -22,6 +23,12 @@ public class PackageListResponse extends BaseResponse {
 	}
 	public void setRecipients(List<String> recipients) {
 		this.recipients = recipients;
+	}
+	public List<String> getContactGroups() {
+		return contactGroups;
+	}
+	public void setContactGroups(List<String> contactGroups) {
+		this.contactGroups = contactGroups;
 	}
 	public List<FileResponse> getFiles() {
 		return files;

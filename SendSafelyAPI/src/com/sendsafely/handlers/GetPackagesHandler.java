@@ -62,24 +62,14 @@ public class GetPackagesHandler extends BaseHandler
 		info.setNeedsApproval(obj.getNeedsApproval());
 		info.setPackageCode(obj.getPackageCode());
 		info.setPackageId(obj.getPackageId());
-		info.setRecipients(convertRecipients(obj.getRecipients()));
+		info.setRecipients(obj.getRecipients());
+		info.setContactGroupNames(obj.getContactGroups());
 		info.setServerSecret(obj.getServerSecret());
 		info.setState(obj.getState());
 		
 		return info;
 	}
-	
-	protected List<String> convertRecipients(List<String> responses) 
-	{
-		List<String> retval = new ArrayList<String>(responses.size());
-		for (String resp : responses)
-		{
-			retval.add(resp);
-		}
-		
-		return retval;
-	}
-	
+
 	protected List<File> convertFiles(List<FileResponse> responses) 
 	{
 		if(responses == null) {

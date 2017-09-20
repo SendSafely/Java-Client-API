@@ -7,6 +7,7 @@ public class UserInformation {
 	private String firstName;
 	private String lastName;
 	private boolean betaUser;
+	private boolean adminUser;
 	
 	/**
 	 * @description The email address connected to the user.
@@ -86,6 +87,22 @@ public class UserInformation {
 	 */
 	public void setBetaUser(boolean betaUser) {
 		this.betaUser = betaUser;
+	}
+
+	/**
+	 * @description Set internally by the API.
+	 * @return isAdmin
+	 */
+	public boolean getAdminUser() {
+		return adminUser;
+	}
+
+	/**
+	 * @description Set internally by the API
+	 * @param isAdmin
+	 */
+	public void setAdminUser(boolean adminUser) {
+		this.adminUser = adminUser;
 	}
 	
 	

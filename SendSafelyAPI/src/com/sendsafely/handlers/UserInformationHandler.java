@@ -49,6 +49,7 @@ public class UserInformationHandler extends BaseHandler
 		info.setFirstName(obj.getFirstName());
 		info.setLastName(obj.getLastName());
 		info.setBetaUser(obj.getBetaUser());
+		info.setAdminUser(obj.getAdminUser());
 		return info;
 	}
 	

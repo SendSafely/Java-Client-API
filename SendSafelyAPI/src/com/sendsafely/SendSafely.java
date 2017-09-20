@@ -21,12 +21,19 @@ import com.sendsafely.credentials.DefaultCredentials;
 import com.sendsafely.dto.EnterpriseInfo;
 import com.sendsafely.dto.PackageURL;
 import com.sendsafely.dto.UserInformation;
+import com.sendsafely.dto.request.AddContactGroupAsRecipientRequest;
 import com.sendsafely.dto.request.AddDropzoneRecipientRequest;
+import com.sendsafely.dto.request.AddUserToContactGroupRequest;
 import com.sendsafely.dto.request.AddMessageRequest;
 import com.sendsafely.dto.request.AddRecipientRequest;
 import com.sendsafely.dto.request.AddRecipientsRequest;
+import com.sendsafely.dto.request.CreateContactGroupRequest;
 import com.sendsafely.dto.request.GetDropzoneRecipientRequest;
 import com.sendsafely.dto.request.GetMessageRequest;
+import com.sendsafely.dto.request.GetContactGroupsRequest;
+import com.sendsafely.dto.request.RemoveContactGroupAsRecipientRequest;
+import com.sendsafely.dto.request.RemoveContactGroupRequest;
+import com.sendsafely.dto.request.RemoveUserFromContactGroupRequest;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.CountryCode;
 import com.sendsafely.enums.Endpoint;
@@ -35,11 +42,18 @@ import com.sendsafely.exceptions.DownloadFileException;
 import com.sendsafely.exceptions.DropzoneRecipientFailedException;
 import com.sendsafely.exceptions.PasswordRequiredException;
 import com.sendsafely.exceptions.RecipientFailedException;
+import com.sendsafely.exceptions.RemoveContactGroupAsRecipientFailedException;
+import com.sendsafely.exceptions.RemoveContactGroupFailedException;
+import com.sendsafely.exceptions.RemoveEmailContactGroupFailedException;
+import com.sendsafely.exceptions.ContactGroupException;
+import com.sendsafely.exceptions.AddEmailContactGroupFailedException;
 import com.sendsafely.exceptions.ApproverRequiredException;
+import com.sendsafely.exceptions.CreateContactGroupFailedException;
 import com.sendsafely.exceptions.CreatePackageFailedException;
 import com.sendsafely.exceptions.DeletePackageException;
 import com.sendsafely.exceptions.EnterpriseInfoFailedException;
 import com.sendsafely.exceptions.FinalizePackageFailedException;
+import com.sendsafely.exceptions.GetContactGroupsFailedException;
 import com.sendsafely.exceptions.GetPackagesException;
 import com.sendsafely.exceptions.InvalidCredentialsException;
 import com.sendsafely.exceptions.LimitExceededException;
@@ -52,16 +66,20 @@ import com.sendsafely.exceptions.UpdateRecipientFailedException;
 import com.sendsafely.exceptions.UploadFileException;
 import com.sendsafely.exceptions.UserInformationFailedException;
 import com.sendsafely.file.FileManager;
+import com.sendsafely.handlers.AddContactGroupAsRecipientHandler;
 import com.sendsafely.handlers.AddDropzoneRecipientHandler;
+import com.sendsafely.handlers.AddUserContactGroupHandler;
 import com.sendsafely.handlers.AddFileHandler;
 import com.sendsafely.handlers.AddMessageHandler;
 import com.sendsafely.handlers.AddRecipientHandler;
 import com.sendsafely.handlers.AddRecipientsHandler;
+import com.sendsafely.handlers.CreateContactGroupHandler;
 import com.sendsafely.handlers.CreatePackageHandler;
 import com.sendsafely.handlers.DeletePackageHandler;
 import com.sendsafely.handlers.DownloadAndDecryptFileHandler;
 import com.sendsafely.handlers.EnterpriseInfoHandler;
 import com.sendsafely.handlers.FinalizePackageHandler;
+import com.sendsafely.handlers.GetContactGroupsHandler;
 import com.sendsafely.handlers.GetDropzoneRecipientHandler;
 import com.sendsafely.handlers.GetMessageHandler;
 import com.sendsafely.handlers.GetPackagesHandler;
@@ -69,7 +87,10 @@ import com.sendsafely.handlers.GetRecipientHandler;
 import com.sendsafely.handlers.HandlerFactory;
 import com.sendsafely.handlers.PackageInformationHandler;
 import com.sendsafely.handlers.ParseLinksHandler;
+import com.sendsafely.handlers.RemoveContactGroupAsRecipientHandler;
+import com.sendsafely.handlers.RemoveContactGroupHandler;
 import com.sendsafely.handlers.RemoveDropzoneRecipientHandler;
+import com.sendsafely.handlers.RemoveUserContactGroupHandler;
 import com.sendsafely.handlers.RemoveRecipientHandler;
 import com.sendsafely.handlers.UpdatePackageLifeHandler;
 import com.sendsafely.handlers.UpdateRecipientHandler;
@@ -746,5 +767,101 @@ public class SendSafely {
 		return defaultCredentials;
 		
 	}
+
+	/**
+	 * API to create a contact group
+	 * Use this to create a new contact group. Will accept a group name. Returned values will include a contact group Id that will be useful
+	 * for other calls against the api.	 
+	 * 
+	 * @param groupName
+	 * @return String of groupId
+	 * @throws CreateContactGroupFailedException
+
+	 */
+	public String createContactGroup(String groupName) throws CreateContactGroupFailedException{
+		CreateContactGroupHandler handler = new CreateContactGroupHandler(uploadManager, new CreateContactGroupRequest(uploadManager.getJsonManager(), groupName));
+		return handler.makeRequest();
+	}
 	
+	/**
+	 * API to remove a contact group
+	 * Use this to remove a contact group. Will accept a group id. No values will be returned. 
+	 * If the api fails, the RemoveContactGroupFailedException will be triggered.	 
+	 * 
+	 * @param groupId
+	 * @throws RemoveContactGroupFailedException
+
+	 */
+	public void deleteContactGroup(String groupId) throws RemoveContactGroupFailedException{
+		RemoveContactGroupHandler handler = new RemoveContactGroupHandler(uploadManager, new RemoveContactGroupRequest(uploadManager.getJsonManager(), groupId));
+		handler.makeRequest();
+	}
+	
+	/**
+	 * API to add an email address to a contact group
+	 * Use this to add an email address to a contact group. Returns a string of recipient id. 
+	 * 
+	 * @param groupId
+	 * @param userEmail
+	 * @return
+	 * @throws AddEmailContactGroupFailedException
+	 */
+	public String addUserToContactGroup(String groupId, String userEmail) throws AddEmailContactGroupFailedException{
+		AddUserContactGroupHandler handler = new AddUserContactGroupHandler(uploadManager, new AddUserToContactGroupRequest(uploadManager.getJsonManager(), groupId, userEmail));
+		return handler.makeRequest();
+	}
+	
+	/**
+	 * API to remove an email address from a contact group
+	 * Use this to remove an email address from a contact group. Throws an exception if an error occurred.
+	 *
+	 * @param groupId
+	 * @param userId
+	 * @throws RemoveEmailContactGroupFailedException
+
+	 */
+	public void removeUserFromContactGroup(String groupId, String userId) throws RemoveEmailContactGroupFailedException{
+		RemoveUserContactGroupHandler handler = new RemoveUserContactGroupHandler(uploadManager, new RemoveUserFromContactGroupRequest(uploadManager.getJsonManager(), groupId, userId));
+		handler.makeRequest();
+	}
+	
+	/**
+	 * API to add a contact group as a recipient on a package
+	 * Use this to add a contact group and all of the email members to a package as complete unit. Throws an exception if the call failed.
+	 * 
+	 * @param packageId
+	 * @param groupId
+	 * @throws ContactGroupException
+	 */
+	public void addContactGroupToPackage(String packageId, String groupId) throws ContactGroupException{
+		AddContactGroupAsRecipientHandler handler = new AddContactGroupAsRecipientHandler(uploadManager, new AddContactGroupAsRecipientRequest(uploadManager.getJsonManager(), packageId, groupId));
+		handler.makeRequest();
+	}
+	
+	/**
+	 * API to remove a contact group as a recipient on a package
+	 * Use this to remove a contact group and all of the associated email members from a package as a complete unit.
+	 * Throws an exception if the call failed
+	 * 
+	 * @param packageId
+	 * @param groupId
+	 * @throws RemoveContactGroupAsRecipientFailedException
+	 */
+	public void removeContactGroupFromPackage(String packageId,String groupId) throws RemoveContactGroupAsRecipientFailedException{
+		RemoveContactGroupAsRecipientHandler handler = new RemoveContactGroupAsRecipientHandler(uploadManager, new RemoveContactGroupAsRecipientRequest(uploadManager.getJsonManager(), packageId, groupId));
+		handler.makeRequest();
+	}
+	
+	/**
+	 * API to retrieve a list of contact groups, including all email addresses associated with the contact groups
+	 * Use this to get a list of contact groups and emails associated with each contact group. Throws an exception if the call fails
+	 * Returns a list of contact groups with email addresses within each contact group
+	 * 
+	 * @return List<ContactGroupDTO> object of contact groups and email addresses
+	 * @throws GetContactGroupsFailedException
+	 */
+	public List<ContactGroup> getContactGroups() throws GetContactGroupsFailedException{
+		GetContactGroupsHandler handler = new GetContactGroupsHandler(uploadManager, new GetContactGroupsRequest(uploadManager.getJsonManager()));
+		return handler.makeRequest();
+	}
 }

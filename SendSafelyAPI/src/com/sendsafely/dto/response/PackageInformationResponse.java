@@ -2,6 +2,7 @@ package com.sendsafely.dto.response;
 
 import java.util.List;
 
+import com.sendsafely.ContactGroup;
 import com.sendsafely.enums.PackageState;
 
 public class PackageInformationResponse extends BaseResponse {
@@ -12,6 +13,7 @@ public class PackageInformationResponse extends BaseResponse {
 	private String packageUserName;
 	private String packageUserId;
 	private List<RecipientResponse> recipients;
+	private List<ContactGroup> contactGroups;
 	private List<FileResponse> files;
 	private List<String> approverList;
 	private boolean needsApproval;
@@ -79,6 +81,12 @@ public class PackageInformationResponse extends BaseResponse {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	public List<ContactGroup> getContactGroups() {
+		return this.contactGroups;
+	}
 	
+	public void setContactGroups(List<ContactGroup> contactGroups) {
+		this.contactGroups = contactGroups;
+	}
 	
 }

@@ -15,6 +15,7 @@ public class Package extends BasePackage {
 
 	private List<Recipient> recipients;
 	
+	private List<ContactGroup> contactGroups;
 	/**
 	 * @description Get all recipients that are currently associated with the package
 	 * @returnType Recipient
@@ -31,5 +32,23 @@ public class Package extends BasePackage {
 	public void setRecipients(List<Recipient> recipients) {
 		this.recipients = recipients;
 	}
+
+	/**
+	 * @description Set internally by the API.
+	 * @return
+	 */
+	public List<ContactGroup> getContactGroups() {
+		return contactGroups;
+	}
+
+	/**
+	 * @description Set internally by the API.
+	 * @param contactGroups
+	 */
+	public void setContactGroups(List<ContactGroup> contactGroups) {
+		this.contactGroups = contactGroups;
+	}
+	
+	
 	
 }

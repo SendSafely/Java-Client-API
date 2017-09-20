@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import com.sendsafely.exceptions.SendFailedException;
 
@@ -58,4 +60,32 @@ public interface ConnectionManager {
 	 * @description Get a header from the response.
 	 */
 	public String getHeader(String header);
+	
+	/**
+	 * @description Gets all headers from the response
+	 */
+	public Map<String, List<String>> getHeaders();
+	
+	/**
+	 * @throws IOException 
+	 * @description gets response code
+	 */
+	public int getResponseCode() throws IOException;
+	
+	/**
+	 * @throws IOException 
+	 * @description gets response message
+	 */
+	public String getResponseMessage() throws IOException;
+	
+	/**
+	 * @description returns the content type
+	 */
+	public String getContentType();
+	
+	/**
+	 * @description Get the server error stream.
+	 */
+	public InputStream getErrorStream() throws IOException;
+	
 }

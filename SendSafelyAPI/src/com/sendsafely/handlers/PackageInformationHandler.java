@@ -2,12 +2,9 @@ package com.sendsafely.handlers;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.sendsafely.File;
 import com.sendsafely.Package;
 import com.sendsafely.Recipient;
@@ -18,9 +15,6 @@ import com.sendsafely.dto.response.FileResponse;
 import com.sendsafely.dto.response.PackageInformationResponse;
 import com.sendsafely.dto.response.RecipientResponse;
 import com.sendsafely.enums.APIResponse;
-import com.sendsafely.enums.GetParam;
-import com.sendsafely.enums.HTTPMethod;
-import com.sendsafely.exceptions.MessageException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
 import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.upload.UploadManager;
@@ -85,6 +79,7 @@ public class PackageInformationHandler extends BaseHandler
 		info.setPackageCode(obj.getPackageCode());
 		info.setPackageId(obj.getPackageId());
 		info.setRecipients(convertRecipients(obj.getRecipients()));
+		info.setContactGroups(obj.getContactGroups());
 		info.setServerSecret(obj.getServerSecret());
 		info.setState(obj.getState());
 		return info;

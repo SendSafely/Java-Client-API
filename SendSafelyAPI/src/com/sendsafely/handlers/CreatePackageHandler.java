@@ -9,6 +9,7 @@ import org.bouncycastle.util.encoders.Base64Encoder;
 import org.bouncycastle.util.encoders.UrlBase64;
 import org.bouncycastle.util.encoders.UrlBase64Encoder;
 
+import com.sendsafely.ContactGroup;
 import com.sendsafely.File;
 import com.sendsafely.Package;
 import com.sendsafely.Recipient;
@@ -102,6 +103,7 @@ public class CreatePackageHandler extends BaseHandler
 			info.setServerSecret(obj.getServerSecret());
 			info.setFiles(new ArrayList<File>());
 			info.setRecipients(new ArrayList<Recipient>());
+			info.setContactGroups(new ArrayList<ContactGroup>());
 		}
 		
 		return info;

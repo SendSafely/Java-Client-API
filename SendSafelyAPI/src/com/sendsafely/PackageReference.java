@@ -14,6 +14,7 @@ import com.sendsafely.enums.PackageState;
 public class PackageReference extends BasePackage {
 
 	private List<String> recipients;
+	private List<String> contactGroupNames;
 	
 	/**
 	 * @description Get all recipients that are currently associated with the package
@@ -32,4 +33,20 @@ public class PackageReference extends BasePackage {
 		this.recipients = recipients;
 	}
 	
+	/**
+	 * @description Get all contactGroup names that are currently associated with the package
+	 * @returnType contactGroupName
+	 * @return
+	 */
+	public List<String> getContactGroupNames() {
+		return contactGroupNames;
+	}
+	
+	/**
+	 * @description Set internally by the API.
+	 * @param contactGroupNames
+	 */
+	public void setContactGroupNames(List<String> contactGroupNames) {
+		this.contactGroupNames = contactGroupNames;
+	}
 }

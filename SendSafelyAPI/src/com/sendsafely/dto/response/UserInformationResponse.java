@@ -7,6 +7,7 @@ public class UserInformationResponse extends BaseResponse {
 	private String firstName;
 	private String lastName;
 	private boolean betaUser;
+	private boolean adminUser;
 	
 	/**
 	 * The email address connected to the user.
@@ -88,6 +89,23 @@ public class UserInformationResponse extends BaseResponse {
 	public void setBetaUser(boolean betaUser) {
 		this.betaUser = betaUser;
 	}
+
+	/**
+	 * Flag indicating if usser is admin
+	 * @return
+	 */
+	public boolean getAdminUser() {
+		return adminUser;
+	}
+
+	/**
+	 * Set the isAdmin flag
+	 * @param isAdmin
+	 */
+	public void setAdminUser(boolean adminUser) {
+		this.adminUser = adminUser;
+	}
+	
 	
 	
 	

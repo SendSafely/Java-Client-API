@@ -5,7 +5,10 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.sendsafely.dto.request.BaseRequest;
 import com.sendsafely.dto.request.DownloadFileRequest;
 import com.sendsafely.dto.request.UploadFileRequest;
@@ -53,7 +56,25 @@ public class SendUtil {
 			return handleFileDownload(clazz);
 		} else {
 			String response = connection.getResponse();
-			return ResponseFactory.getInstanceFromString(response, clazz, connection.getJsonManager());
+
+			try{
+				if("".equals(response)){
+					response = null;
+					throw new SendFailedException("Empty Response");
+				}
+				return ResponseFactory.getInstanceFromString(response, clazz, connection.getJsonManager());
+			}catch(Exception e){
+				HashMap<String,String> hashMap = new HashMap<String,String>();
+				hashMap.put("server", connection.getServer());
+				hashMap.put("date", connection.getDate());
+				int responseCode = connection.getResponseCode();
+				hashMap.put("responseCode", Integer.toString(responseCode));
+				hashMap.put("responseMessage", connection.getResponseMessage());
+				hashMap.put("responseBody", response);
+				Gson gson = new GsonBuilder().serializeNulls().create();
+				String jsonString = gson.toJson(hashMap);
+				throw new SendFailedException(jsonString);
+			}
 		}
 	}
 	
