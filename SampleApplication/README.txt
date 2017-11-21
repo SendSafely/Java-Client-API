@@ -6,10 +6,18 @@ cd to the project folder
 Copy the SendSafely Jar into this folder and name it SendSafely.jar
 
 Compile the code with the following command:
+Linux, MacOS
 javac -cp SendSafely.jar:lib/*.jar: -d bin src/*.java
 
+Windows
+javac -cp "SendSafely.jar;lib/*.jar" -d bin src/*.java
+
 Run the application with the following command:
+Linux, MacOS
 java -cp SendSafely.jar:lib/*:bin/ SendSafelyRefApp
+
+Windows
+java -cp "SendSafely.jar;lib/*;bin/" SendSafelyRefApp
 
 The Application requires 5 arguments
 - SendSafelyHost (Use https://app.sendsafely.com)
