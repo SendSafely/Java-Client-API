@@ -38,5 +38,10 @@ public class CreateFileIdRequest extends BaseRequest {
 	{
 		super.setGetParam(GetParam.PACKAGE_ID, packageId);
 	}
+
+	public void setDirectoryId(String directoryId) {
+		super.setPostParam("directoryId", directoryId);
+		
+	}
 	
 }

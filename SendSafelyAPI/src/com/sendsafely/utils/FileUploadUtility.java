@@ -10,7 +10,6 @@ import com.sendsafely.dto.request.UploadFileRequest;
 import com.sendsafely.dto.response.FileResponse;
 import com.sendsafely.dto.response.UploadFileResponse;
 import com.sendsafely.enums.APIResponse;
-import com.sendsafely.exceptions.DownloadFileException;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.exceptions.UploadFileException;
@@ -89,6 +88,38 @@ public class FileUploadUtility
         }
 	}
 	
+	public long encryptAndUploadFileToDirectory(String fileId, String directoryId, String encryptionKey, FileManager file, UploadFileRequest request, long offset, Progress progress) throws IOException, UploadFileException, SendFailedException, LimitExceededException
+	{
+		request = populateRequest(request, directoryId);
+		
+		long bytesToRead = calculateBytesToRead(file.length(), offset);
+		
+		if(bytesToRead == 0) {
+			return 0;
+		}
+
+        FileManager encryptedFile = encrypt(file, offset, encryptionKey, bytesToRead);
+		
+        try
+        {
+    		UploadFileResponse response = upload(encryptedFile, file.getName(), request, progress);
+            encryptedFile.remove();
+    		this.response = new FileResponse();
+    		this.response.setFileId(response.getMessage());
+    		this.response.setFileName(file.getName());
+    		this.response.setFileSize(file.length());
+    		
+    		parseResponse(response);
+    		
+    		filePart++;
+    		return bytesToRead;
+        }
+        finally
+        {
+        	encryptedFile.remove();
+        }
+	}
+	
 	protected void parseResponse(UploadFileResponse response) throws UploadFileException, LimitExceededException
 	{
 		if(response.getResponse() == APIResponse.LIMIT_EXCEEDED)
@@ -105,6 +136,14 @@ public class FileUploadUtility
 	{
 		request.setUploadType(UPLOAD_TYPE);
 		request.setFilePart("" + filePart);
+		return request;
+	}
+	
+	protected UploadFileRequest populateRequest(UploadFileRequest request, String directoryId)
+	{
+		request.setUploadType(UPLOAD_TYPE);
+		request.setFilePart("" + filePart);
+		request.setDirectoryId(directoryId);
 		return request;
 	}
 

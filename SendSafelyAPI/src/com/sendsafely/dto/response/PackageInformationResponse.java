@@ -15,11 +15,15 @@ public class PackageInformationResponse extends BaseResponse {
 	private List<RecipientResponse> recipients;
 	private List<ContactGroup> contactGroups;
 	private List<FileResponse> files;
+	private List<DirectoryResponse> directories;
 	private List<String> approverList;
 	private boolean needsApproval;
 	private PackageState state;
 	private int life;
 	private String description;
+	private String label;
+	private boolean isVDR;
+	private String rootDirectoryId;
 	
 	public List<RecipientResponse> getRecipients() {
 		return recipients;
@@ -88,5 +92,43 @@ public class PackageInformationResponse extends BaseResponse {
 	public void setContactGroups(List<ContactGroup> contactGroups) {
 		this.contactGroups = contactGroups;
 	}
+	public String getPackageUserName() {
+		return packageUserName;
+	}
+	public void setPackageUserName(String packageUserName) {
+		this.packageUserName = packageUserName;
+	}
+	public String getPackageUserId() {
+		return packageUserId;
+	}
+	public void setPackageUserId(String packageUserId) {
+		this.packageUserId = packageUserId;
+	}
+	public List<DirectoryResponse> getDirectories() {
+		return directories;
+	}
+	public void setDirectories(List<DirectoryResponse> directories) {
+		this.directories = directories;
+	}
+	public String getLabel() {
+		return label;
+	}
+	public void setLabel(String label) {
+		this.label = label;
+	}
+	public boolean isVDR() {
+		return isVDR;
+	}
+	public void setVDR(boolean isVDR) {
+		this.isVDR = isVDR;
+	}
+	public String getRootDirectoryId() {
+		return rootDirectoryId;
+	}
+	public void setRootDirectoryId(String rootDirectoryId) {
+		this.rootDirectoryId = rootDirectoryId;
+	}
+	
+	
 	
 }

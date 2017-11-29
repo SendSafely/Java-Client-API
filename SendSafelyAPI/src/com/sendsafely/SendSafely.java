@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.Security;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -18,91 +19,110 @@ import com.sendsafely.connection.ConnectionManager;
 import com.sendsafely.credentials.CredentialsFactory;
 import com.sendsafely.credentials.CredentialsManager;
 import com.sendsafely.credentials.DefaultCredentials;
+import com.sendsafely.dto.ActivityLogEntry;
 import com.sendsafely.dto.EnterpriseInfo;
+import com.sendsafely.dto.FileInfo;
 import com.sendsafely.dto.PackageURL;
 import com.sendsafely.dto.UserInformation;
 import com.sendsafely.dto.request.AddContactGroupAsRecipientRequest;
 import com.sendsafely.dto.request.AddDropzoneRecipientRequest;
-import com.sendsafely.dto.request.AddUserToContactGroupRequest;
 import com.sendsafely.dto.request.AddMessageRequest;
 import com.sendsafely.dto.request.AddRecipientRequest;
 import com.sendsafely.dto.request.AddRecipientsRequest;
-import com.sendsafely.dto.request.CreateContactGroupRequest;
+import com.sendsafely.dto.request.AddUserToContactGroupRequest;
+import com.sendsafely.dto.request.GetContactGroupsRequest;
 import com.sendsafely.dto.request.GetDropzoneRecipientRequest;
 import com.sendsafely.dto.request.GetMessageRequest;
-import com.sendsafely.dto.request.GetContactGroupsRequest;
+import com.sendsafely.dto.request.GetOrganizationContactGroupsRequest;
 import com.sendsafely.dto.request.RemoveContactGroupAsRecipientRequest;
 import com.sendsafely.dto.request.RemoveContactGroupRequest;
 import com.sendsafely.dto.request.RemoveUserFromContactGroupRequest;
+import com.sendsafely.dto.response.UserInformationResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.CountryCode;
 import com.sendsafely.enums.Endpoint;
+import com.sendsafely.enums.PackageStatus;
 import com.sendsafely.enums.Version;
-import com.sendsafely.exceptions.DownloadFileException;
-import com.sendsafely.exceptions.DropzoneRecipientFailedException;
-import com.sendsafely.exceptions.PasswordRequiredException;
-import com.sendsafely.exceptions.RecipientFailedException;
-import com.sendsafely.exceptions.RemoveContactGroupAsRecipientFailedException;
-import com.sendsafely.exceptions.RemoveContactGroupFailedException;
-import com.sendsafely.exceptions.RemoveEmailContactGroupFailedException;
-import com.sendsafely.exceptions.ContactGroupException;
 import com.sendsafely.exceptions.AddEmailContactGroupFailedException;
 import com.sendsafely.exceptions.ApproverRequiredException;
+import com.sendsafely.exceptions.ContactGroupException;
 import com.sendsafely.exceptions.CreateContactGroupFailedException;
 import com.sendsafely.exceptions.CreatePackageFailedException;
 import com.sendsafely.exceptions.DeletePackageException;
+import com.sendsafely.exceptions.DirectoryOperationFailedException;
+import com.sendsafely.exceptions.DownloadFileException;
+import com.sendsafely.exceptions.DropzoneRecipientFailedException;
 import com.sendsafely.exceptions.EnterpriseInfoFailedException;
+import com.sendsafely.exceptions.FileOperationFailedException;
 import com.sendsafely.exceptions.FinalizePackageFailedException;
+import com.sendsafely.exceptions.GetActivityLogException;
 import com.sendsafely.exceptions.GetContactGroupsFailedException;
 import com.sendsafely.exceptions.GetPackagesException;
 import com.sendsafely.exceptions.InvalidCredentialsException;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.MessageException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
+import com.sendsafely.exceptions.PasswordRequiredException;
+import com.sendsafely.exceptions.RecipientFailedException;
+import com.sendsafely.exceptions.RemoveContactGroupAsRecipientFailedException;
+import com.sendsafely.exceptions.RemoveContactGroupFailedException;
+import com.sendsafely.exceptions.RemoveEmailContactGroupFailedException;
 import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.exceptions.TwoFactorAuthException;
 import com.sendsafely.exceptions.UpdatePackageLifeException;
+import com.sendsafely.exceptions.UpdatePackageDescriptorFailedException;
 import com.sendsafely.exceptions.UpdateRecipientFailedException;
 import com.sendsafely.exceptions.UploadFileException;
 import com.sendsafely.exceptions.UserInformationFailedException;
 import com.sendsafely.file.FileManager;
 import com.sendsafely.handlers.AddContactGroupAsRecipientHandler;
 import com.sendsafely.handlers.AddDropzoneRecipientHandler;
-import com.sendsafely.handlers.AddUserContactGroupHandler;
 import com.sendsafely.handlers.AddFileHandler;
 import com.sendsafely.handlers.AddMessageHandler;
 import com.sendsafely.handlers.AddRecipientHandler;
 import com.sendsafely.handlers.AddRecipientsHandler;
+import com.sendsafely.handlers.AddUserContactGroupHandler;
 import com.sendsafely.handlers.CreateContactGroupHandler;
+import com.sendsafely.handlers.CreateDirectoryHandler;
 import com.sendsafely.handlers.CreatePackageHandler;
+import com.sendsafely.handlers.DeleteDirectoryHandler;
+import com.sendsafely.handlers.DeleteFileHandler;
 import com.sendsafely.handlers.DeletePackageHandler;
 import com.sendsafely.handlers.DownloadAndDecryptFileHandler;
 import com.sendsafely.handlers.EnterpriseInfoHandler;
+import com.sendsafely.handlers.FileInformationHandler;
 import com.sendsafely.handlers.FinalizePackageHandler;
+import com.sendsafely.handlers.GetActivityLogHandler;
 import com.sendsafely.handlers.GetContactGroupsHandler;
+import com.sendsafely.handlers.GetDirectoryHandler;
 import com.sendsafely.handlers.GetDropzoneRecipientHandler;
 import com.sendsafely.handlers.GetMessageHandler;
+import com.sendsafely.handlers.GetOrganizationPackagesHandler;
 import com.sendsafely.handlers.GetPackagesHandler;
 import com.sendsafely.handlers.GetRecipientHandler;
 import com.sendsafely.handlers.HandlerFactory;
+import com.sendsafely.handlers.MoveDirectoryHandler;
+import com.sendsafely.handlers.MoveFileHandler;
 import com.sendsafely.handlers.PackageInformationHandler;
 import com.sendsafely.handlers.ParseLinksHandler;
 import com.sendsafely.handlers.RemoveContactGroupAsRecipientHandler;
 import com.sendsafely.handlers.RemoveContactGroupHandler;
 import com.sendsafely.handlers.RemoveDropzoneRecipientHandler;
-import com.sendsafely.handlers.RemoveUserContactGroupHandler;
 import com.sendsafely.handlers.RemoveRecipientHandler;
+import com.sendsafely.handlers.RemoveUserContactGroupHandler;
+import com.sendsafely.handlers.UpdateDirectoryNameHandler;
 import com.sendsafely.handlers.UpdatePackageLifeHandler;
+import com.sendsafely.handlers.UpdatePackageDescriptorHandler;
 import com.sendsafely.handlers.UpdateRecipientHandler;
 import com.sendsafely.handlers.UserInformationHandler;
 import com.sendsafely.handlers.VerifyCredentialsHandler;
 import com.sendsafely.handlers.VerifyVersionHandler;
 import com.sendsafely.json.JsonManager;
+import com.sendsafely.progress.DefaultProgress;
 import com.sendsafely.upload.UploadFactory;
 import com.sendsafely.upload.UploadManager;
 
 /**
- * @author Erik Larsson
  * @description The main SendSafely API. Use this API to create packages and append files and recipients.
  */
 public class SendSafely {
@@ -164,7 +184,6 @@ public class SendSafely {
      * @param host
      */
 	public SendSafely(String host) {
-		// TODO Auto-generated constructor stub
 		this(host, (ConnectionManager)null, (CredentialsManager)null);
 	}
 
@@ -211,6 +230,34 @@ public class SendSafely {
 	}
 	
 	/**
+	 * API to move a file to another directory
+	 * @param packageId
+	 * @param fileId
+	 * @param targetDirectoryId
+	 * @throws FileOperationFailedException
+	 */
+	public void moveFile(String packageId, String fileId, String targetDirectoryId) throws FileOperationFailedException
+	{
+		MoveFileHandler handler = (MoveFileHandler)HandlerFactory.getInstance(uploadManager, Endpoint.MOVE_FILE);
+		handler.makeRequest(packageId, fileId, targetDirectoryId);
+	}
+
+	/**
+	 * API to move a directory to another directory
+	 * @param packageId
+	 * @param sourceDirectoryId
+	 * @param targetDirectoryId
+	 * @throws DirectoryOperationFailedException
+	 */
+	public void moveDirectory(String packageId, String sourceDirectoryId, String targetDirectoryId) throws DirectoryOperationFailedException
+	{
+		MoveDirectoryHandler handler = (MoveDirectoryHandler)HandlerFactory.getInstance(uploadManager, Endpoint.MOVE_DIRECTORY);
+		handler.makeRequest(packageId, sourceDirectoryId, targetDirectoryId);
+	}
+
+	
+	
+	/**
 	 * @description Retrieves information about the organization the user belongs to. 
 	 * @return A {@link EnterpriseInfo} object.
 	 * @throws EnterpriseInfoFailedException
@@ -222,6 +269,20 @@ public class SendSafely {
 	}
 	
 	/**
+	 * This should call the GetFile API method, which returns the current file version info and all prior versions.
+	 *  The response you will get is the same whether you pass in the current version fileId or a prior version.
+	 * @param packageId
+	 * @param directoryId
+	 * @param fileId
+	 * @return
+	 * @throws FileOperationFailedException 
+	 */
+	public FileInfo getFileInformation(String packageId, String fileId, String directoryId) throws FileOperationFailedException{
+		FileInformationHandler handler = (FileInformationHandler)HandlerFactory.getInstance(uploadManager, Endpoint.FILE_INFORMATION);
+		return handler.makeRequest(packageId, fileId, directoryId);
+	}
+	
+	/**
 	 * @description Creates a new package that can be used to attach files to. A new package must be created before files or recipients can be added. For further information about the package flow, see http://sendsafely.github.io/overview.htm
 	 * @return A {@link Package} object containing information about the package.
 	 * @throws CreatePackageFailedException
@@ -230,6 +291,20 @@ public class SendSafely {
 	public Package createPackage() throws CreatePackageFailedException, LimitExceededException
 	{
 		CreatePackageHandler handler = (CreatePackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.CREATE_PACKAGE);
+		return handler.makeRequest();
+	}
+	
+	/**
+	 * @description Creates a new package that can be used to attach files to. A new package must be created before files or recipients can be added. For further information about the package flow, see http://sendsafely.github.io/overview.htm
+	 * @return A {@link Package} object containing information about the package.
+	 * @param isWorkspace - flag notifying the setup of workspace
+	 * @throws CreatePackageFailedException
+	 * @throws LimitExceededException
+	 */
+	public Package createPackage(Boolean isWorkspace) throws CreatePackageFailedException, LimitExceededException
+	{
+		CreatePackageHandler handler = (CreatePackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.CREATE_PACKAGE);
+		handler.setVDR(isWorkspace);
 		return handler.makeRequest();
 	}
 		
@@ -244,6 +319,33 @@ public class SendSafely {
 	{
 		CreatePackageHandler handler = (CreatePackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.CREATE_PACKAGE);
 		return handler.makeRequest(email);
+	}
+	
+	/**
+	 * API to create a directory within a workspace
+	 * @param packageId
+	 * @param parentDirectoryId
+	 * @param directoryName
+	 * @return
+	 * @throws DirectoryOperationFailedException
+	 */
+	public Directory createDirectory(String packageId, String parentDirectoryId, String directoryName) throws DirectoryOperationFailedException{
+		CreateDirectoryHandler handler = (CreateDirectoryHandler)HandlerFactory.getInstance(uploadManager, Endpoint.CREATE_DIRECTORY);
+		String directoryId = handler.makeRequest(packageId, parentDirectoryId, directoryName);
+		Directory dir = this.getDirectory(packageId, directoryId);
+		return dir;
+	}
+	
+	/**
+	 * API to get the directory information in a workspace
+	 * @param packageId
+	 * @param directoryId
+	 * @return
+	 * @throws DirectoryOperationFailedException
+	 */
+	public Directory getDirectory(String packageId, String directoryId) throws DirectoryOperationFailedException{
+		GetDirectoryHandler handler = ((GetDirectoryHandler)HandlerFactory.getInstance(uploadManager, Endpoint.GET_DIRECTORY));
+		return handler.makeRequest(packageId, directoryId);
 	}
 	
 	/**
@@ -301,18 +403,7 @@ public class SendSafely {
 		handler.makeRequest(packageId, recipientId);
 	}
 	
-	/**
-	 * @description Updates the permissions for a given recipient
-	 * @param packageId The unique packageId the recipient belongs to
-	 * @param recipientId The recipientId of the recipient to be updated.
-	 * @return A {@link Recipient} object containing information about the recipient.
-	 * @throws UpdateRecipientFailedException
-	 */
-	/*public Recipient updateRecipientPermission(String packageId, String recipientId, boolean canAddMessages, boolean canAddFiles, boolean canAddRecipients) throws UpdateRecipientFailedException
-	{
-		UpdateRecipientPermissionsHandler handler = (UpdateRecipientPermissionsHandler)HandlerFactory.getInstance(uploadManager, Endpoint.UPDATE_RECIPIENT_PERMISSIONS);
-		return handler.makeRequest(packageId, recipientId, canAddMessages, canAddFiles, canAddRecipients);
-	}*/
+
 	
 	/**
 	 * @description Adds a phone number to a given recipient.
@@ -366,6 +457,7 @@ public class SendSafely {
 	
 	
 	/**
+	 * API to delete a package
 	 * @description Deletes a package given a package ID.
 	 * @param packageId The unique packageId that you want to delete.
 	 * @throws DeletePackageException
@@ -377,6 +469,30 @@ public class SendSafely {
 	}
 	
 	/**
+	 * API to delete a file within a given directory within a workspace package. 
+	 * @param packageId
+	 * @param directoryId - must be used, pass either root directory id or id of subdirectory
+	 * @param fileId
+	 * @throws DeleteFileException
+	 */
+	public void deleteFile(String packageId, String directoryId, String fileId) throws FileOperationFailedException {
+		DeleteFileHandler handler = (DeleteFileHandler)HandlerFactory.getInstance(uploadManager, Endpoint.DELETE_FILE);
+		handler.makeRequest(packageId, directoryId, fileId);
+		
+	}
+	
+	/**
+	 * API to remove a directory within a package
+	 * @param packageId
+	 * @param directoryId
+	 * @throws DirectoryOperationFailedException
+	 */
+	public void deleteDirectory(String packageId, String directoryId) throws DirectoryOperationFailedException{
+		DeleteDirectoryHandler handler = (DeleteDirectoryHandler)HandlerFactory.getInstance(uploadManager, Endpoint.DELETE_DIRECTORY);
+		handler.makeRequest(packageId, directoryId);
+	}
+	
+	/**
 	 * @description Get all active packages
 	 * @return List<String> a list of all active package IDs.
 	 * @throws GetPackagesException
@@ -385,6 +501,13 @@ public class SendSafely {
 	{
 		GetPackagesHandler handler = (GetPackagesHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ACTIVE_PACKAGES);
 		return handler.makeRequest();
+	}
+	
+	
+	public PackageSearchResults getOrganizationPackages(Date fromDate, Date toDate, String sender, PackageStatus status, String recipient, String fileName) throws GetPackagesException
+	{
+		GetOrganizationPackagesHandler handler = (GetOrganizationPackagesHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ORGANIZATION_PACKAGES);
+		return handler.makeRequest(fromDate, toDate, sender, status, recipient, fileName);
 	}
 	
 	/**
@@ -448,6 +571,44 @@ public class SendSafely {
 	}
 	
 	/**
+	 * API to update a workspace name
+	 * @param packageId
+	 * @param packageDescriptor
+	 * @throws UpdatePackageDescriptorFailedException
+	 */
+	public void updatePackageDescriptor(String packageId, String packageDescriptor) throws UpdatePackageDescriptorFailedException
+	{
+		UpdatePackageDescriptorHandler handler = (UpdatePackageDescriptorHandler)HandlerFactory.getInstance(uploadManager, Endpoint.PACKAGE_NAME);
+		handler.makeRequest(packageId, packageDescriptor);
+	}
+	
+	/**
+	 * API to update the name of a given directory within a workspace
+	 * @param packageId
+	 * @param directoryId
+	 * @param directoryName
+	 * @throws DirectoryOperationFailedException
+	 */
+	public void renameDirectory(String packageId, String directoryId, String directoryName) throws DirectoryOperationFailedException
+	{
+		UpdateDirectoryNameHandler handler = (UpdateDirectoryNameHandler)HandlerFactory.getInstance(uploadManager, Endpoint.DIRECTORY_NAME);
+		handler.makeRequest(packageId, directoryId, directoryName);
+	}
+	
+	/**
+	 * Updates the role for the recipient
+	 * @param packageId
+	 * @param recipientId
+	 * @param role
+	 * @throws UpdateRecipientFailedException
+	 */
+	public void updateRecipientRole(String packageId, String recipientId, String role) throws UpdateRecipientFailedException
+	{
+		UpdateRecipientHandler handler = (UpdateRecipientHandler)HandlerFactory.getInstance(uploadManager, Endpoint.UPDATE_RECIPIENT);
+		handler.makeRequest(packageId, recipientId, role);
+	}
+	
+	/**
 	 * @description Encrypt and upload a new file. The file will be encrypted before being uploaded to the server. The function will block until the file is uploaded.
 	 * @param packageId The packageId to attach the file to. 
 	 * @param keyCode The keycode belonging to the package. 
@@ -479,6 +640,39 @@ public class SendSafely {
 	}
 	
 	/**
+	 * API to upload a file in a workspace directory
+	 * @param packageId
+	 * @param directoryId
+	 * @param keyCode
+	 * @param file
+	 * @return
+	 * @throws LimitExceededException
+	 * @throws UploadFileException
+	 */
+	public File encryptAndUploadFileInDirectory(String packageId, String directoryId, String keyCode, FileManager file) throws LimitExceededException, UploadFileException
+	{
+		AddFileHandler handler = (AddFileHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ADD_FILE);
+		return handler.makeRequest(packageId, directoryId, keyCode, file);
+	}
+	
+	/**
+	 * API to upload a file in a workspace directory
+	 * @param packageId
+	 * @param directoryId
+	 * @param keyCode
+	 * @param file
+	 * @param progress
+	 * @return
+	 * @throws LimitExceededException
+	 * @throws UploadFileException
+	 */
+	public File encryptAndUploadFileInDirectory(String packageId, String directoryId, String keyCode, FileManager file, ProgressInterface progress) throws LimitExceededException, UploadFileException
+	{
+		AddFileHandler handler = (AddFileHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ADD_FILE);
+		return handler.makeRequest(packageId, directoryId, keyCode, file, progress);
+	}
+	
+	/**
 	 * @description Encrypt and upload a new file. The file will be encrypted before being uploaded to the server. The function will block until the file is uploaded.
 	 * @param packageId The packageId to attach the file to. 
 	 * @param keyCode The keycode belonging to the package.
@@ -488,11 +682,12 @@ public class SendSafely {
 	 * @return {@link File} a file object with metadata for the file.
 	 * @throws LimitExceededException
 	 * @throws UploadFileException
+	 * @deprecated
 	 */
 	public File encryptAndUploadFile(String packageId, String keyCode, String serverSecret, FileManager file, ProgressInterface progress) throws LimitExceededException, UploadFileException
 	{
 		AddFileHandler handler = (AddFileHandler)HandlerFactory.getInstance(uploadManager, Endpoint.ADD_FILE);
-		return handler.makeRequest(packageId, keyCode, serverSecret, file, progress);
+		return handler.makeRequest(packageId, null, keyCode, serverSecret, file, progress);
 	}
 	
 	/**
@@ -509,6 +704,8 @@ public class SendSafely {
 		AddMessageHandler handler = new AddMessageHandler(uploadManager, new AddMessageRequest(uploadManager.getJsonManager()));
 		handler.makeRequest(packageId, keyCode, message);
 	}
+	
+
 	
 	/**
 	 * @description Downloads and decrypts a given file from the server.
@@ -538,6 +735,38 @@ public class SendSafely {
 	}
 	
 	/**
+	 * API to download a file from a directory in a workspace
+	 * @param packageId
+	 * @param directoryId
+	 * @param fileId
+	 * @param keyCode
+	 * @return
+	 * @throws DownloadFileException
+	 * @throws PasswordRequiredException
+	 */
+	public java.io.File downloadFileFromDirectory(String packageId, String directoryId, String fileId, String keyCode) throws DownloadFileException, PasswordRequiredException {
+		return downloadFileFromDirectory(packageId, directoryId, fileId, keyCode, new DefaultProgress());
+	}
+	
+	/**
+	 * API to download a file from a directory in a workspace
+	 * @param packageId
+	 * @param directoryId
+	 * @param fileId
+	 * @param keyCode
+	 * @param progress
+	 * @return
+	 * @throws DownloadFileException
+	 * @throws PasswordRequiredException
+	 */
+	public java.io.File downloadFileFromDirectory(String packageId, String directoryId, String fileId, String keyCode, ProgressInterface progress) throws DownloadFileException, PasswordRequiredException {
+		DownloadAndDecryptFileHandler handler = new DownloadAndDecryptFileHandler(uploadManager);
+		return handler.makeRequest(packageId, directoryId, fileId, keyCode, progress);
+	}
+
+
+	
+	/**
 	 * @description Downloads and decrypts a given file from the server.
 	 * @param packageId The packageId to download a file from.
 	 * @param fileId The fileId to download.
@@ -549,7 +778,7 @@ public class SendSafely {
 	public java.io.File downloadFile(String packageId, String fileId, String keyCode, ProgressInterface progress) throws DownloadFileException, PasswordRequiredException
 	{
 		DownloadAndDecryptFileHandler handler = new DownloadAndDecryptFileHandler(uploadManager);
-		return handler.makeRequest(packageId, fileId, keyCode, progress, null);
+		return handler.makeRequest(packageId, null, fileId, keyCode, progress, null);
 	}
 	
 	/**
@@ -565,7 +794,7 @@ public class SendSafely {
 	public java.io.File downloadFile(String packageId, String fileId, String keyCode, ProgressInterface progress, String password) throws DownloadFileException, PasswordRequiredException
 	{
 		DownloadAndDecryptFileHandler handler = new DownloadAndDecryptFileHandler(uploadManager);
-		return handler.makeRequest(packageId, fileId, keyCode, progress, password);
+		return handler.makeRequest(packageId, null, fileId, keyCode, progress, password);
 	}
 	
 	/**
@@ -578,6 +807,13 @@ public class SendSafely {
 	{
 		GetMessageHandler handler = new GetMessageHandler(uploadManager, new GetMessageRequest(uploadManager.getJsonManager()));
 		return handler.makeRequest(secureLink);
+	}
+	
+	public String getWorkspaceLink(String packageId, String keyCode, String host) throws PackageInformationFailedException{
+		ConnectionManager connection = ConnectionFactory.getDefaultManager(host);
+		Package p = getPackageInformation(packageId);
+		String targetURL = connection.getHost()+"/receive/?packageCode=" + p.getPackageCode() + "#keycode=" + keyCode ;
+		return targetURL;
 	}
 	
 	/**
@@ -660,7 +896,7 @@ public class SendSafely {
 		ConnectionManager connection = ConnectionFactory.getDefaultManager(host);
 		String targetURL = connection.getHost()+"/auth-api/generate-key/";
 		String urlParameters = "{email:'"+email+"', password:'"+password+"', keyDescription:'"+keyDescription+"'}";
-		String result = executePostHttpSend(targetURL, urlParameters, "PUT");
+		String result = executeInternalPostHttpSend(targetURL, urlParameters, "PUT");
 		Map gsonJavaObj = new Gson().fromJson(result, Map.class);
 		String apiKey = gsonJavaObj.get("apiKey")==null?"":gsonJavaObj.get("apiKey").toString();
 		String apiSecret = gsonJavaObj.get("apiSecret")==null?"":gsonJavaObj.get("apiSecret").toString();
@@ -688,8 +924,20 @@ public class SendSafely {
 	 * @param urlParameters - parameters (normally in json format)
 	 * @param method - http method
 	 * @return
+	 * @deprecated
 	 */
 	public static String executePostHttpSend(String targetURL, String urlParameters, String method) {
+		return executeInternalPostHttpSend(targetURL, urlParameters, method);
+		}
+	
+	/**
+	 * HELPER UTILITY FOR GENERATE KEY FOR UNAUTHENTICATED REQUESTS.
+	 * @param targetURL 
+	 * @param urlParameters - parameters (normally in json format)
+	 * @param method - http method
+	 * @return
+	 */
+	private static String executeInternalPostHttpSend(String targetURL, String urlParameters, String method) {
 		  HttpURLConnection connection = null;
 
 		  try {
@@ -749,7 +997,7 @@ public class SendSafely {
 		ConnectionManager connection = ConnectionFactory.getDefaultManager(host);
 		String targetURL = connection.getHost()+"/auth-api/generate-key/"+validationToken+"/";
 		String urlParameters = "{smsCode:'"+input+"', keyDescription:'"+keyDescription+"'}";
-		String result = executePostHttpSend(targetURL, urlParameters, "POST");
+		String result = executeInternalPostHttpSend(targetURL, urlParameters, "POST");
 		Map gsonJavaObj = new Gson().fromJson(result, Map.class);
 		String apiKey = gsonJavaObj.get("apiKey").toString();
 		String apiSecret = gsonJavaObj.get("apiSecret").toString();
@@ -776,11 +1024,25 @@ public class SendSafely {
 	 * @param groupName
 	 * @return String of groupId
 	 * @throws CreateContactGroupFailedException
-
 	 */
 	public String createContactGroup(String groupName) throws CreateContactGroupFailedException{
-		CreateContactGroupHandler handler = new CreateContactGroupHandler(uploadManager, new CreateContactGroupRequest(uploadManager.getJsonManager(), groupName));
-		return handler.makeRequest();
+		CreateContactGroupHandler handler = new CreateContactGroupHandler(uploadManager);
+		return handler.makeRequest(groupName);
+	}
+	
+	/**
+	 * API to create an enterprise contact group
+	 * Use this to create a new contact group. Will accept a group name. Returned values will include a contact group Id that will be useful
+	 * for other calls against the api.	 
+	 * 
+	 * @param groupName
+	 * @param isEnterpriseGroup
+	 * @return String of groupId
+	 * @throws CreateContactGroupFailedException
+	 */
+	public String createContactGroup(String groupName, boolean isEnterpriseGroup) throws CreateContactGroupFailedException{
+		CreateContactGroupHandler handler = new CreateContactGroupHandler(uploadManager);
+		return handler.makeRequest(groupName, isEnterpriseGroup);
 	}
 	
 	/**
@@ -864,4 +1126,22 @@ public class SendSafely {
 		GetContactGroupsHandler handler = new GetContactGroupsHandler(uploadManager, new GetContactGroupsRequest(uploadManager.getJsonManager()));
 		return handler.makeRequest();
 	}
+	
+	public List<ContactGroup> getEnterpriseContactGroups() throws GetContactGroupsFailedException{
+		GetContactGroupsHandler handler = new GetContactGroupsHandler(uploadManager, new GetOrganizationContactGroupsRequest(uploadManager.getJsonManager()));
+		return handler.makeRequest();
+	}
+
+	/**
+	 * API to get the activity log for a given package.
+	 * @param packageId
+	 * @param rowIndex - row to start retrieving activity log
+	 * @return
+	 * @throws GetActivityLogException
+	 */
+	public List<ActivityLogEntry> getActivityLog(String packageId, int rowIndex) throws GetActivityLogException {
+		GetActivityLogHandler handler = ((GetActivityLogHandler)HandlerFactory.getInstance(uploadManager, Endpoint.GET_ACTIVITY_LOG));
+		return handler.makeRequest(packageId, rowIndex);
+	}
+
 }

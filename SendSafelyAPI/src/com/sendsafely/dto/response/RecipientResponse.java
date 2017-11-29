@@ -13,6 +13,7 @@ public class RecipientResponse extends BaseResponse {
 	private List<Phonenumber> phonenumbers;
 	private List<ConfirmationResponse> confirmations;
 	private String autoEnabledNumber;
+	private String roleName;
 	
 	public String getRecipientId() {
 		return recipientId;
@@ -50,5 +51,12 @@ public class RecipientResponse extends BaseResponse {
 	public void setConfirmations(List<ConfirmationResponse> confirmations) {
 		this.confirmations = confirmations;
 	}
+	public String getRoleName() {
+		return roleName;
+	}
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
+	
 	
 }

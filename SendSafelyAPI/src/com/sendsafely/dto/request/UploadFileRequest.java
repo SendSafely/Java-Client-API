@@ -26,5 +26,9 @@ public class UploadFileRequest extends BaseRequest {
 	public void setFileId(String fileId) {
 		super.setGetParam(GetParam.FILE_ID, fileId);
 	}
+
+	public void setDirectoryId(String directoryId) {
+		super.setGetParam(GetParam.DIRECTORY_ID, directoryId);
+	}
 	
 }

@@ -2,22 +2,14 @@ package com.sendsafely.handlers;
 
 import java.io.IOException;
 
+import com.sendsafely.File;
 import com.sendsafely.Package;
 import com.sendsafely.ProgressInterface;
-import com.sendsafely.Recipient;
-import com.sendsafely.dto.request.AddRecipientRequest;
 import com.sendsafely.dto.request.CreateFileIdRequest;
-import com.sendsafely.dto.response.AddRecipientResponse;
 import com.sendsafely.dto.response.CreateFileIdResponse;
-import com.sendsafely.dto.response.CreatePackageResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.Endpoint;
-import com.sendsafely.enums.GetParam;
-import com.sendsafely.enums.HTTPMethod;
-import com.sendsafely.exceptions.RecipientFailedException;
-import com.sendsafely.exceptions.CreatePackageFailedException;
-import com.sendsafely.exceptions.FinalizePackageFailedException;
-import com.sendsafely.exceptions.InvalidCredentialsException;
+import com.sendsafely.exceptions.FileOperationFailedException;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
 import com.sendsafely.exceptions.SendFailedException;
@@ -26,7 +18,6 @@ import com.sendsafely.file.FileManager;
 import com.sendsafely.progress.DefaultProgress;
 import com.sendsafely.upload.UploadManager;
 import com.sendsafely.utils.FileUploadUtility;
-import com.sendsafely.utils.SendSafelyConfig;
 
 public class AddFileHandler extends BaseHandler 
 {	
@@ -39,36 +30,58 @@ public class AddFileHandler extends BaseHandler
         request = new CreateFileIdRequest(uploadManager.getJsonManager());
 	}
 
-	public com.sendsafely.File makeRequest(String packageId, String keyCode, FileManager file) throws LimitExceededException, UploadFileException 
+	public File makeRequest(String packageId, String keyCode, FileManager file) throws LimitExceededException, UploadFileException 
 	{	
-		return makeRequest(packageId, keyCode, file, new DefaultProgress());
+		return makeRequest(packageId, null, keyCode, file, new DefaultProgress());
 	}
 	
-	public com.sendsafely.File makeRequest(String packageId, String keyCode, FileManager file, ProgressInterface progress) throws LimitExceededException, UploadFileException 
+	public File makeRequest(String packageId, String directoryId, String keyCode, FileManager file) throws LimitExceededException, UploadFileException 
+	{
+		return makeRequest(packageId, directoryId,  keyCode, file, new DefaultProgress());
+	}
+
+	public File makeRequest(String packageId, String directoryId, String keyCode, FileManager file, ProgressInterface progress) throws LimitExceededException, UploadFileException {
+			
+			Package packageInfo = getPackageInfo(packageId);
+			return makeRequest(packageId, directoryId, keyCode, packageInfo.getServerSecret(), file, progress);
+	}
+	
+	public File makeRequest(String packageId, String keyCode, FileManager file, ProgressInterface progress) throws LimitExceededException, UploadFileException 
 	{	
 		Package packageInfo = getPackageInfo(packageId);
-		return makeRequest(packageId, keyCode, packageInfo.getServerSecret(), file, progress);
+		return makeRequest(packageId, (String)null, keyCode, packageInfo.getServerSecret(), file, progress);
 	}
 	
-	public com.sendsafely.File makeRequest(String packageId, String keyCode, String serverSecret, FileManager file, ProgressInterface progress) throws LimitExceededException, UploadFileException 
+	public File makeRequest(String packageId, String directoryId, String keyCode, String serverSecret,  FileManager file, ProgressInterface progress) throws LimitExceededException, UploadFileException 
 	{	
 		FileUploadUtility uploadUtility = new FileUploadUtility(super.uploadManager);
 
-		String fileId = createFileId(file, packageId, uploadUtility.calculateParts(file));
+		String fileId = createFileId(file, packageId, directoryId, uploadUtility.calculateParts(file));
 		progress.gotFileId(fileId);
 		
 		String encryptionKey = createEncryptionKey(serverSecret, keyCode);
 		
 		UploadFileHandler handler = (UploadFileHandler)HandlerFactory.getInstance(super.uploadManager, Endpoint.UPLOAD_FILE);
-		com.sendsafely.File metaFile = makeRequest(handler, packageId, fileId, encryptionKey, file, progress);
+		com.sendsafely.File metaFile = makeRequest(handler, packageId, fileId, directoryId, encryptionKey, file, progress);
 		
 		return metaFile;
 	}
 	
-	protected com.sendsafely.File makeRequest(UploadFileHandler handler, String packageId, String fileId, String encryptionKey, FileManager file, ProgressInterface progress) throws UploadFileException, LimitExceededException
+	protected File makeRequest(UploadFileHandler handler, String packageId, String fileId, String encryptionKey, FileManager file, ProgressInterface progress) throws UploadFileException, LimitExceededException
 	{
 		try {
-			return handler.makeRequest(packageId, fileId, encryptionKey, file, progress);
+			return handler.makeRequest(packageId, fileId, (String)null, encryptionKey, file, progress);
+		} catch (SendFailedException e) {
+			throw new UploadFileException(e);
+		} catch (IOException e) {
+			throw new UploadFileException(e);
+		}
+	}
+	
+	protected File makeRequest(UploadFileHandler handler, String packageId, String fileId, String directoryId, String encryptionKey, FileManager file, ProgressInterface progress) throws UploadFileException, LimitExceededException
+	{
+		try {
+			return handler.makeRequest(packageId, fileId, directoryId, encryptionKey, file, progress);
 		} catch (SendFailedException e) {
 			throw new UploadFileException(e);
 		} catch (IOException e) {
@@ -93,6 +106,11 @@ public class AddFileHandler extends BaseHandler
     {
         return serverSecret + keyCode;
     }
+		
+	protected String createFileId(FileManager file, String packageId, String directoryId, int calculateParts) throws LimitExceededException, UploadFileException {
+		request.setDirectoryId(directoryId);
+		return createFileId(file, packageId, calculateParts);
+	}
 	
 	protected String createFileId(FileManager file, String packageId, int parts) throws LimitExceededException, UploadFileException
 	{

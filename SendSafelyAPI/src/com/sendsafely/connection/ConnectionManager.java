@@ -10,7 +10,6 @@ import java.util.Map;
 import com.sendsafely.exceptions.SendFailedException;
 
 /**
- * @author Erik Larsson
  * @description Interface for creating custom connection managers. By default a HTTPURLConnection is used to upload files. Implement this interface with your own HTTP Handling to use a different interface than the default.
  */
 public interface ConnectionManager {

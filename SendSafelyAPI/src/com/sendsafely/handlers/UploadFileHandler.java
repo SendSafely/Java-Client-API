@@ -1,6 +1,5 @@
 package com.sendsafely.handlers;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Timer;
 
@@ -28,12 +27,18 @@ public class UploadFileHandler extends BaseHandler
 
 	public com.sendsafely.File makeRequest(String packageId, String fileId, String encryptionKey, FileManager file, ProgressInterface progressCallback) throws SendFailedException, IOException, LimitExceededException, UploadFileException 
 	{	
-		return upload(file, encryptionKey, packageId, fileId, progressCallback);
+		return upload(file, encryptionKey, packageId, null, fileId, progressCallback);
 	}
 	
-	protected com.sendsafely.File upload(FileManager file, String passPhrase, String packageId, String fileId, ProgressInterface progressCallback) throws UploadFileException, LimitExceededException
+	public com.sendsafely.File makeRequest(String packageId, String fileId, String directoryId, String encryptionKey,  FileManager file, ProgressInterface progressCallback) throws SendFailedException, IOException, LimitExceededException, UploadFileException 
+	{	
+		return upload(file, encryptionKey, packageId, directoryId, fileId, progressCallback);
+	}
+	
+	protected com.sendsafely.File upload(FileManager file, String passPhrase, String packageId, String directoryId, String fileId, ProgressInterface progressCallback) throws UploadFileException, LimitExceededException
 	{
 		request.setFileId(fileId);
+		request.setDirectoryId(directoryId);
 		request.setPackageId(packageId);
 		
 		FileUploadUtility uploadUtility = new FileUploadUtility(super.uploadManager);

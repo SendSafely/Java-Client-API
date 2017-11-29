@@ -1,19 +1,21 @@
 package com.sendsafely;
 
+import java.util.Date;
 import java.util.List;
 
 import com.sendsafely.enums.PackageState;
+import com.sendsafely.enums.PackageStatus;
 
 /**
  * A Java Bean containing information about a package. 
  * Only the Getters should be used from this object, since the server will populate the object. 
  * Updating the setters will not change any state on the server and should be avoided.
- * @author Erik Larsson
  *
  */
 public class BasePackage {
 
 	private String packageId;
+	private String packageDescriptor;
 	private String packageCode;
 	private String serverSecret;
 	private String keyCode;
@@ -21,7 +23,12 @@ public class BasePackage {
 	private List<String> approverList;
 	private boolean needsApproval;
 	private PackageState state;
+	private PackageStatus status;
 	private int life;
+	private String rootDirectoryId; 
+	private boolean isWorkspace;
+	private Date packageTimestamp;
+	private String packageOwner = "";
 	
 	/**
 	 * @description The package ID used to identify a given package
@@ -152,6 +159,22 @@ public class BasePackage {
 		this.state = state;
 	}
 	
+	/** 
+	 * @description Returns the current state of the package. 
+	 * @return
+	 */
+	public PackageStatus getStatus() {
+		return status;
+	}
+	
+	/**
+	 * @description Set internally by the API.
+	 * @param status
+	 */
+	public void setStatus(PackageStatus status) {
+		this.status = status;
+	}
+	
 	/**
 	 * @description Get the number of days the final package will be available for before it expires.
 	 * @return
@@ -167,5 +190,51 @@ public class BasePackage {
 	public void setLife(int life) {
 		this.life = life;
 	}
+
+	public String getRootDirectoryId() {
+		return rootDirectoryId;
+	}
+
+	public void setRootDirectoryId(String rootDirectoryId) {
+		this.rootDirectoryId = rootDirectoryId;
+	}
+
+	public String getPackageDescriptor() {
+		return packageDescriptor;
+	}
+
+	public void setPackageDescriptor(String packageDescriptor) {
+		this.packageDescriptor = packageDescriptor;
+	}
+
+	public boolean getIsWorkspace() {
+		return isWorkspace;
+	}
+
+	public void setIsWorkspace(boolean isWorkspace) {
+		this.isWorkspace = isWorkspace;
+	}
+
+	public Date getPackageTimestamp() {
+		return packageTimestamp;
+	}
+
+	public void setPackageTimestamp(Date packageTimestamp) {
+		this.packageTimestamp = packageTimestamp;
+	}
+
+	public String getPackageOwner() {
+		return packageOwner;
+	}
+
+	public void setPackageOwner(String packageOwner) {
+		if(packageOwner == null){
+			this.packageOwner = "";
+		}else{
+			this.packageOwner = packageOwner;
+		}
+	}
+	
+	
 	
 }

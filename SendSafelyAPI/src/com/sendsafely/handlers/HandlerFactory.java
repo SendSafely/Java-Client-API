@@ -3,25 +3,10 @@ package com.sendsafely.handlers;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.sendsafely.dto.request.AddMessageRequest;
-import com.sendsafely.dto.request.AddRecipientRequest;
-import com.sendsafely.dto.request.CreateFileIdRequest;
-import com.sendsafely.dto.request.CreatePackageRequest;
-import com.sendsafely.dto.request.EnterpriseInfoRequest;
-import com.sendsafely.dto.request.FinalizePackageRequest;
 import com.sendsafely.dto.request.GetPackagesRequest;
-import com.sendsafely.dto.request.PackageInformationRequest;
-import com.sendsafely.dto.request.UpdatePackageLifeRequest;
-import com.sendsafely.dto.request.UpdateRecipientRequest;
-import com.sendsafely.dto.request.UploadFileRequest;
-import com.sendsafely.dto.request.UserInformationRequest;
-import com.sendsafely.dto.request.VerifyCredentialsRequest;
-import com.sendsafely.dto.request.VerifyVersionRequest;
 import com.sendsafely.enums.Endpoint;
-import com.sendsafely.enums.GetParam;
 import com.sendsafely.enums.HTTPMethod;
 import com.sendsafely.upload.UploadManager;
-import com.sendsafely.utils.SendSafelyConfig;
 
 public class HandlerFactory 
 {	
@@ -51,6 +36,17 @@ public class HandlerFactory
 		endpoints.put(Endpoint.FINALIZE_PACKAGE, new FinalizePackageHandler(uploadManager));
 		endpoints.put(Endpoint.ADD_FILE, new AddFileHandler(uploadManager));
 		endpoints.put(Endpoint.UPLOAD_FILE, new UploadFileHandler(uploadManager));
+		endpoints.put(Endpoint.ORGANIZATION_PACKAGES, new GetOrganizationPackagesHandler(uploadManager));
+		endpoints.put(Endpoint.CREATE_DIRECTORY, new CreateDirectoryHandler(uploadManager));
+		endpoints.put(Endpoint.GET_DIRECTORY, new GetDirectoryHandler(uploadManager));
+		endpoints.put(Endpoint.PACKAGE_NAME, new UpdatePackageDescriptorHandler(uploadManager));
+		endpoints.put(Endpoint.MOVE_DIRECTORY, new MoveDirectoryHandler(uploadManager));
+		endpoints.put(Endpoint.MOVE_FILE, new MoveFileHandler(uploadManager));
+		endpoints.put(Endpoint.FILE_INFORMATION, new FileInformationHandler(uploadManager));
+		endpoints.put(Endpoint.DELETE_FILE, new DeleteFileHandler(uploadManager));
+		endpoints.put(Endpoint.DIRECTORY_NAME, new UpdateDirectoryNameHandler(uploadManager));
+		endpoints.put(Endpoint.DELETE_DIRECTORY, new DeleteDirectoryHandler(uploadManager));
+		endpoints.put(Endpoint.GET_ACTIVITY_LOG, new GetActivityLogHandler(uploadManager));
 	}
 	
 	public static BaseHandler getInstance(UploadManager uploadManager, Endpoint p)

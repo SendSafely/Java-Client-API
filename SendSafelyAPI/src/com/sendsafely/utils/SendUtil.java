@@ -2,15 +2,11 @@ package com.sendsafely.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sendsafely.dto.request.BaseRequest;
-import com.sendsafely.dto.request.DownloadFileRequest;
 import com.sendsafely.dto.request.UploadFileRequest;
 import com.sendsafely.dto.response.DownloadFileResponse;
 import com.sendsafely.dto.response.ResponseFactory;
@@ -43,6 +39,7 @@ public class SendUtil {
 		String response = connection.sendFile(path, file, filename, data, progress);
 		return ResponseFactory.getInstanceFromString(response, new UploadFileResponse(), connection.getJsonManager());
 	}
+	
 	
 	protected <T> T send(String path, HTTPMethod method, String data, T clazz) throws IOException, SendFailedException
 	{

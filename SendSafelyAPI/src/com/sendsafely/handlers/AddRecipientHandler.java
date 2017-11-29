@@ -58,9 +58,6 @@ public class AddRecipientHandler extends BaseHandler
 		recipient.setNeedsApproval(obj.getApprovalRequired());
 		recipient.setRecipientId(obj.getRecipientId());
 		
-		//recipient.setCanAddFiles(obj.getCanAddFiles());
-		//recipient.setCanAddMessages(obj.getCanAddMessages());
-		//recipient.setCanAddRecipients(obj.getCanAddRecipients());
 		return recipient;
 	}
 	

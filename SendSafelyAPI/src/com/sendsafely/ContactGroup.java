@@ -1,10 +1,7 @@
 package com.sendsafely;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import com.sendsafely.dto.ContactGroupMember;
 
@@ -14,12 +11,12 @@ import com.sendsafely.dto.ContactGroupMember;
  * contactGroupId, contactGroupName, ContactGroupUsers, and users.
  * Only the Getters should be used from this object, since the server will populate the object. 
  * Updating the setters will not change any state on the server and should be avoided.
- * @author michaelnowak
  *
  */
 public class ContactGroup {
 	private String contactGroupId;
 	private String contactGroupName;
+	private boolean contactGroupIsOrganizationGroup;
 	private List<ContactGroupMember> users = new ArrayList<ContactGroupMember>(0);
 	
 	/**
@@ -69,4 +66,24 @@ public class ContactGroup {
 	public void setContactGroupMembers(List<ContactGroupMember> users) {
 		this.users = users;
 	}
+
+	/**
+	 * @description Gets the status of if it's an enterprise contact group.
+	 * @return is enterprise contact group
+	 */
+	public boolean getContactGroupIsOrganizationGroup() {
+		return contactGroupIsOrganizationGroup;
+	}
+
+	/**
+	 * Sets the value for if the group is an enterprise contact group.
+	 * @param contactGroupIsOrganizationGroup
+	 */
+	
+
+	public void setContactGroupIsOrganizationGroup(boolean contactGroupIsOrganizationGroup) {
+		this.contactGroupIsOrganizationGroup = contactGroupIsOrganizationGroup;
+	}
+	
+	
 }

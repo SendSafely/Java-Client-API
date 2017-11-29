@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.sendsafely.File;
 import com.sendsafely.Package;
 import com.sendsafely.Recipient;
@@ -82,6 +83,9 @@ public class PackageInformationHandler extends BaseHandler
 		info.setContactGroups(obj.getContactGroups());
 		info.setServerSecret(obj.getServerSecret());
 		info.setState(obj.getState());
+		info.setRootDirectoryId(obj.getRootDirectoryId());
+		info.setPackageDescriptor(obj.getLabel());
+		info.setIsWorkspace(obj.isVDR());
 		return info;
 	}
 	
@@ -95,6 +99,7 @@ public class PackageInformationHandler extends BaseHandler
 			r.setNeedsApproval(resp.getNeedsApproval());
 			r.setRecipientId(resp.getRecipientId());
 			r.setConfirmations(createConfirmationList(resp));
+			r.setRole(resp.getRoleName());
 			retval.add(r);
 		}
 		

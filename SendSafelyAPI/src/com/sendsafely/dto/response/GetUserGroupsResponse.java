@@ -6,13 +6,13 @@ import com.sendsafely.ContactGroup;
 
 
 public class GetUserGroupsResponse extends BaseResponse {
-	private List<ContactGroup> userContactGroups;
+	private List<ContactGroup> contactGroups;
 
-	public List<ContactGroup> getUserContactGroups() {
-		return userContactGroups;
+	public List<ContactGroup> getContactGroups() {
+		return contactGroups;
 	}
 
-	public void setUserContactGroups(List<ContactGroup> userContactGroups) {
-		this.userContactGroups = userContactGroups;
+	public void setContactGroups(List<ContactGroup> userContactGroups) {
+		this.contactGroups = userContactGroups;
 	}
 }

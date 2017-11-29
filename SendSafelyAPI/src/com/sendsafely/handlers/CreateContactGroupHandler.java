@@ -13,13 +13,26 @@ public class CreateContactGroupHandler extends BaseHandler{
 
 	private CreateContactGroupRequest request;
 
-	public CreateContactGroupHandler(UploadManager uploadManager, CreateContactGroupRequest createContactGroupRequest) {
+	public CreateContactGroupHandler(UploadManager uploadManager) {
 		super(uploadManager);
 		
-		this.request = createContactGroupRequest;
+		this.request = new CreateContactGroupRequest(uploadManager.getJsonManager());
 	}
  
-	public String makeRequest() throws CreateContactGroupFailedException {
+	public String makeRequest(String groupName) throws CreateContactGroupFailedException {
+		request.setgroupName(groupName);
+		CreateContactGroupResponse response = send();
+		
+		if(response.getResponse() != APIResponse.SUCCESS) 
+		{
+			throw new CreateContactGroupFailedException(response.getMessage());
+		}
+		return convert(response);
+	}
+	
+	public String makeRequest(String groupName, boolean isEnterpriseGroup) throws CreateContactGroupFailedException {
+		request.setgroupName(groupName);
+		request.setIsEnterpriseContactGroup(isEnterpriseGroup);
 		CreateContactGroupResponse response = send();
 		
 		if(response.getResponse() != APIResponse.SUCCESS) 

@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import com.sendsafely.ContactGroup;
+import com.sendsafely.dto.request.BaseRequest;
 import com.sendsafely.dto.request.GetContactGroupsRequest;
+import com.sendsafely.dto.request.GetOrganizationContactGroupsRequest;
 import com.sendsafely.dto.response.GetUserGroupsResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.exceptions.GetContactGroupsFailedException;
@@ -12,12 +14,19 @@ import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.upload.UploadManager;
 
 public class GetContactGroupsHandler extends BaseHandler{
-	private GetContactGroupsRequest request;
+	private BaseRequest request;
 
 	public GetContactGroupsHandler(UploadManager uploadManager, GetContactGroupsRequest getUserGroupsRequest) {
 		super(uploadManager);
 		
 		this.request = getUserGroupsRequest;
+	}
+
+	public GetContactGroupsHandler(UploadManager uploadManager,
+			GetOrganizationContactGroupsRequest getOrganizationContactGroupsRequest) {
+		super(uploadManager);
+		
+		this.request = getOrganizationContactGroupsRequest;
 	}
 
 	public List<ContactGroup> makeRequest() throws GetContactGroupsFailedException {
@@ -31,7 +40,7 @@ public class GetContactGroupsHandler extends BaseHandler{
 	}
 	
 	private List<ContactGroup> convert(GetUserGroupsResponse response) {
-		return response.getUserContactGroups();
+		return response.getContactGroups();
 	}
 
 	protected GetUserGroupsResponse send() throws GetContactGroupsFailedException 

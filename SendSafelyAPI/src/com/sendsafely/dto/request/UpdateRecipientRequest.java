@@ -35,5 +35,10 @@ public class UpdateRecipientRequest extends BaseRequest
 		super.setPostParam("phoneNumber", phonenumber);
 		super.setPostParam("countrycode", countryCode);
 	}
+
+	public void setRecipientRole(String role) {
+		super.setPostParam("roleName", role);
+		
+	}
 	
 }

@@ -8,8 +8,6 @@ import com.sendsafely.dto.response.AddRecipientResponse;
 import com.sendsafely.dto.response.BaseResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.CountryCode;
-import com.sendsafely.enums.GetParam;
-import com.sendsafely.enums.HTTPMethod;
 import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.exceptions.UpdateRecipientFailedException;
 import com.sendsafely.upload.UploadManager;
@@ -24,6 +22,12 @@ public class UpdateRecipientHandler extends BaseHandler
         request = new UpdateRecipientRequest(uploadManager.getJsonManager());
 	}
 
+	public void makeRequest(String packageId, String recipientId, String role) throws UpdateRecipientFailedException {
+		request.setRecipientRole(role);
+		makeRequest(packageId, recipientId, null, null);
+		
+	}
+	
 	public void makeRequest(String packageId, String recipientId, String phonenumber, CountryCode countryCode) throws UpdateRecipientFailedException {
 		request.setPackageId(packageId);
 		request.setRecipientId(recipientId);
@@ -55,5 +59,7 @@ public class UpdateRecipientHandler extends BaseHandler
 		recipient.setRecipientId(obj.getRecipientId());
 		return recipient;
 	}
+
+	
 	
 }

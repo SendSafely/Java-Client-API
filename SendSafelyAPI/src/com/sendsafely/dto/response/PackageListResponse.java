@@ -1,5 +1,6 @@
 package com.sendsafely.dto.response;
 
+import java.util.Date;
 import java.util.List;
 
 import com.sendsafely.enums.PackageState;
@@ -12,11 +13,15 @@ public class PackageListResponse extends BaseResponse {
 	private List<String> recipients;
 	private List<String> contactGroups;
 	private List<FileResponse> files;
+	private List<String> filenames;
 	private List<String> approverList;
 	private boolean needsApproval;
 	private PackageState state;
+	private int packageState;
 	private int life;
 	private String description;
+	private String packageUserName;
+	private Date packageUpdateTimestamp;
 	
 	public List<String> getRecipients() {
 		return recipients;
@@ -84,6 +89,35 @@ public class PackageListResponse extends BaseResponse {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+	public String getPackageUserName() {
+		return packageUserName;
+	}
+	public void setPackageUserName(String packageOwner) {
+		if(packageOwner == null){
+			this.packageUserName = "";
+		}else{
+			this.packageUserName = packageOwner;
+		}	
+	}
+	public Date getPackageUpdateTimestamp() {
+		return packageUpdateTimestamp;
+	}
+	public void setPackageUpdateTimestamp(Date packageUpdateTimestamp) {
+		this.packageUpdateTimestamp = packageUpdateTimestamp;
+	}
+	public List<String> getFilenames() {
+		return filenames;
+	}
+	public void setFilenames(List<String> filenames) {
+		this.filenames = filenames;
+	}
+	public int getPackageState() {
+		return packageState;
+	}
+	public void setPackageState(int packageState) {
+		this.packageState = packageState;
+	}
+
 	
 	
 }
