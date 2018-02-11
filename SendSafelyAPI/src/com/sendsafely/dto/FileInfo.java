@@ -18,42 +18,76 @@ public class FileInfo {
 	private Integer fileVersion;
 	private int fileParts;
 	
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getFileId() {
 		return fileId;
 	}
 	public void setFileId(String fileId) {
 		this.fileId = fileId;
 	}
+	
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getFileName() {
 		return fileName;
 	}
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
+	
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getFileSize() {
 		return fileSize;
 	}
 	public void setFileSize(String fileSize) {
 		this.fileSize = fileSize;
 	}
+	
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getCreatedByEmail() {
 		return createdByEmail;
 	}
 	public void setCreatedByEmail(String createdByEmail) {
 		this.createdByEmail = createdByEmail;
 	}
+	
+	/**
+	 * @returnType List<FileInfo>
+	 * @return
+	 */
 	public List<FileInfo> getOldVersions() {
 		return oldVersions;
 	}
 	public void setOldVersions(List<FileInfo> versions) {
 		this.oldVersions = versions;
 	}
+	
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getCreatedById() {
 		return createdById;
 	}
 	public void setCreatedById(String createdById) {
 		this.createdById = createdById;
 	}
+	
+	/**
+	 * @returnType Date
+	 * @return
+	 */
 	public Date getUploaded() {
 		return uploaded;
 	}
@@ -61,6 +95,12 @@ public class FileInfo {
 		this.uploaded = uploaded;
 	}
 		
+	/**
+	 * @returnType List<FileInfo>
+	 * @param files
+	 * @param timeZone
+	 * @return
+	 */
 	private List<FileInfo> createFileVersions(Collection<FileInfo> files, String timeZone)
 	{
 		List<FileInfo> versions = new ArrayList<FileInfo>();
@@ -79,6 +119,10 @@ public class FileInfo {
 		return versions;
 	}
 
+	/**
+	 * @returnType int
+	 * @return
+	 */
 	public int getFileParts() {
 		return fileParts;
 	}
@@ -87,6 +131,10 @@ public class FileInfo {
 		this.fileParts = fileParts;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getUploadedStr() {
 		return uploadedStr;
 	}
@@ -95,6 +143,10 @@ public class FileInfo {
 		this.uploadedStr = uploadedStr;
 	}
 	
+	/**
+	 * @returnType Integer
+	 * @return
+	 */
 	public Integer getFileVersion() {
 		return fileVersion;
 	}

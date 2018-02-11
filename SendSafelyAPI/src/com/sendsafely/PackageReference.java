@@ -15,8 +15,8 @@ public class PackageReference extends BasePackage {
 	
 	/**
 	 * @description Get all recipients that are currently associated with the package
-	 * @returnType Email
-	 * @return
+	 * @returnType List<String>
+	 * @return A list of recipient emails.
 	 */
 	public List<String> getRecipients() {
 		return recipients;
@@ -32,8 +32,8 @@ public class PackageReference extends BasePackage {
 	
 	/**
 	 * @description Get all contactGroup names that are currently associated with the package
-	 * @returnType contactGroupName
-	 * @return
+	 * @returnType List<String>
+	 * @return A list of contact group names.
 	 */
 	public List<String> getContactGroupNames() {
 		return contactGroupNames;

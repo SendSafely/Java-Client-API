@@ -21,6 +21,7 @@ public class ContactGroup {
 	
 	/**
 	 * @description Get the contact group id
+	 * @returnType String
 	 * @return contactGroupId The id representation of the contact group.
 	 */
 	public String getContactGroupId() {
@@ -37,7 +38,8 @@ public class ContactGroup {
 	
 	/**
 	 * @description Get the contact group Name
-	 * @return contactGroupName
+	 * @returnType String
+	 * @return A string of contactGroupName
 	 */
 	public String getContactGroupName() {
 		return contactGroupName;
@@ -53,7 +55,8 @@ public class ContactGroup {
 	
 	/**
 	 * @description Get a list of users
-	 * @return List<Map<String,String>> users
+	 * @returnType List<ContactGroupMember>
+	 * @return A list of ContactGrouMember.
 	 */
 	public List<ContactGroupMember> getContactGroupMembers() {
 		return users;
@@ -69,6 +72,7 @@ public class ContactGroup {
 
 	/**
 	 * @description Gets the status of if it's an enterprise contact group.
+	 * @returnType boolean
 	 * @return is enterprise contact group
 	 */
 	public boolean getContactGroupIsOrganizationGroup() {
@@ -79,8 +83,6 @@ public class ContactGroup {
 	 * Sets the value for if the group is an enterprise contact group.
 	 * @param contactGroupIsOrganizationGroup
 	 */
-	
-
 	public void setContactGroupIsOrganizationGroup(boolean contactGroupIsOrganizationGroup) {
 		this.contactGroupIsOrganizationGroup = contactGroupIsOrganizationGroup;
 	}

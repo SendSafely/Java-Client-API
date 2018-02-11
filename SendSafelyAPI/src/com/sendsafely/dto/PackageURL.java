@@ -9,6 +9,7 @@ public class PackageURL {
 	private boolean needsApproval;
 	
 	/**
+	 * @returnType URL
 	 * @description Returns the secure link that must be sent to the recipients. 
 	 * @return the secure link
 	 */
@@ -23,6 +24,7 @@ public class PackageURL {
 		this.secureLink = secureLink;
 	}
 	/**
+	 * @returnType String
 	 * @description Returns the keycode
 	 * @return the keycode
 	 */
@@ -37,6 +39,7 @@ public class PackageURL {
 		this.keycode = keycode;
 	}
 	/**
+	 * @returnType boolean
 	 * @description Returns true if the package needs approval before it can be accessed by all recipients.
 	 * @return the needsApproval flag indicating if the package needs approval before it can be sent to all recipients
 	 */

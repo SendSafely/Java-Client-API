@@ -21,11 +21,13 @@ public interface ConnectionManager {
 	public void open(URL url) throws IOException;
 	
 	/**
+	 * @returnType URL
 	 * @description Get the URL we are currently connected to.
 	 */
 	public URL getURL();
 	
 	/**
+	 * @returnType String
 	 * @description Return the host of the of the current connection.
 	 */
 	public String getHost();
@@ -46,16 +48,19 @@ public interface ConnectionManager {
 	public void send(String data) throws IOException;
 	
 	/**
+	 * @returnType OutputStream
 	 * @description Return an output stream. The output stream will be used to upload larger data objects such as files.
 	 */
 	public OutputStream getOutputStream() throws IOException;
 	
 	/**
+	 * @returnType InputStream
 	 * @description Get the server response. Will be called after first calling send or getOutputStream
 	 */
 	public InputStream getResponse() throws IOException;
 	
 	/**
+	 * @returnType String
 	 * @description Get a header from the response.
 	 */
 	public String getHeader(String header);
@@ -66,23 +71,27 @@ public interface ConnectionManager {
 	public Map<String, List<String>> getHeaders();
 	
 	/**
+	 * @returnType int
 	 * @throws IOException 
 	 * @description gets response code
 	 */
 	public int getResponseCode() throws IOException;
 	
 	/**
+	 * @returnType String
 	 * @throws IOException 
 	 * @description gets response message
 	 */
 	public String getResponseMessage() throws IOException;
 	
 	/**
+	 * @returnType String
 	 * @description returns the content type
 	 */
 	public String getContentType();
 	
 	/**
+	 * @returnType InputStream
 	 * @description Get the server error stream.
 	 */
 	public InputStream getErrorStream() throws IOException;

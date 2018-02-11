@@ -153,7 +153,11 @@ public class DefaultUploadManager implements UploadManager {
 	public String getResponseMessage() {
 		return responseMessage;
 	}
-
+	
+	public String getApiHost() {
+		return conn.getHost();
+	}
+	
 	private URL createUrl(String path) throws SendFailedException
 	{
 		try {

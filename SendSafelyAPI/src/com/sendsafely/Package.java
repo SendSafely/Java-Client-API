@@ -15,8 +15,8 @@ public class Package extends BasePackage {
 	private List<ContactGroup> contactGroups;
 	/**
 	 * @description Get all recipients that are currently associated with the package
-	 * @returnType Recipient
-	 * @return
+	 * @returnType List<Recipient>
+	 * @return A list of recipients.
 	 */
 	public List<Recipient> getRecipients() {
 		return recipients;
@@ -32,7 +32,8 @@ public class Package extends BasePackage {
 
 	/**
 	 * @description Set internally by the API.
-	 * @return
+	 * @returnType List<ContactGroup>
+	 * @return A list of contact groups.
 	 */
 	public List<ContactGroup> getContactGroups() {
 		return contactGroups;

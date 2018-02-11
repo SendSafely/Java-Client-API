@@ -27,7 +27,8 @@ public class File {
 
 	/**
 	 * @description Get the unique file ID associated with the file.
-	 * @return
+	 * @returnType String
+	 * @return A string representing File Id.
 	 */
 	public String getFileId() {
 		return fileId;
@@ -43,7 +44,8 @@ public class File {
 	
 	/**
 	 * @description Get the filename associated with the file.
-	 * @return
+	 * @returnType String
+	 * @return A string representing File Name.
 	 */
 	public String getFileName() {
 		return fileName;
@@ -59,7 +61,8 @@ public class File {
 	
 	/**
 	 * @description Get the file size for the unencrypted file.
-	 * @return
+	 * @returnType long
+	 * @return A long representing File Size.
 	 */
 	public long getFileSize() {
 		return fileSize;

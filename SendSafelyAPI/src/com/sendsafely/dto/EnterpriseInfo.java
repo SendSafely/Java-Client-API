@@ -11,6 +11,7 @@ public class EnterpriseInfo {
 	private boolean messageEncryption;
 	
 	/**
+	 * @returnType String
 	 * @description Returns the host name for the organization.
 	 * @return The host name for the organization.
 	 */
@@ -27,6 +28,7 @@ public class EnterpriseInfo {
 	}
 	
 	/** 
+	 * @returnType String
 	 * @description Returns the system name for the organization.
 	 * @return The system name for the organization.
 	 */
@@ -43,6 +45,7 @@ public class EnterpriseInfo {
 	}
 	
 	/** 
+	 * @returnType Boolean
 	 * @description Returns true or false depending on if the Organization allows finalizing packages without recipients.
 	 * @return True or false depending on the organization settings.
 	 */
@@ -58,6 +61,10 @@ public class EnterpriseInfo {
 		this.allowUndisclosedRecipients = allowUndisclosedRecipients;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getHeaderColor() {
 		return headerColor;
 	}
@@ -66,6 +73,10 @@ public class EnterpriseInfo {
 		this.headerColor = headerColor;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getLinkColor() {
 		return linkColor;
 	}
@@ -74,6 +85,10 @@ public class EnterpriseInfo {
 		this.linkColor = linkColor;
 	}
 	
+	/**
+	 * boolean
+	 * @return
+	 */
 	public boolean getMessageEncryption()
 	{
 		return this.messageEncryption;

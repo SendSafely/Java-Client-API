@@ -10,6 +10,7 @@ public class UserInformation {
 	private boolean adminUser;
 	
 	/**
+	 * @returnType String
 	 * @description The email address connected to the user.
 	 * @return email
 	 */
@@ -26,6 +27,7 @@ public class UserInformation {
 	}
 	
 	/**
+	 * @returnType String
 	 * @description The client key for the current user. The client key is a unique token for every user. This token can be used to encrypt secrets belonging to the user.
 	 * @return client key
 	 */
@@ -42,6 +44,7 @@ public class UserInformation {
 	}
 	
 	/**
+	 * @returnType String
 	 * @description Get the first name of the current user.
 	 * @return firstName
 	 */
@@ -58,6 +61,7 @@ public class UserInformation {
 	}
 	
 	/**
+	 * @returnType String
 	 * @description Get the last name of the current user.
 	 * @return lastName
 	 */
@@ -74,6 +78,7 @@ public class UserInformation {
 	}
 
 	/**
+	 * @returnType boolean
 	 * @description Flag to determine if user is eligible to receive beta features.
 	 * @param betaUser
 	 */
@@ -90,6 +95,7 @@ public class UserInformation {
 	}
 
 	/**
+	 * @returnType boolean
 	 * @description Set internally by the API.
 	 * @return isAdmin
 	 */

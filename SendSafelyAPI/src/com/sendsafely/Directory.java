@@ -18,6 +18,10 @@ public class Directory {
 		this.directoryId = directoryId;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getDirectoryId() {
 		return directoryId;
 	}
@@ -26,6 +30,10 @@ public class Directory {
 		this.directoryId = directoryId;
 	}
 
+	/**
+	 * @returnType Directory
+	 * @return
+	 */
 	public Directory getDirectory() {
 		return directory;
 	}
@@ -34,6 +42,10 @@ public class Directory {
 		this.directory = directory;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getDirectoryName() {
 		return directoryName;
 	}
@@ -42,6 +54,10 @@ public class Directory {
 		this.directoryName = directoryName;
 	}
 
+	/**
+	 * @returnType List<File>
+	 * @return
+	 */
 	public List<File> getFiles() {
 		return files;
 	}
@@ -50,6 +66,10 @@ public class Directory {
 		this.files = files;
 	}
 
+	/**
+	 * @returnType Collection<Subdirectory>
+	 * @return
+	 */
 	public Collection<Subdirectory> getSubDirectories() {
 		return subDirectories;
 	}

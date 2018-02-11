@@ -21,7 +21,8 @@ public class Recipient {
 	
 	/**
 	 * @description Get the unique recipient ID for the object. The recipient ID is unique for every new package. The same user will have different recipient IDs for different packages.
-	 * @return
+	 * @returnType String
+	 * @return A string representing recipient id. 
 	 */
 	public String getRecipientId() {
 		return recipientId;
@@ -37,7 +38,8 @@ public class Recipient {
 	
 	/**
 	 * @description Get the email address for the given recipient.
-	 * @return
+	 * @returnType String
+	 * @return an email address string.
 	 */
 	public String getEmail() {
 		return email;
@@ -53,7 +55,8 @@ public class Recipient {
 	
 	/**
 	 * @description Returns true if this recipient requires approval before the package can be retrieved.
-	 * @return
+	 * @returnType boolean
+	 * @return A boolean representing that the recipient needs approval.
 	 */
 	public boolean getNeedsApproval() {
 		return needsApproval;
@@ -69,8 +72,8 @@ public class Recipient {
 	
 	/**
 	 * @description Returns the list of confirmations.
-	 * @returnType Confirmation
-	 * @return
+	 * @returnType List<Confirmation>
+	 * @return A list of confirmations.
 	 */
 	public List<Confirmation> getConfirmations() {
 		return confirmations;
@@ -84,10 +87,19 @@ public class Recipient {
 		this.confirmations = confirmations;
 	}
 
+	/**
+	 * @description Retrieves the role of the recipient
+	 * @returnType String
+	 * @return A String of the role value.
+	 */
 	public String getRole() {
 		return role;
 	}
 
+	/**
+	 * @description Sets the role for the recipient
+	 * @param roleName Name of the role for the recipient
+	 */
 	public void setRole(String roleName) {
 		this.role = roleName;
 	}

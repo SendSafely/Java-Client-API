@@ -15,6 +15,10 @@ public class ActivityLogEntry {
 	private UserDTO user;
 	
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getPackageId(){
 		return this.packageId;
 	}
@@ -23,6 +27,10 @@ public class ActivityLogEntry {
 		this.packageId = packageId;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getActivityLogId() {
 		return activityLogId;
 	}
@@ -31,6 +39,10 @@ public class ActivityLogEntry {
 		this.activityLogId = activityLogId;
 	}
 
+	/**
+	 * @returnType Date
+	 * @return
+	 */
 	public Date getTimestamp() {
 		return timestamp;
 	}
@@ -39,6 +51,10 @@ public class ActivityLogEntry {
 		this.timestamp = timestamp;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getIpAddress() {
 		return ipAddress;
 	}
@@ -47,6 +63,10 @@ public class ActivityLogEntry {
 		this.ipAddress = ipAddress;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getTargetId() {
 		return targetId;
 	}
@@ -55,6 +75,10 @@ public class ActivityLogEntry {
 		this.targetId = targetId;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getActionDescription() {
 		return actionDescription;
 	}
@@ -63,6 +87,10 @@ public class ActivityLogEntry {
 		this.actionDescription = actionDescription;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getAction() {
 		return action;
 	}
@@ -71,6 +99,10 @@ public class ActivityLogEntry {
 		this.action = action;
 	}
 
+	/**
+	 * @returnType UserDTO
+	 * @return
+	 */
 	public UserDTO getUser() {
 		return user;
 	}
@@ -79,6 +111,10 @@ public class ActivityLogEntry {
 		this.user = user;
 	}
 
+	/**
+	 * @returnType String
+	 * @return
+	 */
 	public String getTimestampStr() {
 		return timestampStr;
 	}
