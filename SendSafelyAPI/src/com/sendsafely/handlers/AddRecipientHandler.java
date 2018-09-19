@@ -57,6 +57,8 @@ public class AddRecipientHandler extends BaseHandler
 		recipient.setEmail(obj.getEmail());
 		recipient.setNeedsApproval(obj.getApprovalRequired());
 		recipient.setRecipientId(obj.getRecipientId());
+		recipient.setPhonenumbers(obj.getPhonenumbers());
+		recipient.setApprovers(obj.getApprovers());
 		
 		return recipient;
 	}

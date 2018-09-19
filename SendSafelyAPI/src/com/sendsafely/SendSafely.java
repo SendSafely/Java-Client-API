@@ -2,16 +2,19 @@ package com.sendsafely;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openpgp.PGPException;
 
 import com.google.gson.Gson;
 import com.sendsafely.connection.ConnectionFactory;
@@ -23,6 +26,7 @@ import com.sendsafely.dto.ActivityLogEntry;
 import com.sendsafely.dto.EnterpriseInfo;
 import com.sendsafely.dto.FileInfo;
 import com.sendsafely.dto.PackageURL;
+import com.sendsafely.dto.RecipientHistory;
 import com.sendsafely.dto.UserInformation;
 import com.sendsafely.dto.request.AddContactGroupAsRecipientRequest;
 import com.sendsafely.dto.request.AddDropzoneRecipientRequest;
@@ -57,12 +61,14 @@ import com.sendsafely.exceptions.FileOperationFailedException;
 import com.sendsafely.exceptions.FinalizePackageFailedException;
 import com.sendsafely.exceptions.GetActivityLogException;
 import com.sendsafely.exceptions.GetContactGroupsFailedException;
+import com.sendsafely.exceptions.GetKeycodeFailedException;
 import com.sendsafely.exceptions.GetPackagesException;
 import com.sendsafely.exceptions.InvalidCredentialsException;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.MessageException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
 import com.sendsafely.exceptions.PasswordRequiredException;
+import com.sendsafely.exceptions.PublicKeysFailedException;
 import com.sendsafely.exceptions.RecipientFailedException;
 import com.sendsafely.exceptions.RemoveContactGroupAsRecipientFailedException;
 import com.sendsafely.exceptions.RemoveContactGroupFailedException;
@@ -88,6 +94,8 @@ import com.sendsafely.handlers.CreatePackageHandler;
 import com.sendsafely.handlers.DeleteDirectoryHandler;
 import com.sendsafely.handlers.DeleteFileHandler;
 import com.sendsafely.handlers.DeletePackageHandler;
+import com.sendsafely.handlers.RevokePublicKey;
+import com.sendsafely.handlers.DeleteTempPackageHandler;
 import com.sendsafely.handlers.DownloadAndDecryptFileHandler;
 import com.sendsafely.handlers.EnterpriseInfoHandler;
 import com.sendsafely.handlers.FileInformationHandler;
@@ -96,10 +104,12 @@ import com.sendsafely.handlers.GetActivityLogHandler;
 import com.sendsafely.handlers.GetContactGroupsHandler;
 import com.sendsafely.handlers.GetDirectoryHandler;
 import com.sendsafely.handlers.GetDropzoneRecipientHandler;
+import com.sendsafely.handlers.GetKeycode;
 import com.sendsafely.handlers.GetMessageHandler;
 import com.sendsafely.handlers.GetOrganizationPackagesHandler;
 import com.sendsafely.handlers.GetPackagesHandler;
 import com.sendsafely.handlers.GetRecipientHandler;
+import com.sendsafely.handlers.GetRecipientHistoryHandler;
 import com.sendsafely.handlers.HandlerFactory;
 import com.sendsafely.handlers.MoveDirectoryHandler;
 import com.sendsafely.handlers.MoveFileHandler;
@@ -114,6 +124,7 @@ import com.sendsafely.handlers.UpdateDirectoryNameHandler;
 import com.sendsafely.handlers.UpdatePackageDescriptorHandler;
 import com.sendsafely.handlers.UpdatePackageLifeHandler;
 import com.sendsafely.handlers.UpdateRecipientHandler;
+import com.sendsafely.handlers.UploadPublicKey;
 import com.sendsafely.handlers.UserInformationHandler;
 import com.sendsafely.handlers.VerifyCredentialsHandler;
 import com.sendsafely.handlers.VerifyVersionHandler;
@@ -122,6 +133,8 @@ import com.sendsafely.progress.DefaultProgress;
 import com.sendsafely.upload.DefaultUploadManager;
 import com.sendsafely.upload.UploadFactory;
 import com.sendsafely.upload.UploadManager;
+import com.sendsafely.utils.CryptoUtil;
+import com.sendsafely.utils.Keypair;
 
 /**
  * @description The main SendSafely API. Use this API to create packages and append files and recipients.
@@ -442,6 +455,18 @@ public class SendSafely {
 		return handler.makeRequest(packageId, null, fileId, keyCode, progress, null);
 	}
 	
+	/*
+	 * @ description Gets a list of Recipient History information.
+	 * @ param recipientEmail
+	 * @ returnType List<RecipientHistory>
+	 * @ return a List<RecipientHistory> object containing a list of all recipient history items.
+	 * @ throws RecipientFailedException
+	 */
+	public List<RecipientHistory> getRecipientHistory(String recipientEmail) throws RecipientFailedException{ 
+		GetRecipientHistoryHandler handler = ((GetRecipientHistoryHandler)HandlerFactory.getInstance(uploadManager, Endpoint.RECIPIENT_HISTORY));
+		return handler.makeRequest(recipientEmail);
+	}
+	
 	/**
 	 * @description Downloads a file from the server and decrypts it.
 	 * @param packageId The unique package id of the package for the file download operation.
@@ -543,6 +568,17 @@ public class SendSafely {
 	}
 	
 	/**
+	 * @description Deletes a package given a package ID.
+	 * @param packageId The unique package id of the package for the delete temporary package operation.  
+	 * @throws DeletePackageException
+	 */
+	public void deleteTempPackage(String packageId) throws DeletePackageException
+	{
+		DeleteTempPackageHandler handler = (DeleteTempPackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.DELETE_TEMP_PACKAGE);
+		handler.makeRequest(packageId);
+	}
+	
+	/**
 	 * @description Encrypt and upload a new file. The file will be encrypted before being uploaded to the server. The function will block until the file is uploaded.
 	 * @param packageId The packageId to attach the file to. 
 	 * @param keyCode The keycode belonging to the package.
@@ -561,6 +597,17 @@ public class SendSafely {
 		return handler.makeRequest(packageId, null, keyCode, serverSecret, file, progress);
 	}
 	
+	/**
+	 * @description Get all received packages
+	 * @return List<String> a list of all received package IDs.
+	 * @throws GetPackagesException
+	 */
+	public List<PackageReference> getReceivedPackages() throws GetPackagesException
+	{
+		GetPackagesHandler handler = (GetPackagesHandler)HandlerFactory.getInstance(uploadManager, Endpoint.RECEIVED_PACKAGES);
+		return handler.makeRequest();
+	}
+					
 	/**
 	 * @description Encrypt and upload a new file to a directory in a Workspace package. The file will be encrypted before being uploaded to the server. The function will block until the file is uploaded.
 	 * @param packageId The unique package id of the package for the file upload operation.  
@@ -844,6 +891,43 @@ public class SendSafely {
 		return handler.makeRequest();
 	}
 	
+	/**
+	 * @description Generates a new RSA Key pair used to encrypt keycodes. The private key as well as an identifier associating the public Key is returned to the user. The public key is uploaded and stored on the SendSafely servers.
+	 * @param description The description used for generating the key pair.
+	 * @returnType Privatekey
+	 * @return Returns a Private Key containing the armored private key and a Public Key ID associating a public key to the private key.
+	 * @throws NoSuchAlgorithmException 
+	 * @throws PublicKeysFailedException 
+	 * @throws IOException 
+	 * @throws PGPException 
+	 */
+	public Privatekey generateKeyPair(String description) throws NoSuchAlgorithmException, PublicKeysFailedException, PGPException, IOException{
+
+		UploadPublicKey handler = new UploadPublicKey(uploadManager);
+		Keypair kp = CryptoUtil.GenerateKeyPair();
+		String publicKeyId = handler.makeRequest(kp.getPublicKey(), description);
+		Privatekey privateKey = new Privatekey();
+		privateKey.setPublicKeyId(publicKeyId);
+		privateKey.setArmoredKey(kp.getPrivateKey());
+		return privateKey;
+	}
+	
+	public String getKeycode(String packageId, Privatekey privateKey) throws GetKeycodeFailedException{
+		GetKeycode handler = new GetKeycode(uploadManager);
+		return handler.get(packageId, privateKey);
+	}
+	
+	/**
+	 * @description Revokes a public key from the server. Only call this if the private key has been deleted and should not be used anymore.
+	 * @param publicKeyId The public key id to revoke.
+	 * @throws PublicKeysFailedException 
+	 */
+	public void revokePublicKey(String publicKeyId) throws PublicKeysFailedException{
+		RevokePublicKey handler = new RevokePublicKey(uploadManager);
+		handler.makeRequest(publicKeyId);
+	}
+
+
 	/**
 	 * @description Retrieves meta data about a file in a Workspace package.
 	 * @param packageId The unique package id of the package for the get file information operation.

@@ -11,6 +11,7 @@ import com.sendsafely.utils.CryptoUtil;
 
 import java.io.IOException;
 import java.security.NoSuchProviderException;
+import com.sendsafely.Privatekey;
 
 public class GetKeycode extends BaseHandler
 {
@@ -22,15 +23,18 @@ public class GetKeycode extends BaseHandler
         request = new GetKeycodeRequest(uploadManager.getJsonManager());
 	}
 
-	public String get(String packageId, String privateKey, String publicKeyId) throws GetKeycodeFailedException {
+	public String get(String packageId, Privatekey privateKey) throws GetKeycodeFailedException {
 		
+		String publicKeyId = privateKey.getPublicKeyId();
+        String privateKeyStr = privateKey.getArmoredKey();
+        
 		request.setPackageId(packageId);
         request.setPublicKeyId(publicKeyId);
 		BaseResponse response = send();
 		
 		if(response.getResponse() == APIResponse.SUCCESS) 
 		{
-            return decrypt(privateKey, response.getMessage());
+            return decrypt(privateKeyStr, response.getMessage());
 		}
 		else
 		{

@@ -1,11 +1,18 @@
 package com.sendsafely.utils;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -13,39 +20,61 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 
-import com.sendsafely.exceptions.PublicKeyEncryptionFailedException;
-
 import org.bouncycastle.bcpg.ArmoredOutputStream;
-import org.bouncycastle.crypto.AsymmetricBlockCipher;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.engines.RSAEngine;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
+import org.bouncycastle.crypto.generators.RSAKeyPairGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.util.PrivateKeyFactory;
-import org.bouncycastle.crypto.util.PublicKeyFactory;
-import org.bouncycastle.openpgp.*;
+import org.bouncycastle.crypto.params.RSAKeyGenerationParameters;
+import org.bouncycastle.openpgp.PGPCompressedData;
+import org.bouncycastle.openpgp.PGPEncryptedData;
+import org.bouncycastle.openpgp.PGPEncryptedDataGenerator;
+import org.bouncycastle.openpgp.PGPEncryptedDataList;
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPKeyPair;
+import org.bouncycastle.openpgp.PGPLiteralData;
+import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
+import org.bouncycastle.openpgp.PGPObjectFactory;
+import org.bouncycastle.openpgp.PGPOnePassSignatureList;
+import org.bouncycastle.openpgp.PGPPBEEncryptedData;
+import org.bouncycastle.openpgp.PGPPrivateKey;
+import org.bouncycastle.openpgp.PGPPublicKey;
+import org.bouncycastle.openpgp.PGPPublicKeyEncryptedData;
+import org.bouncycastle.openpgp.PGPPublicKeyRing;
+import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
+import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
+import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.PBEDataDecryptorFactory;
+import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
 import org.bouncycastle.openpgp.operator.PGPKeyEncryptionMethodGenerator;
-import org.bouncycastle.openpgp.operator.PublicKeyKeyEncryptionMethodGenerator;
-import org.bouncycastle.openpgp.operator.bc.*;
+import org.bouncycastle.openpgp.operator.bc.BcPBEDataDecryptorFactory;
+import org.bouncycastle.openpgp.operator.bc.BcPBEKeyEncryptionMethodGenerator;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDataEncryptorBuilder;
+import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
+import org.bouncycastle.openpgp.operator.bc.BcPGPKeyPair;
+import org.bouncycastle.openpgp.operator.bc.BcPublicKeyDataDecryptorFactory;
+import org.bouncycastle.openpgp.operator.bc.BcPublicKeyKeyEncryptionMethodGenerator;
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPDigestCalculatorProviderBuilder;
 import org.bouncycastle.openpgp.operator.jcajce.JcePBESecretKeyDecryptorBuilder;
-import org.bouncycastle.openpgp.operator.jcajce.JcePublicKeyDataDecryptorFactoryBuilder;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.encoders.UrlBase64;
 
 import com.sendsafely.exceptions.MessageException;
 import com.sendsafely.exceptions.PublicKeyDecryptionFailedException;
+import com.sendsafely.exceptions.PublicKeyEncryptionFailedException;
 import com.sendsafely.exceptions.SignatureCreationFailedException;
 import com.sendsafely.exceptions.TokenGenerationFailedException;
 
-import org.bouncycastle.util.io.Streams;
-
 public class CryptoUtil 
 {
+
+	private static final int RsaKeySize = 2048;
 
 	public static String createChecksum(String keyCode, String packageCode)
 	{
@@ -88,6 +117,38 @@ public class CryptoUtil
 		return new String(UrlBase64.encode(randomBytes)).replace(".", "");
 	}
 	
+	public static Keypair GenerateKeyPair() throws NoSuchAlgorithmException, PGPException, IOException{
+		
+		RSAKeyPairGenerator generator = new RSAKeyPairGenerator();
+		RSAKeyGenerationParameters params = new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), RsaKeySize, 12);
+		generator.init(params);
+		AsymmetricCipherKeyPair keyPair = generator.generateKeyPair();
+		Keypair pair = Armor(keyPair, "no-reply@sendsafely.com");
+		return pair;
+	}
+	
+	private static Keypair Armor(AsymmetricCipherKeyPair keyPair, String email) throws PGPException, IOException, NoSuchAlgorithmException {
+		PGPKeyPair pgpKeyPair = new BcPGPKeyPair(PGPPublicKey.RSA_GENERAL, keyPair, new Date());
+		ByteArrayOutputStream memOut = new ByteArrayOutputStream(); // this is where we put the signed data
+		ArmoredOutputStream secretOut = new ArmoredOutputStream(memOut);
+		PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder().build().get(PGPEncryptedData.AES_256);
+		BcPGPContentSignerBuilder builder = new BcPGPContentSignerBuilder(pgpKeyPair.getPublicKey().getAlgorithm(), PGPEncryptedData.AES_256);
+		PGPSecretKey secretKey = new PGPSecretKey(PGPSignature.DEFAULT_CERTIFICATION, pgpKeyPair, email, sha1Calc, null, null, builder, null);
+		secretKey.encode(secretOut);
+		secretOut.close();
+		ByteArrayOutputStream memPublicOut = new ByteArrayOutputStream();
+		ArmoredOutputStream publicOut = new ArmoredOutputStream(memPublicOut);
+		PGPPublicKey key = secretKey.getPublicKey();
+		key.encode((OutputStream) publicOut);
+		publicOut.close();
+		String privateKeyStr = memOut.toString();
+		String publicKeyStr = memPublicOut.toString();
+		Keypair pair = new Keypair();
+		pair.setPrivateKey(privateKeyStr);
+		pair.setPublicKey(publicKeyStr);
+		return pair;
+	}
+
 	public static String PBKDF2(String token, String salt, int iterations)
 	{
 		PBEParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
@@ -481,5 +542,6 @@ public class CryptoUtil
 		inputStream.close();
 		pOut.close();
 	}
+
 	
 }
