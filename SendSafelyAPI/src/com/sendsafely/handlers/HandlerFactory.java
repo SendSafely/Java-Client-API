@@ -21,6 +21,7 @@ public class HandlerFactory
 	{
 		GetPackagesRequest activePackageRequest = new GetPackagesRequest(uploadManager.getJsonManager(), HTTPMethod.GET, "/package/");
 		GetPackagesRequest archivedPackageRequest = new GetPackagesRequest(uploadManager.getJsonManager(), HTTPMethod.GET, "/package/archived/");
+		GetPackagesRequest receivedPackageRequest = new GetPackagesRequest(uploadManager.getJsonManager(), HTTPMethod.GET, "/package/received/");
 		
 		endpoints.put(Endpoint.VerifyVersion, new VerifyVersionHandler(uploadManager));
 		endpoints.put(Endpoint.VerifyCredentials, new VerifyCredentialsHandler(uploadManager));
@@ -29,10 +30,12 @@ public class HandlerFactory
 		endpoints.put(Endpoint.CREATE_PACKAGE, new CreatePackageHandler(uploadManager));
 		endpoints.put(Endpoint.UPDATE_RECIPIENT, new UpdateRecipientHandler(uploadManager));
 		endpoints.put(Endpoint.DELETE_PACKAGE, new DeletePackageHandler(uploadManager));
+		endpoints.put(Endpoint.DELETE_TEMP_PACKAGE, new DeleteTempPackageHandler(uploadManager));
 		endpoints.put(Endpoint.PACKAGE_INFORMATION, new PackageInformationHandler(uploadManager));
 		endpoints.put(Endpoint.PACKAGE_LIFE, new UpdatePackageLifeHandler(uploadManager));
 		endpoints.put(Endpoint.ACTIVE_PACKAGES, new GetPackagesHandler(uploadManager, activePackageRequest));
 		endpoints.put(Endpoint.ARCHIVED_PACKAGES, new GetPackagesHandler(uploadManager, archivedPackageRequest));
+		endpoints.put(Endpoint.RECEIVED_PACKAGES, new GetPackagesHandler(uploadManager, receivedPackageRequest));
 		endpoints.put(Endpoint.FINALIZE_PACKAGE, new FinalizePackageHandler(uploadManager));
 		endpoints.put(Endpoint.ADD_FILE, new AddFileHandler(uploadManager));
 		endpoints.put(Endpoint.UPLOAD_FILE, new UploadFileHandler(uploadManager));
@@ -47,6 +50,7 @@ public class HandlerFactory
 		endpoints.put(Endpoint.DIRECTORY_NAME, new UpdateDirectoryNameHandler(uploadManager));
 		endpoints.put(Endpoint.DELETE_DIRECTORY, new DeleteDirectoryHandler(uploadManager));
 		endpoints.put(Endpoint.GET_ACTIVITY_LOG, new GetActivityLogHandler(uploadManager));
+		endpoints.put(Endpoint.RECIPIENT_HISTORY, new GetRecipientHistoryHandler(uploadManager));
 	}
 	
 	public static BaseHandler getInstance(UploadManager uploadManager, Endpoint p)

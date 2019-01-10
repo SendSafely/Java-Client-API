@@ -2,9 +2,7 @@ package com.sendsafely.handlers;
 
 import java.io.IOException;
 
-import com.sendsafely.Recipient;
 import com.sendsafely.dto.request.UpdateRecipientRequest;
-import com.sendsafely.dto.response.AddRecipientResponse;
 import com.sendsafely.dto.response.BaseResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.CountryCode;
@@ -50,16 +48,4 @@ public class UpdateRecipientHandler extends BaseHandler
 			throw new UpdateRecipientFailedException(e);
 		}
 	}
-	
-	protected Recipient convert(AddRecipientResponse obj)
-	{
-		Recipient recipient = new Recipient();
-		recipient.setEmail(obj.getEmail());
-		recipient.setNeedsApproval(obj.getApprovalRequired());
-		recipient.setRecipientId(obj.getRecipientId());
-		return recipient;
-	}
-
-	
-	
 }

@@ -11,6 +11,7 @@ public class RecipientResponse extends BaseResponse {
 	private String email;
 	private Boolean needsApproval;
 	private List<Phonenumber> phonenumbers;
+	private List<String> approvers;
 	private List<ConfirmationResponse> confirmations;
 	private String autoEnabledNumber;
 	private String roleName;
@@ -56,6 +57,12 @@ public class RecipientResponse extends BaseResponse {
 	}
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
+	}
+	public List<String> getApprovers() {
+		return approvers;
+	}
+	public void setApprovers(List<String> approvers) {
+		this.approvers = approvers;
 	}
 	
 	
