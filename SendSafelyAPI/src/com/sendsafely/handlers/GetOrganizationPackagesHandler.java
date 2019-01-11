@@ -32,7 +32,7 @@ public class GetOrganizationPackagesHandler extends BaseHandler {
 	public PackageSearchResults makeRequest(Date fromDate, Date toDate, String sender, PackageStatus status,
 			String recipient, String fileName) throws GetPackagesException {
 		//Convert Date to String to pass to server. 
-		SimpleDateFormat outputDateFormat = new SimpleDateFormat("MM/dd/YYYY"); 
+		SimpleDateFormat outputDateFormat = new SimpleDateFormat("MM/dd/yyyy"); 
 		String fromDateStr = fromDate==null?"":outputDateFormat.format(fromDate);
 		String toDateStr = toDate==null?"":outputDateFormat.format(toDate); 
 		request.setFromDate(fromDateStr);

@@ -8,12 +8,15 @@ public class Privatekey {
 	public String getArmoredKey() {
 		return privateKey;
 	}
+	
 	public void setArmoredKey(String privateKey) {
 		this.privateKey = privateKey;
 	}
+	
 	public String getPublicKeyId() {
 		return publicKeyId;
 	}
+	
 	public void setPublicKeyId(String publicKeyId) {
 		this.publicKeyId = publicKeyId;
 	}

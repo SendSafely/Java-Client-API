@@ -455,12 +455,12 @@ public class SendSafely {
 		return handler.makeRequest(packageId, null, fileId, keyCode, progress, null);
 	}
 	
-	/*
-	 * @ description Gets a list of Recipient History information.
-	 * @ param recipientEmail
-	 * @ returnType List<RecipientHistory>
-	 * @ return a List<RecipientHistory> object containing a list of all recipient history items.
-	 * @ throws RecipientFailedException
+	/**
+	 * @description Retrieves a list of packages where the passed in email address is a package recipient.
+	 * @param recipientEmail The email address of the recipient.
+	 * @returnType List<RecipientHistory>
+	 * @return A List<RecipientHistory> containing information about each package retrieved, including confirmed downloads for the recipient.
+	 * @throws RecipientFailedException
 	 */
 	public List<RecipientHistory> getRecipientHistory(String recipientEmail) throws RecipientFailedException{ 
 		GetRecipientHistoryHandler handler = ((GetRecipientHistoryHandler)HandlerFactory.getInstance(uploadManager, Endpoint.RECIPIENT_HISTORY));
@@ -568,8 +568,8 @@ public class SendSafely {
 	}
 	
 	/**
-	 * @description Deletes a package given a package ID.
-	 * @param packageId The unique package id of the package for the delete temporary package operation.  
+	 * @description Deletes a temporary package, which is a package that has not yet been finalized.
+	 * @param packageId The unique package id of the package to be deleted. 
 	 * @throws DeletePackageException
 	 */
 	public void deleteTempPackage(String packageId) throws DeletePackageException
@@ -598,8 +598,9 @@ public class SendSafely {
 	}
 	
 	/**
-	 * @description Get all received packages
-	 * @return List<String> a list of all received package IDs.
+	 * @description Retrieves a list of all active packages received for the given API User.
+	 * @return A List<PackageReference> containing package metadata for all received packages.
+	 * @returnType List<PackageReference>
 	 * @throws GetPackagesException
 	 */
 	public List<PackageReference> getReceivedPackages() throws GetPackagesException
@@ -892,7 +893,7 @@ public class SendSafely {
 	}
 	
 	/**
-	 * @description Generates a new RSA Key pair used to encrypt keycodes. The private key as well as an identifier associating the public Key is returned to the user. The public key is uploaded and stored on the SendSafely servers.
+	 * @description Generates a new RSA Key pair used to encrypt keycodes. The private key as well as an identifier associating the public Key is returned to the user. The public key is uploaded and stored on the SendSafely servers. 
 	 * @param description The description used for generating the key pair.
 	 * @returnType Privatekey
 	 * @return Returns a Private Key containing the armored private key and a Public Key ID associating a public key to the private key.
@@ -912,6 +913,14 @@ public class SendSafely {
 		return privateKey;
 	}
 	
+	/**
+	 * @description Downloads and decrypts a keycode from the server for a given packageId and RSA Key pair.
+	 * @param packageId The package id for the keycode.
+	 * @param privateKey The private key associated with the RSA Key pair used to encrypt the package keycode.
+	 * @return Returns the decrypted keycode.
+	 * @returnType String
+	 * @throws GetKeycodeFailedException
+	 */
 	public String getKeycode(String packageId, Privatekey privateKey) throws GetKeycodeFailedException{
 		GetKeycode handler = new GetKeycode(uploadManager);
 		return handler.get(packageId, privateKey);
