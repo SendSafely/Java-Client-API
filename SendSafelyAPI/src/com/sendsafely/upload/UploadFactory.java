@@ -16,5 +16,10 @@ public class UploadFactory {
     {
         return new DefaultUploadManager(connection, manager, jsonManager);
     }
+    
+    public static UploadManager getManagerS3(ConnectionManager connection)
+    {
+        return new S3UploadManager(connection, JsonFactory.getDefaultManager());
+    }
 	
 }

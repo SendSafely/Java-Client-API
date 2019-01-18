@@ -49,7 +49,7 @@ public class SendUtil {
 	
 	protected <T> T handleResponse(T clazz) throws IOException, SendFailedException
 	{
-		if(connection.getContentType() != null && connection.getContentType().equals("application/octet-stream")) {
+		if(connection.getContentType() != null && (connection.getContentType().equals("application/octet-stream")|| connection.getContentType().equals("binary/octet-stream"))) {
 			return handleFileDownload(clazz);
 		} else {
 			String response = connection.getResponse();
