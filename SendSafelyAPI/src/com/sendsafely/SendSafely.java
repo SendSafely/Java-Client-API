@@ -147,6 +147,8 @@ public class SendSafely {
 	
 	protected double version = 0.3;
 	
+	private boolean ec2Proxy = false;
+	
 	/**
 	 * @description Constructor to create a new SendSafely object.
 	 * @param host The hostname you use to access SendSafely. Should be https://companyname.sendsafely.com or https://www.sendsafely.com
@@ -214,6 +216,10 @@ public class SendSafely {
      */
 	public SendSafely(String host) {
 		this(host, (ConnectionManager)null, (CredentialsManager)null);
+	}
+	
+	public void setEc2Proxy (boolean isProxy) {
+		this.ec2Proxy = isProxy;
 	}
 	
 	/**
@@ -435,7 +441,7 @@ public class SendSafely {
 	 */
 	public java.io.File downloadFile(String packageId, String fileId, String keyCode) throws DownloadFileException, PasswordRequiredException
 	{
-		return downloadFile(packageId, fileId, keyCode, null, (String)null);
+		return downloadFile(packageId, fileId, keyCode, new DefaultProgress());
 	}
 	
 	/**
@@ -452,7 +458,7 @@ public class SendSafely {
 	public java.io.File downloadFile(String packageId, String fileId, String keyCode, ProgressInterface progress) throws DownloadFileException, PasswordRequiredException
 	{
 		DownloadAndDecryptFileHandler handler = new DownloadAndDecryptFileHandler(uploadManager);
-		return handler.makeRequest(packageId, null, fileId, keyCode, progress, null);
+		return handler.makeRequestS3(packageId, null, fileId, keyCode, progress, null, ec2Proxy);
 	}
 	
 	/**
@@ -485,7 +491,6 @@ public class SendSafely {
 		return handler.makeRequest(packageId, null, fileId, keyCode, progress, password);
 	}
 	
-	
 	/**
 	 * @description Downloads a file from the server and decrypts it.
 	 * @param packageId The unique package id of the package for the file download operation.
@@ -499,7 +504,8 @@ public class SendSafely {
 	 */
 	public java.io.File downloadFile(String packageId, String fileId, String keyCode, String password) throws DownloadFileException, PasswordRequiredException
 	{
-		return downloadFile(packageId, fileId, keyCode, null, password);
+		DownloadAndDecryptFileHandler handler = new DownloadAndDecryptFileHandler(uploadManager);
+		return handler.makeRequest(packageId, null, fileId, keyCode, null, password);
 	}
 	
 	/**
@@ -531,7 +537,7 @@ public class SendSafely {
 	 */
 	public java.io.File downloadFileFromDirectory(String packageId, String directoryId, String fileId, String keyCode, ProgressInterface progress) throws DownloadFileException, PasswordRequiredException {
 		DownloadAndDecryptFileHandler handler = new DownloadAndDecryptFileHandler(uploadManager);
-		return handler.makeRequest(packageId, directoryId, fileId, keyCode, progress);
+		return handler.makeRequestS3(packageId, directoryId, fileId, keyCode, progress, (String)null, ec2Proxy);
 	}
 	
 	/**

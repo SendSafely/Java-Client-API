@@ -8,6 +8,7 @@ import com.sendsafely.dto.request.DownloadFileFromDirectoryRequest;
 import com.sendsafely.dto.request.DownloadFileRequest;
 import com.sendsafely.dto.response.DownloadFileResponse;
 import com.sendsafely.enums.APIResponse;
+import com.sendsafely.enums.HTTPMethod;
 import com.sendsafely.exceptions.DownloadFileException;
 import com.sendsafely.exceptions.PasswordRequiredException;
 import com.sendsafely.exceptions.SendFailedException;
@@ -23,15 +24,31 @@ public class DownloadFileHandler extends BaseHandler
 	private String checksum;
 	private String password;
 	private int part;
+	private String path;
 	
 	public DownloadFileHandler(UploadManager uploadManager) {
 		super(uploadManager);
 	}
-
-	public InputStream makeRequest(Package packageInfo, String fileId, int part) throws DownloadFileException, PasswordRequiredException {
-		return makeRequest(packageInfo, fileId, part, null);
+	
+	public InputStream makeRequest(String url) throws DownloadFileException {
+		DownloadFileResponse response = downloadFile(new DownloadFileRequest(uploadManager.getJsonManager(), HTTPMethod.GET, url));
+		if(response.getResponse() == APIResponse.SUCCESS) {
+			return response.getFileStream();
+		} else {
+			throw new DownloadFileException("Server returned error message: " + response.getResponse() + " " + response.getMessage());
+		}
 	}
 	
+	public InputStream makeRequest(String path, Package packageInfo, int part, String password) throws DownloadFileException, PasswordRequiredException {
+		this.path = path;
+		this.packageInfo = packageInfo;
+		this.part = part;
+		this.password = password;
+		
+		return downloadFile();
+	}
+	
+	@Deprecated
 	public InputStream makeRequest(Package packageInfo, String fileId, int part, String password) throws DownloadFileException, PasswordRequiredException {
 		this.fileId = fileId;
 		this.packageInfo = packageInfo;
@@ -41,6 +58,7 @@ public class DownloadFileHandler extends BaseHandler
 		return downloadFile();
 	}
 	
+	@Deprecated
 	public InputStream makeRequest(Package packageInfo, String directoryId, String fileId, int part, String password) throws DownloadFileException, PasswordRequiredException {
 		this.fileId = fileId;
 		this.directoryId = directoryId;
@@ -67,6 +85,7 @@ public class DownloadFileHandler extends BaseHandler
 		}
 	}
 	
+	@Deprecated
 	private InputStream downloadFile(String directoryId) throws DownloadFileException, PasswordRequiredException {
 		this.checksum = calculateChecksum(packageInfo.getPackageCode(), packageInfo.getKeyCode());
 		DownloadFileFromDirectoryRequest request = createRequest(directoryId, part);
@@ -83,8 +102,13 @@ public class DownloadFileHandler extends BaseHandler
 	private DownloadFileRequest createRequest(int part)
 	{
 		DownloadFileRequest request = new DownloadFileRequest(uploadManager.getJsonManager());
-		request.setPackageId(packageInfo.getPackageId());
-		request.setFileId(fileId);
+		if (path != null) {
+			request = new DownloadFileRequest(uploadManager.getJsonManager(),HTTPMethod.POST, path);
+		} else {
+			request.setPackageId(packageInfo.getPackageId());
+			request.setFileId(fileId);
+		}
+		
 		request.setChecksum(checksum);
 		request.setPart(part);	
 		request.setApi(DOWNLOAD_API);
@@ -96,6 +120,7 @@ public class DownloadFileHandler extends BaseHandler
 		return request;
 	}
 	
+	@Deprecated 
 	private DownloadFileFromDirectoryRequest createRequest(String directoryId, int part)
 	{
 		DownloadFileFromDirectoryRequest request = new DownloadFileFromDirectoryRequest(uploadManager.getJsonManager());
@@ -124,6 +149,7 @@ public class DownloadFileHandler extends BaseHandler
 		}
 	}
 	
+	@Deprecated
 	private DownloadFileResponse downloadFile(DownloadFileFromDirectoryRequest request) throws DownloadFileException
 	{
 		try {
@@ -138,5 +164,5 @@ public class DownloadFileHandler extends BaseHandler
 	private String calculateChecksum(String packageCode, String keycode)
 	{
 		return CryptoUtil.createChecksum(keycode, packageCode);
-	}
+	}	
 }
