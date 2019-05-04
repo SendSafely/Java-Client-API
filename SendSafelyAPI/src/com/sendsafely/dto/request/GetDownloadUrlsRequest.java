@@ -35,4 +35,7 @@ public class GetDownloadUrlsRequest extends BaseRequest {
 	public void setForceProxy(boolean forceProxy){
 		super.setPostParam("forceProxy", forceProxy);
 	}
+	public void setPassword(String password){
+		super.setPostParam("password", password);
+	}
 }

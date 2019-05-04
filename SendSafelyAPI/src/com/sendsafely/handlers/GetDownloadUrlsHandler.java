@@ -29,7 +29,7 @@ public class GetDownloadUrlsHandler extends BaseHandler {
 		this.downloadUrls = new ArrayList<Map<String, String>>();
 	}
 	
-	public void fetchDownloadUrls(String packageId, String fileId, String directoryId, int filePart, boolean forceProxy, String checksum) throws GetDownloadUrlsException {
+	public void fetchDownloadUrls(String packageId, String fileId, String directoryId, int filePart, boolean forceProxy, String password, String checksum) throws GetDownloadUrlsException {
 		
 		int urlBatchSize = 0;
 		
@@ -38,7 +38,7 @@ public class GetDownloadUrlsHandler extends BaseHandler {
 			if(directoryId!=null){
 				createRequest(packageId,fileId,directoryId,filePart,urlBatchSize, forceProxy, checksum);
 			}else{
-				createRequest(packageId,fileId,filePart,urlBatchSize, forceProxy, checksum);
+				createRequest(packageId,fileId,filePart,urlBatchSize, forceProxy, checksum, password);
 			}
 			makeRequest();
 		} else if (filePart == (totalDownloadUrlsFetched - URL_REFRESH_LIMIT)) {
@@ -49,7 +49,7 @@ public class GetDownloadUrlsHandler extends BaseHandler {
 				if(directoryId!=null){
 					createRequest(packageId,fileId,directoryId,totalDownloadUrlsFetched+1,totalDownloadUrlsFetched+urlBatchSize, forceProxy, checksum);
 				}else{
-					createRequest(packageId,fileId,totalDownloadUrlsFetched+1,totalDownloadUrlsFetched+urlBatchSize, forceProxy, checksum);
+					createRequest(packageId,fileId,totalDownloadUrlsFetched+1,totalDownloadUrlsFetched+urlBatchSize, forceProxy, checksum, password);
 				}
 				makeRequest();
 			}
@@ -73,7 +73,7 @@ public class GetDownloadUrlsHandler extends BaseHandler {
 		
 	}
 	
-	private void createRequest (String packageId, String fileId, int startSegment, int endSegment, boolean forceProxy, String checksum) {
+	private void createRequest (String packageId, String fileId, int startSegment, int endSegment, boolean forceProxy, String checksum, String password) {
 		
 		this.request = new GetDownloadUrlsRequest(this.uploadManager.getJsonManager());
 		((GetDownloadUrlsRequest) request).setPackageId(packageId);
@@ -82,6 +82,9 @@ public class GetDownloadUrlsHandler extends BaseHandler {
 		((GetDownloadUrlsRequest) request).setEndSegment(endSegment);
 		((GetDownloadUrlsRequest) request).setChecksum(checksum);
 		((GetDownloadUrlsRequest) request).setForceProxy(forceProxy);
+		if(password != null){
+			((GetDownloadUrlsRequest) request).setPassword(password);
+		}
 	}
 	private void createRequest (String packageId, String fileId, String directoryId, int startSegment, int endSegment, boolean forceProxy, String checksum) {
 		

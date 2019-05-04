@@ -121,13 +121,15 @@ public class DownloadAndDecryptFileHandler extends BaseHandler
 		// Download the file
 		java.io.File file = null;
 		try {
-			file = downloadFileFromS3(systemFile, fileToDownload, forceProxy);
+			file = downloadFileS3(systemFile, fileToDownload, password, forceProxy, 0);
 		} catch (GetDownloadUrlsException e) {
-			throw new DownloadFileException("Unable to get download URLs");
+			throw new DownloadFileException(e.getMessage());
 		} catch (LimitExceededException e){
 			try {
-				file = downloadFileFromS3(systemFile, fileToDownload, true, Integer.parseInt(e.getMessage().toString()));
-			} catch (GetDownloadUrlsException | LimitExceededException e1) {
+				file = downloadFileS3(systemFile, fileToDownload, password, true, Integer.parseInt(e.getMessage().toString()));
+			} catch (GetDownloadUrlsException e1) {
+				throw new DownloadFileException(e.getMessage());
+			} catch (LimitExceededException e1) {
 				throw new DownloadFileException("Unable to get download URLs");
 			}
 		}catch(Exception e){
@@ -232,11 +234,7 @@ public class DownloadAndDecryptFileHandler extends BaseHandler
 		return outFile;
 	}
 	
-	private java.io.File downloadFileFromS3(java.io.File systemFile, File fileToDownload, boolean forceProxy) throws DownloadFileException, PasswordRequiredException, GetDownloadUrlsException, LimitExceededException {
-		return downloadFileFromS3(systemFile, fileToDownload, forceProxy, 0);
-	}
-	
-	private java.io.File downloadFileFromS3(java.io.File outFile, File ssFile, boolean forceProxy, int filePart) throws DownloadFileException, PasswordRequiredException, GetDownloadUrlsException, LimitExceededException {
+	private java.io.File downloadFileS3(java.io.File outFile, File ssFile, String password, boolean forceProxy, int filePart) throws DownloadFileException, PasswordRequiredException, GetDownloadUrlsException, LimitExceededException {
 		
 		Progress progress = new Progress(this.progress, ssFile.getFileId());
 		progress.setTotal(ssFile.getFileSize());
@@ -256,7 +254,7 @@ public class DownloadAndDecryptFileHandler extends BaseHandler
 			
 			GetDownloadUrlsHandler urlHandler = new GetDownloadUrlsHandler(uploadManager,ssFile.getParts());
 			String checksum = calculateChecksum(packageInfo.getPackageCode(), packageInfo.getKeyCode());
-			urlHandler.fetchDownloadUrls(packageInfo.getPackageId(), ssFile.getFileId(), this.directoryId, part, forceProxy, checksum);//do we need password here?
+			urlHandler.fetchDownloadUrls(packageInfo.getPackageId(), ssFile.getFileId(), this.directoryId, part, forceProxy, password, checksum);
 			
 			while (!urlHandler.getCurrentDownloadUrls().isEmpty()) {
 				
@@ -309,7 +307,7 @@ public class DownloadAndDecryptFileHandler extends BaseHandler
 				}
 				urlHandler.removeUrl();
 				part++;
-				urlHandler.fetchDownloadUrls(packageInfo.getPackageId(), ssFile.getFileId(), this.directoryId, part, forceProxy, checksum);
+				urlHandler.fetchDownloadUrls(packageInfo.getPackageId(), ssFile.getFileId(), this.directoryId, part, forceProxy, password, checksum);
 			}
 		}catch(LimitExceededException e){
 			throw new LimitExceededException(e.getMessage());
