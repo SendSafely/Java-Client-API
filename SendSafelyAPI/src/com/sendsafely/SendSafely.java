@@ -488,7 +488,7 @@ public class SendSafely {
 	public java.io.File downloadFile(String packageId, String fileId, String keyCode, ProgressInterface progress, String password) throws DownloadFileException, PasswordRequiredException
 	{
 		DownloadAndDecryptFileHandler handler = new DownloadAndDecryptFileHandler(uploadManager);
-		return handler.makeRequest(packageId, null, fileId, keyCode, progress, password);
+		return handler.makeRequestS3(packageId, null, fileId, keyCode, progress, password, ec2Proxy);
 	}
 	
 	/**
@@ -505,7 +505,7 @@ public class SendSafely {
 	public java.io.File downloadFile(String packageId, String fileId, String keyCode, String password) throws DownloadFileException, PasswordRequiredException
 	{
 		DownloadAndDecryptFileHandler handler = new DownloadAndDecryptFileHandler(uploadManager);
-		return handler.makeRequest(packageId, null, fileId, keyCode, null, password);
+		return handler.makeRequestS3(packageId, null, fileId, keyCode, new DefaultProgress(), password, ec2Proxy);
 	}
 	
 	/**
