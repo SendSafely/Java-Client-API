@@ -66,6 +66,8 @@ public class GetPackagesHandler extends BaseHandler
 		info.setContactGroupNames(obj.getContactGroups());
 		info.setServerSecret(obj.getServerSecret());
 		info.setState(obj.getState());
+		info.setPackageTimestamp(obj.getPackageUpdateTimestamp());
+		info.setPackageOwner(obj.getPackageUserName());
 		
 		return info;
 	}

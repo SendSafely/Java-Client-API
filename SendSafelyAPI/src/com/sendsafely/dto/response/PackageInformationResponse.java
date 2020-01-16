@@ -1,5 +1,6 @@
 package com.sendsafely.dto.response;
 
+import java.util.Date;
 import java.util.List;
 
 import com.sendsafely.ContactGroup;
@@ -24,6 +25,8 @@ public class PackageInformationResponse extends BaseResponse {
 	private String label;
 	private boolean isVDR;
 	private String rootDirectoryId;
+	private Date packageTimestamp;
+	private String packageSender;
 	
 	public List<RecipientResponse> getRecipients() {
 		return recipients;
@@ -127,6 +130,18 @@ public class PackageInformationResponse extends BaseResponse {
 	}
 	public void setRootDirectoryId(String rootDirectoryId) {
 		this.rootDirectoryId = rootDirectoryId;
+	}
+	public Date getPackageTimestamp() {
+		return packageTimestamp;
+	}
+	public void setPackageTimestamp(Date packageTimestamp) {
+		this.packageTimestamp = packageTimestamp;
+	}
+	public String getPackageSender() {
+		return packageSender;
+	}
+	public void setPackageSender(String packageSender) {
+		this.packageSender = packageSender;
 	}
 	
 	

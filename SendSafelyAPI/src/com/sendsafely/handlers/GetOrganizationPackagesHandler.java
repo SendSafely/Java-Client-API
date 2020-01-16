@@ -79,6 +79,8 @@ public class GetOrganizationPackagesHandler extends BaseHandler {
 		info.setStatus(convert(obj.getPackageState()));
 		info.setPackageOwner(obj.getPackageUserName());
 		info.setPackageTimestamp(obj.getPackageUpdateTimestamp());
+		info.setPackageDescriptor(obj.getDescription());
+		info.setIsWorkspace(obj.getIsWorkspace());
 		return info;
 	}
 
