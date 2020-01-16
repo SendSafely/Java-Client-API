@@ -19,7 +19,8 @@ public class PackageListResponse extends BaseResponse {
 	private PackageState state;
 	private int packageState;
 	private int life;
-	private String description;
+	private String packageLabel;
+	private boolean packageIsVdr;
 	private String packageUserName;
 	private Date packageUpdateTimestamp;
 	
@@ -84,10 +85,16 @@ public class PackageListResponse extends BaseResponse {
 		this.life = life;
 	}
 	public String getDescription() {
-		return description;
+		return packageLabel;
 	}
 	public void setDescription(String description) {
-		this.description = description;
+		this.packageLabel = description;
+	}
+	public boolean getIsWorkspace() {
+		return packageIsVdr;
+	}
+	public void setIsWorkspace(boolean isWorkspace) {
+		this.packageIsVdr = isWorkspace;
 	}
 	public String getPackageUserName() {
 		return packageUserName;

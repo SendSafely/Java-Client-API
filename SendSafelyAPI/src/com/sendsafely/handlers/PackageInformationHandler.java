@@ -86,6 +86,8 @@ public class PackageInformationHandler extends BaseHandler
 		info.setRootDirectoryId(obj.getRootDirectoryId());
 		info.setPackageDescriptor(obj.getLabel());
 		info.setIsWorkspace(obj.isVDR());
+		info.setPackageTimestamp(obj.getPackageTimestamp());
+		info.setPackageOwner(obj.getPackageSender());
 		return info;
 	}
 	
