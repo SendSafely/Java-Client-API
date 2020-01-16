@@ -7,6 +7,7 @@ public class PackageURL {
 	private URL secureLink;
 	private String keycode;
 	private boolean needsApproval;
+	private String notificationStatus = "DISABLED";
 	
 	/**
 	 * @returnType URL
@@ -52,6 +53,23 @@ public class PackageURL {
 	 */
 	public void setNeedsApproval(boolean needsApproval) {
 		this.needsApproval = needsApproval;
+	}
+	
+	/**
+	 * @returnType String
+	 * @description Returns status DISABLED by default, SUCCESS if package email notification sent successfully, otherwise returns error message. 
+	 * @return notificationStatus message indicating status of package email notification
+	 */
+	public String getNotificationStatus() {
+		return notificationStatus;
+	}
+	
+	/**
+	 * @description Set internally by the API.
+	 * @param notificationStatus the status message indication success or error
+	 */
+	public void setNotificationStatus(String notificationStatus) {
+		this.notificationStatus = notificationStatus;
 	}
 	
 	

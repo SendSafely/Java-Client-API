@@ -3,7 +3,6 @@ package com.sendsafely.handlers;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.sendsafely.Package;
@@ -23,6 +22,7 @@ public class FinalizePackageHandler extends BaseHandler
 {	
 	
 	private FinalizePackageRequest request;
+	private boolean notify = false;
 	
 	public FinalizePackageHandler(UploadManager uploadManager) {
 		super(uploadManager);
@@ -77,7 +77,18 @@ public class FinalizePackageHandler extends BaseHandler
 		
 		if(response.getResponse() == APIResponse.SUCCESS || response.getResponse() == APIResponse.PACKAGE_NEEDS_APPROVAL) 
 		{
-			return convert(response, keyCode);
+			PackageURL packageUrl = convert(response, keyCode);
+			
+			if (notify) {
+				try {
+					notifyPackageRecipients(packageId,keyCode);
+					packageUrl.setNotificationStatus(APIResponse.SUCCESS.toString());
+				} catch (NotifyPackageRecipientsException e) {
+					packageUrl.setNotificationStatus(e.getMessage());
+				}
+			}
+			
+			return packageUrl;
 		}
 		else if(response.getResponse() == APIResponse.LIMIT_EXCEEDED)
 		{
@@ -153,6 +164,25 @@ public class FinalizePackageHandler extends BaseHandler
 		info.setPackageId(obj.getPackageId());
 		info.setServerSecret(obj.getServerSecret());
 		return info;
+	}
+
+	protected void notifyPackageRecipients(String packageId, String keycode) throws NotifyPackageRecipientsException {
+
+		NotifyPackageRecipientsHandler handler = new NotifyPackageRecipientsHandler(uploadManager,keycode);
+		
+		try {
+            handler.makeRequest(packageId);
+        } catch (NotifyPackageRecipientsException e) {
+            throw new NotifyPackageRecipientsException(e);
+        }
+	}
+	
+	public boolean isNotify() {
+		return notify;
+	}
+
+	public void setNotify(boolean notify) {
+		this.notify = notify;
 	}
 	
 }
