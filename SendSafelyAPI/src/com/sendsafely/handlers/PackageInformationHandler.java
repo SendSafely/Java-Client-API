@@ -88,6 +88,7 @@ public class PackageInformationHandler extends BaseHandler
 		info.setIsWorkspace(obj.isVDR());
 		info.setPackageTimestamp(obj.getPackageTimestamp());
 		info.setPackageOwner(obj.getPackageSender());
+		info.setPackageParentId(obj.getPackageParentId());
 		return info;
 	}
 	

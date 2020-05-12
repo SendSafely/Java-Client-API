@@ -68,6 +68,7 @@ public class GetPackagesHandler extends BaseHandler
 		info.setState(obj.getState());
 		info.setPackageTimestamp(obj.getPackageUpdateTimestamp());
 		info.setPackageOwner(obj.getPackageUserName());
+		info.setPackageParentId(obj.getPackageParentId());
 		
 		return info;
 	}

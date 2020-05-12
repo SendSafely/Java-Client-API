@@ -23,6 +23,7 @@ public class PackageListResponse extends BaseResponse {
 	private boolean packageIsVdr;
 	private String packageUserName;
 	private Date packageUpdateTimestamp;
+	private String packageParentId;
 	
 	public List<String> getRecipients() {
 		return recipients;
@@ -124,7 +125,10 @@ public class PackageListResponse extends BaseResponse {
 	public void setPackageState(int packageState) {
 		this.packageState = packageState;
 	}
-
-	
-	
+	public String getPackageParentId() {
+		return packageParentId;
+	}
+	public void setPackageParentId(String packageParentId) {
+		this.packageParentId = packageParentId;
+	}
 }

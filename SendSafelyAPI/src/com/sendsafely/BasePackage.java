@@ -29,6 +29,7 @@ public class BasePackage {
 	private boolean isWorkspace;
 	private Date packageTimestamp;
 	private String packageOwner = "";
+	private String packageParentId;
 	
 	/**
 	 * @returnType String
@@ -263,7 +264,13 @@ public class BasePackage {
 			this.packageOwner = packageOwner;
 		}
 	}
-	
-	
-	
+
+	public String getPackageParentId() {
+		return packageParentId;
+	}
+
+	public void setPackageParentId(String packageParentId) {
+		this.packageParentId = packageParentId;
+	}
+
 }

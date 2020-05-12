@@ -27,6 +27,7 @@ public class PackageInformationResponse extends BaseResponse {
 	private String rootDirectoryId;
 	private Date packageTimestamp;
 	private String packageSender;
+	private String packageParentId;
 	
 	public List<RecipientResponse> getRecipients() {
 		return recipients;
@@ -143,7 +144,10 @@ public class PackageInformationResponse extends BaseResponse {
 	public void setPackageSender(String packageSender) {
 		this.packageSender = packageSender;
 	}
-	
-	
-	
+	public String getPackageParentId() {
+		return packageParentId;
+	}
+	public void setPackageParentId(String packageParentId) {
+		this.packageParentId = packageParentId;
+	}
 }
