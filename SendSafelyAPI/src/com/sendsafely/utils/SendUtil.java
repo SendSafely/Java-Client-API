@@ -2,6 +2,8 @@ package com.sendsafely.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 
 import com.google.gson.Gson;
@@ -68,6 +70,12 @@ public class SendUtil {
 				hashMap.put("responseCode", Integer.toString(responseCode));
 				hashMap.put("responseMessage", connection.getResponseMessage());
 				hashMap.put("responseBody", response);
+				hashMap.put("exceptionClass", e.getClass().toString());
+				hashMap.put("exceptionMessage", e.getMessage());
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				e.printStackTrace(pw);
+				hashMap.put("exceptionTrace", sw.toString());
 				Gson gson = new GsonBuilder().serializeNulls().create();
 				String jsonString = gson.toJson(hashMap);
 				throw new SendFailedException(jsonString);

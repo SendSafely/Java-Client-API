@@ -13,7 +13,6 @@ import com.sendsafely.exceptions.DropzoneRecipientFailedException;
 import com.sendsafely.exceptions.RecipientFailedException;
 import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.upload.UploadManager;
-import com.sun.xml.internal.ws.util.StringUtils;
 
 public class GetDropzoneRecipientHandler extends BaseHandler {
 
