@@ -48,9 +48,11 @@ import org.bouncycastle.openpgp.PGPSecretKey;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSignature;
 import org.bouncycastle.openpgp.PGPUtil;
+import org.bouncycastle.openpgp.operator.KeyFingerPrintCalculator;
 import org.bouncycastle.openpgp.operator.PBEDataDecryptorFactory;
 import org.bouncycastle.openpgp.operator.PGPDigestCalculator;
 import org.bouncycastle.openpgp.operator.PGPKeyEncryptionMethodGenerator;
+import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.operator.bc.BcPBEDataDecryptorFactory;
 import org.bouncycastle.openpgp.operator.bc.BcPBEKeyEncryptionMethodGenerator;
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
@@ -75,6 +77,7 @@ public class CryptoUtil
 {
 
 	private static final int RsaKeySize = 2048;
+	private static final KeyFingerPrintCalculator KEY_FINGERPRINT_CALCULATOR = new BcKeyFingerprintCalculator();
 
 	public static String createChecksum(String keyCode, String packageCode)
 	{
@@ -247,7 +250,7 @@ public class CryptoUtil
         
 		try
 		{
-			PGPObjectFactory pgpF = new PGPObjectFactory(in);
+			PGPObjectFactory pgpF = new PGPObjectFactory(in, KEY_FINGERPRINT_CALCULATOR);
 			PGPEncryptedDataList enc;
 			
 			Object o = pgpF.nextObject();
@@ -266,7 +269,7 @@ public class CryptoUtil
 			Iterator it = enc.getEncryptedDataObjects();
 			PGPPrivateKey sKey = null;
 			PGPPublicKeyEncryptedData pbe = null;
-			PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(keyIn));
+			PGPSecretKeyRingCollection pgpSec = new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(keyIn), KEY_FINGERPRINT_CALCULATOR);
 
 			while (sKey == null && it.hasNext())
 			{
@@ -280,7 +283,7 @@ public class CryptoUtil
 			}
 
 			InputStream clear = pbe.getDataStream(new BcPublicKeyDataDecryptorFactory(sKey));
-			PGPObjectFactory plainFact = new PGPObjectFactory(clear);
+			PGPObjectFactory plainFact = new PGPObjectFactory(clear, KEY_FINGERPRINT_CALCULATOR);
 			Object message = plainFact.nextObject();
 
 			if (message instanceof PGPLiteralData)
@@ -325,7 +328,7 @@ public class CryptoUtil
         try {
             InputStream in=new ByteArrayInputStream(publicKeyStr.getBytes());
             in = PGPUtil.getDecoderStream(in);
-            PGPPublicKeyRingCollection pgpPub = new PGPPublicKeyRingCollection(in);
+            PGPPublicKeyRingCollection pgpPub = new PGPPublicKeyRingCollection(in, KEY_FINGERPRINT_CALCULATOR);
             PGPPublicKey key = null;
             Iterator rIt = pgpPub.getKeyRings();
             while (key == null && rIt.hasNext()) {
@@ -387,7 +390,7 @@ public class CryptoUtil
 	public static void decryptFile(InputStream input, OutputStream output, String decryptionKey, Progress progress) throws IOException, PGPException
 	{
 		input = PGPUtil.getDecoderStream(input);
-		PGPObjectFactory pgpF = new PGPObjectFactory(input);
+		PGPObjectFactory pgpF = new PGPObjectFactory(input, KEY_FINGERPRINT_CALCULATOR);
 		PGPEncryptedDataList enc;
 		Object o = pgpF.nextObject();
 		
@@ -405,14 +408,14 @@ public class CryptoUtil
 		PBEDataDecryptorFactory pdf = new BcPBEDataDecryptorFactory(decryptionKey.toCharArray(), bcPgp);
 		
 		InputStream clear = pbe.getDataStream(pdf); 
-		PGPObjectFactory pgpFact = new PGPObjectFactory(clear);
+		PGPObjectFactory pgpFact = new PGPObjectFactory(clear, KEY_FINGERPRINT_CALCULATOR);
 		
 		o = pgpFact.nextObject();
 		
 		if (o instanceof  PGPCompressedData) 
 		{
 			PGPCompressedData cData = (PGPCompressedData) o;
-			pgpFact = new PGPObjectFactory(cData.getDataStream());
+			pgpFact = new PGPObjectFactory(cData.getDataStream(), KEY_FINGERPRINT_CALCULATOR);
 			o = pgpFact.nextObject();
 		}
 
@@ -455,7 +458,7 @@ public class CryptoUtil
             InputStream in = new ByteArrayInputStream(encrypted);
             in = PGPUtil.getDecoderStream(in);
 		
-            PGPObjectFactory pgpF = new PGPObjectFactory(in);
+            PGPObjectFactory pgpF = new PGPObjectFactory(in, KEY_FINGERPRINT_CALCULATOR);
             PGPEncryptedDataList enc = null;
             Object o = pgpF.nextObject();
 			           
@@ -474,7 +477,7 @@ public class CryptoUtil
             PBEDataDecryptorFactory pdf = new BcPBEDataDecryptorFactory(decryptionKey.toCharArray(), bcPgp);
             InputStream clear = pbe.getDataStream(pdf);
 
-            PGPObjectFactory pgpFact = new PGPObjectFactory(clear);
+            PGPObjectFactory pgpFact = new PGPObjectFactory(clear, KEY_FINGERPRINT_CALCULATOR);
 			
             PGPLiteralData  ld = (PGPLiteralData)pgpFact.nextObject();
 			
