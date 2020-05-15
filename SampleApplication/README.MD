@@ -3,13 +3,13 @@ SampleApplication is intended to provide a starting point for building custom Ja
 # Instructions
 Download the most recent release of the SendSafely Client API, extract, and copy all of the contained jar files into the SampleApplication/lib folder.
 
-## Compile the sample
+## Compile
 
 `mkdir bin`
 
 `javac -cp "lib/*" -d bin src/*.java`
 
-## Run the sample
+## Run
 
 ```
 java -cp "lib/*;bin/" SendSafelyRefApp
@@ -20,9 +20,8 @@ This program will print out the secure URL to access the package after it has be
 
 ### Command Line Argments
  
-- SendSafelyHost - Use your SendSafely organizaiton host or https://app.sendsafely.com
+- SendSafelyHost - Use your SendSafely organization host or https://app.sendsafely.com
 - UserApiKey - Generate ApiKey and ApiSecret from your Edit Profile page when logged into the SendSafely web portal 
 - UserApiSecret - Generate ApiKey and ApiSecret from your Edit Profile page when logged into the SendSafely web portal
 - FileToUpload - Path to the file that is to be uploaded (i.e. /path-to-file/test.pdf)
 - RecipientEmailAddress - The email address of the person you want to send the file to (i.e. anybody@example.com)
-
