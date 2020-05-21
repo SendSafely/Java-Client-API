@@ -9,16 +9,25 @@ Download the most recent release of the SendSafely Client API, extract, and copy
 
 `javac -cp "lib/*" -d bin src/*.java`
 
-## Run
+## Run (macOS/Linux)
+
+```
+java -cp "lib/*:bin" SendSafelyRefApp
+```
+
+## Run (Windows)
 
 ```
 java -cp "lib/*;bin/" SendSafelyRefApp
-Usage: SendSafelyRefApp SendSafelyHost UserApiKey UserApiSecret FileToUpload RecipientEmailAddress
-
-This program will print out the secure URL to access the package after it has been submitted.`
 ```
 
 ### Command Line Argments
+ 
+ ```
+ Usage: SendSafelyRefApp SendSafelyHost UserApiKey UserApiSecret FileToUpload RecipientEmailAddress
+ 
+ This program will print out the secure URL to access the package after it has been submitted.`
+ ```
  
 - SendSafelyHost - Use your SendSafely organization host or https://app.sendsafely.com
 - UserApiKey - Generate ApiKey and ApiSecret from your Edit Profile page when logged into the SendSafely web portal 
