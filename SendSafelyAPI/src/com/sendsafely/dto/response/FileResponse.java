@@ -1,5 +1,7 @@
 package com.sendsafely.dto.response;
 
+import java.util.Date;
+
 public class FileResponse {
 
 	private String fileId;
@@ -7,6 +9,8 @@ public class FileResponse {
 	private long fileSize;
 	private String createdByEmail;
 	private int parts;
+	private Date fileUploaded;
+	private String fileUploadedStr;
 	
 	public String getFileId() {
 		return fileId;
@@ -38,6 +42,10 @@ public class FileResponse {
 	public void setParts(int parts) {
 		this.parts = parts;
 	}
-	
-	
+	public Date getFileUploaded() {
+		return fileUploaded;
+	}
+	public String getFileUploadedStr() {
+		return fileUploadedStr;
+	}
 }

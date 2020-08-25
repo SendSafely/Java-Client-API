@@ -28,6 +28,7 @@ public class PackageInformationResponse extends BaseResponse {
 	private Date packageTimestamp;
 	private String packageSender;
 	private String packageParentId;
+	private boolean allowReplyAll;
 	
 	public List<RecipientResponse> getRecipients() {
 		return recipients;
@@ -150,4 +151,11 @@ public class PackageInformationResponse extends BaseResponse {
 	public void setPackageParentId(String packageParentId) {
 		this.packageParentId = packageParentId;
 	}
+	public boolean isAllowReplyAll() {
+		return allowReplyAll;
+	}
+	public void setAllowReplyAll(boolean allowReplyAll) {
+		this.allowReplyAll = allowReplyAll;
+	}
+	
 }

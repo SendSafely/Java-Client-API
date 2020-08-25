@@ -31,4 +31,8 @@ public class FinalizePackageRequest extends BaseRequest
 		super.setPostParam("undisclosedRecipients", undisclosedRecipients);
 	}
 	
+	public void setAllowReplyAll(boolean allowReplyAll) {
+		super.setPostParam("allowReplyAll", allowReplyAll);
+	}
+	
 }

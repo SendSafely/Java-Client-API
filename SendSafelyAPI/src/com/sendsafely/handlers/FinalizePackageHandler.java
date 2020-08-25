@@ -185,4 +185,9 @@ public class FinalizePackageHandler extends BaseHandler
 		this.notify = notify;
 	}
 	
+	public FinalizePackageHandler setRequestAllowReplyAll(boolean allowReplyAll) {
+		request.setAllowReplyAll(allowReplyAll);
+		return this;
+	}
+	
 }

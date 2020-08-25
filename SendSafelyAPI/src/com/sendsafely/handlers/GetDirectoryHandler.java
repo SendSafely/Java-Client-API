@@ -61,6 +61,7 @@ public class GetDirectoryHandler extends BaseHandler {
 			newFile.setFileName(resp.getFileName());
 			newFile.setFileSize(resp.getFileSize());
 			newFile.setParts(resp.getParts());
+			newFile.setFileUploaded(resp.getFileUploaded());
 			fileList.add(newFile);
 		}
 		return fileList;	

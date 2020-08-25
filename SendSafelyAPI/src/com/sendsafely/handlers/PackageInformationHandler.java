@@ -89,6 +89,7 @@ public class PackageInformationHandler extends BaseHandler
 		info.setPackageTimestamp(obj.getPackageTimestamp());
 		info.setPackageOwner(obj.getPackageSender());
 		info.setPackageParentId(obj.getPackageParentId());
+		info.setAllowReplyAll(obj.isAllowReplyAll());
 		return info;
 	}
 	
@@ -127,6 +128,7 @@ public class PackageInformationHandler extends BaseHandler
 		f.setFileName(resp.getFileName());
 		f.setFileSize(resp.getFileSize());
 		f.setParts(resp.getParts());
+		f.setFileUploaded(resp.getFileUploaded());
 		return f;
 	}
 	

@@ -685,6 +685,25 @@ public class SendSafely {
 	 * @param packageId The unique package id of the package to be finalized.
 	 * @param keycode The keycode belonging to the package.
 	 * @param notify A boolean flag indicating whether SendSafely should send the secure link to the package recipients
+	 * @param allowReplyAll A boolean flag that when set to true will allow recipients to reply to the package sender and all other recipients on the package. By default, SendSafely only allows replying to the package sender.
+	 * @returnType PackageURL
+	 * @return A link to access the package. This link can be sent to the recipients.
+	 * @throws LimitExceededException
+	 * @throws FinalizePackageFailedException
+	 * @throws ApproverRequiredException 
+	 */
+	public PackageURL finalizePackage(String packageId, String keycode, boolean notify, boolean allowReplyAll) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException
+	{
+		FinalizePackageHandler handler = (FinalizePackageHandler)HandlerFactory.getInstance(uploadManager, Endpoint.FINALIZE_PACKAGE);
+		handler.setNotify(notify);
+		return handler.setRequestAllowReplyAll(allowReplyAll).makeRequest(packageId, keycode);
+	}
+
+	/**
+	 * @description Finalizes the package so it can be delivered to the recipients.
+	 * @param packageId The unique package id of the package to be finalized.
+	 * @param keycode The keycode belonging to the package.
+	 * @param notify A boolean flag indicating whether SendSafely should send the secure link to the package recipients
 	 * @returnType PackageURL
 	 * @return A link to access the package. This link can be sent to the recipients.
 	 * @throws LimitExceededException
