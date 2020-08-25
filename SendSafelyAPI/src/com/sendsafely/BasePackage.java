@@ -30,6 +30,7 @@ public class BasePackage {
 	private Date packageTimestamp;
 	private String packageOwner = "";
 	private String packageParentId;
+	private boolean allowReplyAll;
 	
 	/**
 	 * @returnType String
@@ -273,4 +274,11 @@ public class BasePackage {
 		this.packageParentId = packageParentId;
 	}
 
+	public boolean isAllowReplyAll() {
+		return allowReplyAll;
+	}
+
+	public void setAllowReplyAll(boolean allowReplyAll) {
+		this.allowReplyAll = allowReplyAll;
+	}
 }

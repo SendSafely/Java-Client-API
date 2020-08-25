@@ -1,5 +1,7 @@
 package com.sendsafely;
 
+import java.util.Date;
+
 /**
  * A Java Bean containing information about a file. 
  * Only the Getters should be used from this object, since the server will populate the object. 
@@ -13,6 +15,7 @@ public class File {
 	private long fileSize;
 	//private String createdBy;
 	private int parts;
+	private Date fileUploaded;
 	
 	public File(String fileId, String fileName, long fileSize, int parts){
 		this.fileId = fileId;
@@ -101,5 +104,15 @@ public class File {
 	public void setParts(int parts) {
 		this.parts = parts;
 	}
+
+	public Date getFileUploaded() {
+		return fileUploaded;
+	}
+
+	public void setFileUploaded(Date fileUploaded) {
+		this.fileUploaded = fileUploaded;
+	}
+
+	
 	
 }
