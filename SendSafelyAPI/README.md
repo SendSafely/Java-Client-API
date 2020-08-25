@@ -1,5 +1,5 @@
 # Installation
-The sendsafely-java-api jar is available from [GitHub](https://github.com/SendSafely/Java-Client-API/releases) or a [public maven repository](https://mvnrepository.com/artifact/com.sendsafely/sendsafely-java-api).
+The sendsafely-java-api jar is available from [GitHub](https://github.com/SendSafely/Java-Client-API/releases) or a [public maven repository](https://search.maven.org/artifact/com.sendsafely/sendsafely-java-api).
 
 Use the following dependency in your project to grab via Maven:
 ```
