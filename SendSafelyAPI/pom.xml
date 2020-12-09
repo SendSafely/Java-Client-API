@@ -6,7 +6,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 
 	<groupId>com.sendsafely</groupId>
 	<artifactId>sendsafely-java-api</artifactId>
-	<version>3.1.6</version>
+	<version>3.1.7</version>
 	<packaging>jar</packaging>
 	
 	<name>SendSafely Java Client API</name>

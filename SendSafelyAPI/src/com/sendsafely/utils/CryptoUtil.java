@@ -18,7 +18,6 @@ import java.util.Iterator;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -101,7 +100,8 @@ public class CryptoUtil
 		byte[] rawHmac = mac.doFinal(dataToSign.getBytes());
 		
 		// Hex encode and return
-		return DatatypeConverter.printHexBinary(rawHmac);
+		
+		return Hex.toHexString(rawHmac);
 	}
 	
 	public static String GenerateKeyCode() throws TokenGenerationFailedException
