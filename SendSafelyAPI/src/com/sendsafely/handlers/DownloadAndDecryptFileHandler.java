@@ -348,10 +348,10 @@ public class DownloadAndDecryptFileHandler extends BaseHandler
 		}
 	}
 	
-	private java.io.File createTempFile(File file) throws DownloadFileException
-	{
+	private java.io.File createTempFile(File file) throws DownloadFileException {
+		String filename = file.getFileName().replaceAll("[<>:\"/\\\\|?*]", "_");
 		try {
-			return java.io.File.createTempFile(file.getFileName(), "");
+			return java.io.File.createTempFile(filename, "");
 		} catch (IOException e) {
 			throw new DownloadFileException(e);
 		}

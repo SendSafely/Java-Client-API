@@ -274,10 +274,19 @@ public class BasePackage {
 		this.packageParentId = packageParentId;
 	}
 
+	/**
+	 * @description Returns boolean flag if the allowReplyAll flag is set on the package.
+	 * @returnType boolean
+	 * @return Flag representing the value of allow reply all.
+	 */
 	public boolean isAllowReplyAll() {
 		return allowReplyAll;
 	}
 
+	/**
+	 * @description Set internally by the API.
+	 * @param allowReplyAll
+	 */
 	public void setAllowReplyAll(boolean allowReplyAll) {
 		this.allowReplyAll = allowReplyAll;
 	}

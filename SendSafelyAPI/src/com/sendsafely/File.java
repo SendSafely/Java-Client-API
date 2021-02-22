@@ -105,10 +105,19 @@ public class File {
 		this.parts = parts;
 	}
 
+	/**
+	 * @description Returns the Date object representing when the file was uploaded
+	 * @returnType Date
+	 * @return A Date representing when the file was upload
+	 */
 	public Date getFileUploaded() {
 		return fileUploaded;
 	}
 
+	/**
+	 * @description Set internally by the API.
+	 * @param fileUploaded
+	 */
 	public void setFileUploaded(Date fileUploaded) {
 		this.fileUploaded = fileUploaded;
 	}

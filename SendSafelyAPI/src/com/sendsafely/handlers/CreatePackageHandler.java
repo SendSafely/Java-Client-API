@@ -3,12 +3,6 @@ package com.sendsafely.handlers;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.xml.bind.DatatypeConverter;
-
-import org.bouncycastle.util.encoders.Base64Encoder;
-import org.bouncycastle.util.encoders.UrlBase64;
-import org.bouncycastle.util.encoders.UrlBase64Encoder;
-
 import com.sendsafely.ContactGroup;
 import com.sendsafely.File;
 import com.sendsafely.Package;
@@ -17,7 +11,6 @@ import com.sendsafely.dto.request.CreatePackageRequest;
 import com.sendsafely.dto.response.CreatePackageResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.Endpoint;
-import com.sendsafely.enums.HTTPMethod;
 import com.sendsafely.exceptions.CreatePackageFailedException;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
