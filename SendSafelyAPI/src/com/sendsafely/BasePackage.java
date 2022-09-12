@@ -31,6 +31,7 @@ public class BasePackage {
 	private String packageOwner = "";
 	private String packageParentId;
 	private boolean allowReplyAll;
+	private boolean packageContainsMessage;
 	
 	/**
 	 * @returnType String
@@ -289,5 +290,18 @@ public class BasePackage {
 	 */
 	public void setAllowReplyAll(boolean allowReplyAll) {
 		this.allowReplyAll = allowReplyAll;
+	}
+
+	/**
+	 * @description Returns boolean flag indicating if the package contains an encrypted message.
+	 * @returnType boolean
+	 * @return Flag representing if the package contains an encrypted message.
+	 */
+	public boolean getPackageContainsMessage() {
+		return packageContainsMessage;
+	}
+
+	public void setPackageContainsMessage(boolean packageContainsMessage) {
+		this.packageContainsMessage = packageContainsMessage;
 	}
 }
