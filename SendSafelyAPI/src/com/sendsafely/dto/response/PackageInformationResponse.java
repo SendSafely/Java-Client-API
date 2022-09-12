@@ -29,6 +29,7 @@ public class PackageInformationResponse extends BaseResponse {
 	private String packageSender;
 	private String packageParentId;
 	private boolean allowReplyAll;
+	private boolean packageContainsMessage;
 	
 	public List<RecipientResponse> getRecipients() {
 		return recipients;
@@ -157,5 +158,7 @@ public class PackageInformationResponse extends BaseResponse {
 	public void setAllowReplyAll(boolean allowReplyAll) {
 		this.allowReplyAll = allowReplyAll;
 	}
+	public Boolean getPackageContainsMessage() { return packageContainsMessage; }
+	public void setPackageContainsMessage(Boolean packageContainsMessage) { this.packageContainsMessage = packageContainsMessage; }
 	
 }

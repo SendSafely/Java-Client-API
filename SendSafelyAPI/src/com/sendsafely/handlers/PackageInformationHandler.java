@@ -90,6 +90,7 @@ public class PackageInformationHandler extends BaseHandler
 		info.setPackageOwner(obj.getPackageSender());
 		info.setPackageParentId(obj.getPackageParentId());
 		info.setAllowReplyAll(obj.isAllowReplyAll());
+		info.setPackageContainsMessage(obj.getPackageContainsMessage());
 		return info;
 	}
 	
