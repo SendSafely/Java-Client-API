@@ -347,6 +347,7 @@ public class CryptoUtil
 
             // create an encrypted payload and set the public key on the data generator
             BcPGPDataEncryptorBuilder bcpgpdeb = new BcPGPDataEncryptorBuilder(PGPEncryptedData.AES_256);
+			bcpgpdeb.setWithIntegrityPacket(true);
             PGPEncryptedDataGenerator encryptGen = new PGPEncryptedDataGenerator(bcpgpdeb);
             encryptGen.addMethod(new BcPublicKeyKeyEncryptionMethodGenerator(key));
 
