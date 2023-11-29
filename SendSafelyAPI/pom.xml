@@ -6,7 +6,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 
 	<groupId>com.sendsafely</groupId>
 	<artifactId>sendsafely-java-api</artifactId>
-	<version>3.1.9</version>
+	<version>3.1.10</version>
 	<packaging>jar</packaging>
 	
 	<name>SendSafely Java Client API</name>
@@ -63,13 +63,13 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk15on</artifactId>
-			<version>1.70</version>
+			<artifactId>bcpg-jdk18on</artifactId>
+			<version>1.74</version>
 		</dependency>
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpg-jdk15on</artifactId>
-			<version>1.70</version>
+			<artifactId>bcpg-jdk18on</artifactId>
+			<version>1.74</version>
 		</dependency>
 	</dependencies>
 </project>
