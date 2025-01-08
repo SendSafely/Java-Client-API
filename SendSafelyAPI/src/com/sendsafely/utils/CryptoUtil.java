@@ -20,6 +20,8 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bouncycastle.bcpg.ArmoredOutputStream;
+import org.bouncycastle.bcpg.PublicKeyAlgorithmTags;
+import org.bouncycastle.bcpg.sig.KeyFlags;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.SHA256Digest;
@@ -32,7 +34,9 @@ import org.bouncycastle.openpgp.PGPEncryptedData;
 import org.bouncycastle.openpgp.PGPEncryptedDataGenerator;
 import org.bouncycastle.openpgp.PGPEncryptedDataList;
 import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPKeyFlags;
 import org.bouncycastle.openpgp.PGPKeyPair;
+import org.bouncycastle.openpgp.PGPKeyRingGenerator;
 import org.bouncycastle.openpgp.PGPLiteralData;
 import org.bouncycastle.openpgp.PGPLiteralDataGenerator;
 import org.bouncycastle.openpgp.PGPObjectFactory;
@@ -44,8 +48,11 @@ import org.bouncycastle.openpgp.PGPPublicKeyEncryptedData;
 import org.bouncycastle.openpgp.PGPPublicKeyRing;
 import org.bouncycastle.openpgp.PGPPublicKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSecretKey;
+import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPSignature;
+import org.bouncycastle.openpgp.PGPSignatureSubpacketGenerator;
+import org.bouncycastle.openpgp.PGPSignatureSubpacketVector;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.KeyFingerPrintCalculator;
 import org.bouncycastle.openpgp.operator.PBEDataDecryptorFactory;
@@ -121,28 +128,47 @@ public class CryptoUtil
 	}
 	
 	public static Keypair GenerateKeyPair() throws NoSuchAlgorithmException, PGPException, IOException{
-		
-		RSAKeyPairGenerator generator = new RSAKeyPairGenerator();
-		RSAKeyGenerationParameters params = new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), RsaKeySize, 12);
-		generator.init(params);
-		AsymmetricCipherKeyPair keyPair = generator.generateKeyPair();
+		AsymmetricCipherKeyPair keyPair = generateAsymmetricCipherKeyPair();
 		Keypair pair = Armor(keyPair, "no-reply@sendsafely.com");
 		return pair;
 	}
 	
 	private static Keypair Armor(AsymmetricCipherKeyPair keyPair, String email) throws PGPException, IOException, NoSuchAlgorithmException {
-		PGPKeyPair pgpKeyPair = new BcPGPKeyPair(PGPPublicKey.RSA_GENERAL, keyPair, new Date());
+		PGPKeyPair pgpPrimaryKey = new BcPGPKeyPair(PublicKeyAlgorithmTags.RSA_GENERAL, keyPair, new Date());
 		ByteArrayOutputStream memOut = new ByteArrayOutputStream(); // this is where we put the signed data
 		ArmoredOutputStream secretOut = new ArmoredOutputStream(memOut);
+
+		AsymmetricCipherKeyPair subKeyPair = generateAsymmetricCipherKeyPair();
+		PGPSignatureSubpacketGenerator subPackets = new PGPSignatureSubpacketGenerator();
+		subPackets.setKeyFlags(false, KeyFlags.SIGN_DATA | KeyFlags.CERTIFY_OTHER);
+		subPackets.setKeyExpirationTime(false, 0);
+		PGPKeyPair pgpSubKey = new BcPGPKeyPair(PublicKeyAlgorithmTags.RSA_GENERAL, subKeyPair, new Date());
+
 		PGPDigestCalculator sha1Calc = new JcaPGPDigestCalculatorProviderBuilder().build().get(PGPEncryptedData.AES_256);
-		BcPGPContentSignerBuilder builder = new BcPGPContentSignerBuilder(pgpKeyPair.getPublicKey().getAlgorithm(), PGPEncryptedData.AES_256);
-		PGPSecretKey secretKey = new PGPSecretKey(PGPSignature.DEFAULT_CERTIFICATION, pgpKeyPair, email, sha1Calc, null, null, builder, null);
+		BcPGPContentSignerBuilder builder = new BcPGPContentSignerBuilder(pgpPrimaryKey.getPublicKey().getAlgorithm(), PGPEncryptedData.AES_256);
+		PGPKeyRingGenerator pgpKeyRingGenerator = new PGPKeyRingGenerator(
+				PGPSignature.DEFAULT_CERTIFICATION,
+				pgpPrimaryKey,
+				email,
+				sha1Calc,
+				subPackets.generate(),
+				null,
+				builder,
+				null
+		);
+
+		subPackets = new PGPSignatureSubpacketGenerator();
+		subPackets.setKeyFlags(false, KeyFlags.ENCRYPT_COMMS | KeyFlags.ENCRYPT_STORAGE);
+		pgpKeyRingGenerator.addSubKey(pgpSubKey, subPackets.generate(), null);
+
+		PGPSecretKeyRing secretKey = pgpKeyRingGenerator.generateSecretKeyRing();
+		PGPPublicKeyRing publicKey = pgpKeyRingGenerator.generatePublicKeyRing();
 		secretKey.encode(secretOut);
 		secretOut.close();
 		ByteArrayOutputStream memPublicOut = new ByteArrayOutputStream();
 		ArmoredOutputStream publicOut = new ArmoredOutputStream(memPublicOut);
-		PGPPublicKey key = secretKey.getPublicKey();
-		key.encode((OutputStream) publicOut);
+
+		publicKey.encode((OutputStream) publicOut);
 		publicOut.close();
 		String privateKeyStr = memOut.toString();
 		String publicKeyStr = memPublicOut.toString();
@@ -150,6 +176,13 @@ public class CryptoUtil
 		pair.setPrivateKey(privateKeyStr);
 		pair.setPublicKey(publicKeyStr);
 		return pair;
+	}
+
+	private static AsymmetricCipherKeyPair generateAsymmetricCipherKeyPair() {
+		RSAKeyPairGenerator rsaKeyPairGenerator = new RSAKeyPairGenerator();
+		RSAKeyGenerationParameters params = new RSAKeyGenerationParameters(BigInteger.valueOf(0x10001), new SecureRandom(), RsaKeySize, 12);
+		rsaKeyPairGenerator.init(params);
+		return rsaKeyPairGenerator.generateKeyPair();
 	}
 
 	public static String PBKDF2(String token, String salt, int iterations)
@@ -336,7 +369,7 @@ public class CryptoUtil
                 Iterator kIt = kRing.getPublicKeys();
                 while (key == null && kIt.hasNext()) {
                     PGPPublicKey k = (PGPPublicKey) kIt.next();
-                    if (k.isEncryptionKey()) {
+                    if (k.isEncryptionKey() /*&& CanEncrypt(k.getSignatures()*/) { //Enable CanEncrypt check in future version of SDK
                         key = k;
                     }
                 }
@@ -387,6 +420,23 @@ public class CryptoUtil
 
         return encrypted;
     }
+
+	private static Boolean CanEncrypt(Iterator<PGPSignature> keySignatures) {
+		int keyFlags = 0;
+		for (Iterator<PGPSignature> it = keySignatures; it.hasNext(); ) {
+			PGPSignature signature = it.next();
+
+			PGPSignatureSubpacketVector subpacketVector = signature.getHashedSubPackets();
+			if (subpacketVector != null) {
+				keyFlags += signature.getHashedSubPackets().getKeyFlags();
+			}
+
+		}
+		Boolean isEncryptCommunication = (keyFlags & PGPKeyFlags.CAN_ENCRYPT_COMMS) == PGPKeyFlags.CAN_ENCRYPT_COMMS;
+		Boolean isEncryptStorage = (keyFlags & PGPKeyFlags.CAN_ENCRYPT_STORAGE) == PGPKeyFlags.CAN_ENCRYPT_STORAGE;
+
+		return isEncryptCommunication || isEncryptStorage;
+	}
 	
 	public static void decryptFile(InputStream input, OutputStream output, String decryptionKey, Progress progress) throws IOException, PGPException
 	{
