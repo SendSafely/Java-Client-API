@@ -1,75 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>com.sendsafely</groupId>
-	<artifactId>sendsafely-java-api</artifactId>
-	<version>3.1.10</version>
-	<packaging>jar</packaging>
-	
-	<name>SendSafely Java Client API</name>
-	<description>The SendSafely Client API allows programmatic access to SendSafely and provides a layer of abstraction from our REST API, which requires developers to perform several complex tasks in a correct manner. </description>
-	<url>https://developer.sendsafely.com</url>
-
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-		</license>
-	</licenses>
-	
-	<developers>
-		<developer>
-			<name>SendSafely</name>
-			<email>info@sendsafely.com</email>
-			<organization>SendSafely</organization>
-			<organizationUrl>https://www.sendsafely.com</organizationUrl>
-		</developer>
-	</developers>
-	
-	<issueManagement>
-    	<url>https://sendsafely.zendesk.com/hc/requests/new</url>
-  	</issueManagement>
-  
-	<scm>
-		<connection>scm:git:git://github.com/SendSafely/Java-Client-API.git</connection>
-		<developerConnection>scm:git:ssh://github.com/SendSafely/Java-Client-API.git</developerConnection>
-		<url>https://github.com/SendSafely/Java-Client-API</url>
-	</scm>
-	
-	<distributionManagement> 
-		<snapshotRepository> 
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url> 
-		</snapshotRepository> 
-		<repository> 
-			<id>ossrh</id> 
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url> 
-		</repository> 
-	</distributionManagement>
-		
-	<dependencies>
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.10.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.13.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpg-jdk18on</artifactId>
-			<version>1.74</version>
-		</dependency>
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpg-jdk18on</artifactId>
-			<version>1.74</version>
-		</dependency>
-	</dependencies>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sendsafely</groupId>
+  <artifactId>sendsafely-java-api</artifactId>
+  <version>3.1.11</version>
+  <name>SendSafely Java Client API</name>
+  <description>The SendSafely Client API allows programmatic access to SendSafely and provides a layer of abstraction from our REST API, which requires developers to perform several complex tasks in a correct manner.</description>
+  <url>https://developer.sendsafely.com</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>SendSafely</name>
+      <email>info@sendsafely.com</email>
+      <organization>SendSafely</organization>
+      <organizationUrl>https://www.sendsafely.com</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:git://github.com/SendSafely/Java-Client-API.git</connection>
+    <developerConnection>scm:git:ssh://github.com/SendSafely/Java-Client-API.git</developerConnection>
+    <url>https://github.com/SendSafely/Java-Client-API</url>
+  </scm>
+  <issueManagement>
+    <url>https://sendsafely.zendesk.com/hc/requests/new</url>
+  </issueManagement>
+  <dependencies>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10.1</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.14.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk18on</artifactId>
+      <version>1.79</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk18on</artifactId>
+      <version>1.79</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcutil-jdk18on</artifactId>
+      <version>1.79</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
 </project>
