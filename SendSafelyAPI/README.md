@@ -6,7 +6,7 @@ Use the following dependency in your project to grab via Maven:
 <dependency>
 	<groupId>com.sendsafely</groupId>
 	<artifactId>sendsafely-java-api</artifactId>
-	<version>3.1.11</version>
+	<version>3.1.12</version>
 </dependency>
 ```
 

@@ -369,11 +369,27 @@ public class CryptoUtil
                 Iterator kIt = kRing.getPublicKeys();
                 while (key == null && kIt.hasNext()) {
                     PGPPublicKey k = (PGPPublicKey) kIt.next();
-                    if (k.isEncryptionKey() /*&& CanEncrypt(k.getSignatures()*/) { //Enable CanEncrypt check in future version of SDK
+                    if (k.isEncryptionKey() && CanEncrypt(k.getSignatures())) {
                         key = k;
                     }
                 }
             }
+			// if no encrypt key was found then see if we can use the signing key.
+			// this is only to provide legacy support for incorrectly formatted keys that don't have an encryption key.
+			if (key == null) {
+				rIt = pgpPub.getKeyRings();
+				while (key == null && rIt.hasNext()) {
+					PGPPublicKeyRing kRing = (PGPPublicKeyRing) rIt.next();
+					Iterator kIt = kRing.getPublicKeys();
+					while (key == null && kIt.hasNext()) {
+						PGPPublicKey k = (PGPPublicKey) kIt.next();
+						if (k.isEncryptionKey()) { 
+							key = k;
+						}
+					}
+				}
+			}
+			// if the key is still null then throw an exception
             if (key == null) {
                 throw new IllegalArgumentException("Can't find encryption key in key ring.");
             }
