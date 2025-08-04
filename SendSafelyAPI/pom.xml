@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sendsafely</groupId>
   <artifactId>sendsafely-java-api</artifactId>
-  <version>3.1.11</version>
+  <version>3.1.12</version>
   <name>SendSafely Java Client API</name>
   <description>The SendSafely Client API allows programmatic access to SendSafely and provides a layer of abstraction from our REST API, which requires developers to perform several complex tasks in a correct manner.</description>
   <url>https://developer.sendsafely.com</url>
