@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import com.sendsafely.SendSafely;
 import com.sendsafely.connection.ConnectionManager;
 import com.sendsafely.credentials.CredentialsManager;
 import com.sendsafely.enums.HTTPMethod;
@@ -213,6 +214,7 @@ public class DefaultUploadManager implements UploadManager {
 	private void populateHeaders(String method, String contentType) throws SendFailedException
 	{
 		conn.addHeader("Content-Type", contentType);
+		conn.addHeader(SendSafely.SDK_VERSION_HEADER, SendSafely.SDK_VERSION_VALUE);
 		conn.setRequestMethod(method);
 	}
 

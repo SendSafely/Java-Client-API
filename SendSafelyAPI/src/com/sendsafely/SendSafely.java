@@ -12,6 +12,7 @@ import java.security.Security;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.openpgp.PGPException;
@@ -148,6 +149,27 @@ public class SendSafely {
 	protected double version = 0.3;
 	
 	private boolean ec2Proxy = false;
+
+	public static final String SDK_VERSION = loadVersion();
+	public static final String SDK_VERSION_HEADER = "ss-sdk-version";
+	public static final String SDK_VERSION_VALUE = "sendsafely-java/" + SDK_VERSION;
+
+	private static String loadVersion() {
+		try (InputStream is = SendSafely.class.getResourceAsStream("/version.properties")) {
+			if (is == null) {
+				return "unknown-missing";
+			}
+			Properties props = new Properties();
+			props.load(is);
+			String version = props.getProperty("sdk.version", "unknown-missing");
+			if (version.contains("${")) {
+				return "unknown-unfiltered";
+			}
+			return version;
+		} catch (IOException e) {
+			return "unknown-error";
+		}
+	}
 	
 	/**
 	 * @description Constructor to create a new SendSafely object.
@@ -1296,6 +1318,7 @@ public class SendSafely {
 		    connection.setRequestProperty("Content-Length", 
 		        Integer.toString(urlParameters.getBytes().length));
 		    connection.setRequestProperty("Content-Language", "en-US");  
+			connection.setRequestProperty(SDK_VERSION_HEADER, SDK_VERSION_VALUE);
 
 		    connection.setUseCaches(false);
 		    connection.setDoOutput(true);

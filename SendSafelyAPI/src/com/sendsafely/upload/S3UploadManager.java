@@ -10,6 +10,7 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import com.sendsafely.SendSafely;
 import com.sendsafely.connection.ConnectionManager;
 import com.sendsafely.credentials.CredentialsManager;
 import com.sendsafely.enums.HTTPMethod;
@@ -199,6 +200,7 @@ public class S3UploadManager implements UploadManager {
 	private void populateHeaders(String method, String contentType) throws SendFailedException
 	{
 		conn.addHeader("Content-Type", contentType);
+		conn.addHeader(SendSafely.SDK_VERSION_HEADER, SendSafely.SDK_VERSION_VALUE);
 		conn.setRequestMethod(method);
 	}
 
