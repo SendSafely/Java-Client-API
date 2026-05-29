@@ -215,6 +215,9 @@ public class DefaultUploadManager implements UploadManager {
 	{
 		conn.addHeader("Content-Type", contentType);
 		conn.addHeader(SendSafely.SDK_VERSION_HEADER, SendSafely.SDK_VERSION_VALUE);
+		if (SendSafely.CLIENT_VERSION != null) {
+			conn.addHeader(SendSafely.CLIENT_VERSION_HEADER, SendSafely.CLIENT_VERSION);
+		}
 		conn.setRequestMethod(method);
 	}
 

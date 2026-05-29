@@ -153,6 +153,12 @@ public class SendSafely {
 	public static final String SDK_VERSION = loadVersion();
 	public static final String SDK_VERSION_HEADER = "ss-sdk-version";
 	public static final String SDK_VERSION_VALUE = "sendsafely-java/" + SDK_VERSION;
+	public static final String CLIENT_VERSION_HEADER = "ss-client-version";
+	public static String CLIENT_VERSION = null;
+
+	public static void setClientVersion(String version) {
+		CLIENT_VERSION = version;
+	}
 
 	private static String loadVersion() {
 		try (InputStream is = SendSafely.class.getResourceAsStream("/version.properties")) {
@@ -1319,6 +1325,9 @@ public class SendSafely {
 		        Integer.toString(urlParameters.getBytes().length));
 		    connection.setRequestProperty("Content-Language", "en-US");  
 			connection.setRequestProperty(SDK_VERSION_HEADER, SDK_VERSION_VALUE);
+			if (CLIENT_VERSION != null) {
+				connection.setRequestProperty(CLIENT_VERSION_HEADER, CLIENT_VERSION);
+			}
 
 		    connection.setUseCaches(false);
 		    connection.setDoOutput(true);
