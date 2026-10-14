@@ -22,6 +22,11 @@ public class CreatePackageFailedException extends Exception
 		error = e.getMessage();
 	}
 	
+	public CreatePackageFailedException(String err, Exception e){
+		super(err, e);
+		error = err;
+	}
+	
 	public String getError()
 	{
 		return error;

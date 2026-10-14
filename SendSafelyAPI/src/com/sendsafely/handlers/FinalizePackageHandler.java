@@ -30,14 +30,8 @@ public class FinalizePackageHandler extends BaseHandler
 	}
 
 	public PackageURL makeRequest(String packageId, String keyCode) throws LimitExceededException, FinalizePackageFailedException, ApproverRequiredException {
-		// Get the public keys available for the users.
-        List<PublicKey> publicKeys = getPublicKeys(packageId);
-
-        // Encrypt the keycode with the public keys.
-        List<EncryptedKeycode> encryptedKeycodes = encryptKeycode(publicKeys, keyCode);
-
-        // Upload the keycodes
-        uploadKeycodes(packageId, encryptedKeycodes);
+        // Encrypt the keycode to every key on the package and upload it, before finalizing.
+        syncKeycodes(packageId, keyCode);
 
         // Finalize
         request.setPackageId(packageId);
@@ -104,31 +98,34 @@ public class FinalizePackageHandler extends BaseHandler
 		}
 	}
 	
-    protected void uploadKeycodes(String packageId, List<EncryptedKeycode> encryptedKeycodes) throws FinalizePackageFailedException {
-        UploadKeycodesHandler handler = new UploadKeycodesHandler(this.uploadManager);
+    protected void syncKeycodes(String packageId, String keyCode) throws FinalizePackageFailedException {
+        uploadKeycodes(packageId, encryptKeycode(getPublicKeys(packageId), keyCode));
+    }
+
+    protected List<PublicKey> getPublicKeys(String packageId) throws FinalizePackageFailedException {
         try {
-            handler.makeRequest(packageId, encryptedKeycodes);
+            return new KeycodeSyncHandler(this.uploadManager).getPublicKeys(packageId);
         } catch (UploadKeycodeException e) {
             throw new FinalizePackageFailedException(e);
         }
     }
 
-    protected List<PublicKey> getPublicKeys(String packageId) throws FinalizePackageFailedException {
-        GetPublicKeysHandler handler = new GetPublicKeysHandler(this.uploadManager);
+    protected List<EncryptedKeycode> encryptKeycode(List<PublicKey> publicKeys, String keyCode) throws FinalizePackageFailedException {
         try {
-            return handler.makeRequest(packageId);
-        } catch (PublicKeysFailedException e) {
+            return new KeycodeSyncHandler(this.uploadManager).encrypt(publicKeys, keyCode);
+        } catch (UploadKeycodeException e) {
             throw new FinalizePackageFailedException(e);
         }
     }
 
-    protected List<EncryptedKeycode> encryptKeycode(List<PublicKey> publicKeys, String keyCode) throws FinalizePackageFailedException {
-
-        EncryptKeycodeHandler handler = new EncryptKeycodeHandler(uploadManager);
-
+    protected void uploadKeycodes(String packageId, List<EncryptedKeycode> encryptedKeycodes) throws FinalizePackageFailedException {
+        if (encryptedKeycodes == null || encryptedKeycodes.isEmpty()) {
+            return;
+        }
+        
         try {
-            return handler.encrypt(publicKeys, keyCode);
-        } catch (PublicKeyEncryptionFailedException e) {
+            new UploadKeycodesHandler(this.uploadManager).makeRequest(packageId, encryptedKeycodes);
+        } catch (UploadKeycodeException e) {
             throw new FinalizePackageFailedException(e);
         }
     }

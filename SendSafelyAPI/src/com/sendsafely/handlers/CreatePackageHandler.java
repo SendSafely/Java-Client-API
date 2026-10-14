@@ -12,10 +12,12 @@ import com.sendsafely.dto.response.CreatePackageResponse;
 import com.sendsafely.enums.APIResponse;
 import com.sendsafely.enums.Endpoint;
 import com.sendsafely.exceptions.CreatePackageFailedException;
+import com.sendsafely.exceptions.DeletePackageException;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.PackageInformationFailedException;
 import com.sendsafely.exceptions.SendFailedException;
 import com.sendsafely.exceptions.TokenGenerationFailedException;
+import com.sendsafely.exceptions.UploadKeycodeException;
 import com.sendsafely.upload.UploadManager;
 import com.sendsafely.utils.CryptoUtil;
 
@@ -45,7 +47,14 @@ public class CreatePackageHandler extends BaseHandler
 		
 		if(response.getResponse() == APIResponse.SUCCESS) 
 		{
-			return convert(response);
+			Package info = convert(response);
+
+			if(this.isVDR)
+			{
+				syncWorkspaceKeycode(info);
+			}
+
+			return info;
 		}
 		else if(response.getResponse() == APIResponse.LIMIT_EXCEEDED)
 		{
@@ -85,6 +94,31 @@ public class CreatePackageHandler extends BaseHandler
 		}
 	}
 	
+	protected void syncWorkspaceKeycode(Package info) throws CreatePackageFailedException
+	{
+		try {
+			new KeycodeSyncHandler(uploadManager).syncPackageKeycode(info.getPackageId(), info.getKeyCode());
+		} catch (UploadKeycodeException e) {
+			if(deleteOrphanedWorkspace(info.getPackageId())) {
+				throw new CreatePackageFailedException(e);
+			}
+			
+			throw new CreatePackageFailedException(e.getMessage() + " (Workspace " + info.getPackageId()
+					+ " could not be deleted and cannot be opened)", e);
+		}
+	}
+
+	protected boolean deleteOrphanedWorkspace(String packageId)
+	{
+		try {
+			new DeletePackageHandler(uploadManager).makeRequest(packageId);
+			return true;
+		} catch (DeletePackageException cleanupFailed) {
+			// Swallowed so it cannot mask the upload error the caller needs to see.
+			return false;
+		}
+	}
+
 	protected Package getPackageInformation(CreatePackageResponse obj) throws CreatePackageFailedException
 	{	
 		Package info = new Package();

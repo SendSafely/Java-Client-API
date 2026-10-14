@@ -15,17 +15,27 @@ import com.sendsafely.enums.HTTPMethod;
 import com.sendsafely.exceptions.RecipientFailedException;
 import com.sendsafely.exceptions.LimitExceededException;
 import com.sendsafely.exceptions.SendFailedException;
+import com.sendsafely.exceptions.UploadKeycodeException;
 import com.sendsafely.upload.UploadManager;
 
 public class AddRecipientsHandler extends BaseHandler 
 {	
 	
 	private AddRecipientRequest request;
+	private String keyCode;
 	
 	public AddRecipientsHandler(UploadManager uploadManager, AddRecipientRequest request) {
 		super(uploadManager);
 		
 		this.request = request;
+	}
+	
+	public void setKeyCode(String keyCode) {
+		if(keyCode == null || keyCode.isEmpty()) {
+			throw new IllegalArgumentException("keyCode is required. Use addRecipients(packageId, emails) to add recipients without syncing Trusted Browser keys.");
+		}
+		
+		this.keyCode = keyCode;
 	}
 
 	public List<Recipient> makeRequest(String packageId) throws LimitExceededException, RecipientFailedException {
@@ -34,6 +44,8 @@ public class AddRecipientsHandler extends BaseHandler
 		
 		if(response.getResponse() == APIResponse.SUCCESS) 
 		{
+			syncRecipientKeycodes(packageId, response);
+			
 			List<Recipient> recipients = convert(response);
 			if(recipients.size() == 0) {
 				throw new RecipientFailedException("The Recipients could not be added");
@@ -59,6 +71,53 @@ public class AddRecipientsHandler extends BaseHandler
 		} catch (IOException e) {
 			throw new RecipientFailedException(e);
 		}
+	}
+	
+	protected void syncRecipientKeycodes(String packageId, AddRecipientsResponse obj) throws RecipientFailedException
+	{
+		if(this.keyCode == null) {
+			return;
+		}
+		
+		KeycodeSyncHandler keycodeSync = new KeycodeSyncHandler(uploadManager);
+		List<String> failed = new ArrayList<String>();
+		List<UploadKeycodeException> causes = new ArrayList<UploadKeycodeException>();
+		
+		for(RecipientResponse recipient : obj.getRecipients()) {
+			if(!shouldSync(recipient)) {
+				continue;
+			}
+			
+			try {
+				keycodeSync.syncRecipientKeycode(packageId, recipient.getRecipientId(), this.keyCode);
+			} catch (UploadKeycodeException e) {
+				failed.add(describe(recipient));
+				causes.add(e);
+			}
+		}
+		
+		if(!failed.isEmpty()) {
+			RecipientFailedException failure = new RecipientFailedException(
+					"Trusted Browser keycode sync failed for: " + String.join(", ", failed), causes.get(0));
+			for(int i = 1; i < causes.size(); i++) {
+				failure.addSuppressed(causes.get(i));
+			}
+			throw failure;
+		}
+	}
+	
+	private static boolean shouldSync(RecipientResponse recipient)
+	{
+		return recipient.getResponse() == APIResponse.SUCCESS
+				? KeycodeSyncHandler.shouldSyncRecipient(recipient.getRecipientId(), recipient.getCheckForPublicKeys())
+				: KeycodeSyncHandler.shouldSyncExistingRecipient(recipient.getRecipientId());
+	}
+	
+	private String describe(RecipientResponse recipient)
+	{
+		String email = recipient.getEmail();
+		
+		return (email == null || email.isEmpty()) ? recipient.getRecipientId() : email;
 	}
 	
 	protected List<Recipient> convert(AddRecipientsResponse obj)

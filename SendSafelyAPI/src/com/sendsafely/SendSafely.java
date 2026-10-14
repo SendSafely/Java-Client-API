@@ -273,7 +273,7 @@ public class SendSafely {
 	}
 	
 	/**
-	 * @description Adds a recipient to a given package.
+	 * @description Adds a recipient to a given package. On a Workspace, use addRecipient(packageId, email, keyCode) instead.
 	 * @param packageId The unique package id of the package for the add recipient operation.
 	 * @param email The recipient email to be added.
 	 * @returnType Recipient
@@ -284,6 +284,24 @@ public class SendSafely {
 	public Recipient addRecipient(String packageId, String email) throws LimitExceededException, RecipientFailedException
 	{
 		AddRecipientHandler handler = new AddRecipientHandler(uploadManager, new AddRecipientRequest(uploadManager.getJsonManager(), email));
+		return handler.addRecipient(packageId);
+	}
+
+	/**
+	 * @description Adds a recipient to a given package and encrypts the package keycode to that recipient's Trusted Browser keys. Use this when adding a Collaborator to a Workspace.
+	 * @param packageId The unique package id of the package for the add recipient operation.
+	 * @param email The recipient email to be added.
+	 * @param keyCode The package keycode, from Package.getKeyCode().
+	 * @returnType Recipient
+	 * @return A Recipient object containing information about the recipient.
+	 * @throws IllegalArgumentException If keyCode is null or empty.
+	 * @throws LimitExceededException
+	 * @throws RecipientFailedException If the recipient could not be added, or if the keycode sync failed. The recipient is not removed either way.
+	 */
+	public Recipient addRecipient(String packageId, String email, String keyCode) throws LimitExceededException, RecipientFailedException
+	{
+		AddRecipientHandler handler = new AddRecipientHandler(uploadManager, new AddRecipientRequest(uploadManager.getJsonManager(), email));
+		handler.setKeyCode(keyCode);
 		return handler.addRecipient(packageId);
 	}
 
@@ -302,7 +320,7 @@ public class SendSafely {
 	}
 	
 	/**
-	 * @description Adds a list of recipients to a given package.
+	 * @description Adds a list of recipients to a given package. On a Workspace, use addRecipients(packageId, emails, keyCode) instead.
 	 * @param packageId The unique package id of the package for the add recipient operation.
 	 * @param emails The list of recipients to be added.
 	 * @returnType List<Recipient>
@@ -314,6 +332,25 @@ public class SendSafely {
 	{
 		AddRecipientsRequest request = new AddRecipientsRequest(uploadManager.getJsonManager(), emails);
 		AddRecipientsHandler handler = new AddRecipientsHandler(uploadManager, request);
+		return handler.makeRequest(packageId);
+	}
+
+	/**
+	 * @description Adds a list of recipients to a given package and encrypts the package keycode to each recipient's Trusted Browser keys. Use this when adding Collaborators to a Workspace.
+	 * @param packageId The unique package id of the package for the add recipient operation.
+	 * @param emails The list of recipients to be added.
+	 * @param keyCode The package keycode, from Package.getKeyCode().
+	 * @returnType List<Recipient>
+	 * @return A list containing information about the recipients.
+	 * @throws IllegalArgumentException If keyCode is null or empty.
+	 * @throws LimitExceededException
+	 * @throws RecipientFailedException If no recipient could be added, or if a keycode sync failed. Recipients are not removed either way.
+	 */
+	public List<Recipient> addRecipients(String packageId, List<String> emails, String keyCode) throws LimitExceededException, RecipientFailedException
+	{
+		AddRecipientsRequest request = new AddRecipientsRequest(uploadManager.getJsonManager(), emails);
+		AddRecipientsHandler handler = new AddRecipientsHandler(uploadManager, request);
+		handler.setKeyCode(keyCode);
 		return handler.makeRequest(packageId);
 	}
 	
