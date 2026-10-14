@@ -25,6 +25,11 @@ public class GetPublicKeysHandler extends BaseHandler
         request = new GetPublicKeysRequest(uploadManager.getJsonManager());
 	}
 
+	public List<PublicKey> makeRequest(String packageId, String recipientId) throws PublicKeysFailedException {
+		this.request = new GetPublicKeysRequest(uploadManager.getJsonManager(), recipientId);
+		return makeRequest(packageId);
+	}
+
 	public List<PublicKey> makeRequest(String packageId) throws PublicKeysFailedException {
 		
 		request.setPackageId(packageId);

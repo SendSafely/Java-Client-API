@@ -9,6 +9,7 @@ public class AddRecipientResponse extends BaseResponse {
 	private String recipientId;
 	private String email;
 	private boolean approvalRequired;
+	private Boolean checkForPublicKeys;
 	private List<String> approvers;
     private List<Phonenumber> phonenumbers;
 	
@@ -29,6 +30,12 @@ public class AddRecipientResponse extends BaseResponse {
 	}
 	public void setApprovalRequired(boolean approvalRequired) {
 		this.approvalRequired = approvalRequired;
+	}
+	public Boolean getCheckForPublicKeys() {
+		return checkForPublicKeys;
+	}
+	public void setCheckForPublicKeys(Boolean checkForPublicKeys) {
+		this.checkForPublicKeys = checkForPublicKeys;
 	}
 	public List<String> getApprovers() {
 		return approvers;

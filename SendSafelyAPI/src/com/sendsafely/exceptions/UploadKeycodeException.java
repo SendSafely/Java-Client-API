@@ -18,7 +18,7 @@ public class UploadKeycodeException extends Exception
 	}
 
 	public UploadKeycodeException(Exception e){
-		super(e);
+		super(e.getMessage(), e);
 		error = e.getMessage();
 	}
 	

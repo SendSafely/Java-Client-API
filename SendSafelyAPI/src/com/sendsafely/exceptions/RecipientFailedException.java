@@ -22,6 +22,11 @@ public class RecipientFailedException extends Exception
 		error = e.getMessage();
 	}
 	
+	public RecipientFailedException(String err, Exception e){
+		super(err, e);
+		error = err;
+	}
+	
 	public String getError()
 	{
 		return error;
